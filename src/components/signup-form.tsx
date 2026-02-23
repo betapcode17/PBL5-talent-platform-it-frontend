@@ -43,8 +43,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'form'>
               </div>
               {/* Quote */}
               <p className='text-sm italic text-white/90 mb-4'>
-                "ITJobVN helped me land my Senior Dev role at a top fintech firm within 2 weeks. The platform is
-                incredibly efficient."
+                "TalentPlatformIT helped me land my Senior Dev role at a top fintech firm within 2 weeks. The platform
+                is incredibly efficient."
               </p>
               {/* Author */}
               <div className='flex items-center gap-3'>

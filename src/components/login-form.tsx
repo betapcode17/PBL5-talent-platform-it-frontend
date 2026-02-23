@@ -3,22 +3,97 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Briefcase, CheckCircle } from 'lucide-react'
+import { Briefcase, CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from 'react-router-dom'
+import { loginSchema, type LoginFormData } from '@/validators/loginSchema'
+import { loginApi } from '@/api/auth'
+import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/@types/auth'
+import { Alert, AlertDescription } from './ui/alert'
+import { useAuthStore } from '@/store/authStore'
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
+  const navigate = useNavigate()
+  // ========== ZUSTAND STORE ==========
+  const { setAuth, setLoading, setError, isShowPassword, setShowPassword, clearError, isLoading, error } =
+    useAuthStore()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  })
+
+  // Di chuyển onSubmit vào trong component
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      // 1. Clear error cũ và set loading
+      clearError()
+      setLoading(true)
+
+      // 2. Gọi API login
+      const response = await loginApi(data)
+      //3. Lưu thông tin vào store
+      setAuth(response.user, response.accessToken)
+
+      // 4. Redirect theo role
+      switch (response.user.role) {
+        case 'candidate':
+          navigate('/candidate/dashboard')
+          break
+        case 'employer':
+          navigate('/employer/dashboard')
+          break
+        case 'admin':
+          navigate('/admin/dashboard')
+          break
+        default:
+          navigate('/')
+      }
+    } catch (err) {
+      const axiosError = err as AxiosError<ApiErrorResponse>
+      const errorMessage = axiosError.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.'
+
+      console.error('[Login] Error:', errorMessage)
+      setError(errorMessage)
+    }
+  }
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className='overflow-hidden p-0'>
         <CardContent className='grid p-0 md:grid-cols-2'>
-          <form className='p-6 md:p-8'>
+          <form className='p-6 md:p-8' onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <div className='flex flex-col items-center gap-2 text-center'>
                 <h1 className='text-2xl font-bold'>Welcome back</h1>
                 <p className='text-muted-foreground text-balance'>Login to your Acme Inc account</p>
               </div>
+              {/* Hiển thị lỗi từ API */}
+              {error && (
+                <Alert variant='destructive'>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
               <Field>
                 <FieldLabel htmlFor='email'>Email</FieldLabel>
-                <Input id='email' type='email' placeholder='m@example.com' required />
+                <Input
+                  id='email'
+                  type='email'
+                  placeholder='m@example.com'
+                  {...register('email')}
+                  className={cn(errors.email && 'border-destructive')}
+                  disabled={isLoading}
+                  required
+                />
+                {errors.email && <p className='text-sm text-destructive'>{errors.email.message}</p>}
               </Field>
               <Field>
                 <div className='flex items-center'>
@@ -27,10 +102,37 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                     Forgot your password?
                   </a>
                 </div>
-                <Input id='password' type='password' required />
+                <div className='relative'>
+                  <Input
+                    id='password'
+                    type={isShowPassword ? 'text' : 'password'}
+                    placeholder='••••••••'
+                    {...register('password')}
+                    className={cn(errors.password && 'border-destructive', 'pr-10')}
+                    disabled={isLoading}
+                  />
+                  {/* Toggle show/hide password */}
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='icon'
+                    className='absolute right-0 top-0 h-full px-3 hover:bg-transparent'
+                    onClick={() => setShowPassword(!isShowPassword)}
+                    tabIndex={-1}
+                  >
+                    {isShowPassword ? (
+                      <EyeOff className='h-4 w-4 text-muted-foreground' />
+                    ) : (
+                      <Eye className='h-4 w-4 text-muted-foreground' />
+                    )}
+                  </Button>
+                </div>
+                {errors.password && <p className='text-sm text-destructive'>{errors.password.message}</p>}
               </Field>
               <Field>
-                <Button type='submit'>Login</Button>
+                <Button type='submit' disabled={isLoading}>
+                  Login
+                </Button>
               </Field>
               <FieldSeparator className='*:data-[slot=field-separator-content]:bg-card'>
                 Or continue with

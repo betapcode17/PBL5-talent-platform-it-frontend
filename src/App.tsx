@@ -1,11 +1,14 @@
+import { BrowserRouter } from 'react-router-dom'
 import './App.css'
-import { SignupForm } from './components/signup-form'
+import { LoginForm } from './components/login-form'
 
 function App() {
   return (
-    <div className='flex min-h-screen items-center justify-center bg-background p-4'>
-      <SignupForm className='w-full max-w-4xl' />
-    </div>
+    <BrowserRouter>
+      <div className='flex min-h-screen items-center justify-center bg-background p-4'>
+        <LoginForm className='w-full max-w-4xl' />
+      </div>
+    </BrowserRouter>
   )
 }
 

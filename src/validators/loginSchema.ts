@@ -1,0 +1,9 @@
+import { z } from 'zod'
+
+export const loginSchema = z.object({
+  email: z.string().min(1, 'Email không được để trống').email('Email không hợp lệ'),
+  password: z.string().min(1, 'Mật khẩu không được để trống').min(6, 'Mật khẩu tối thiểu 6 ký tự')
+})
+
+// Export type từ schema
+export type LoginFormData = z.infer<typeof loginSchema>

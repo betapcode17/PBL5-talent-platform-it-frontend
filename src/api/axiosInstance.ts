@@ -2,7 +2,7 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'http://localhost:4000',
   headers: {
     'Content-Type': 'application/json'
   },
@@ -36,15 +36,19 @@ axiosInstance.interceptors.response.use(
   },
   async (error: AxiosError) => {
     const status = error.response?.status
+    const requestUrl = error.config?.url
 
-    //// Nếu lỗi 401 (token hết hạn hoặc không hợp lệ)
-    if (status === 401) {
+    console.error(`[API Error] Status: ${status}, URL: ${requestUrl}`)
+
+    // Nếu lỗi 401 (token hết hạn hoặc không hợp lệ)
+    // CHỈ redirect nếu KHÔNG phải đang ở trang login
+    if (status === 401 && !requestUrl?.includes('/auth/login')) {
       console.warn('[API] Unauthorized - Redirecting to login')
+      // Xóa token và redirect về trang login
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('auth-storage')
+      window.location.href = '/login'
     }
-    // Xóa token và redirect về trang login
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('auth-storage')
-    window.location.href = '/login'
 
     // Nếu lỗi 403 (không có quyền)
     if (status === 403) {

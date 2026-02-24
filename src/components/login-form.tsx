@@ -8,17 +8,18 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 import { loginSchema, type LoginFormData } from '@/validators/loginSchema'
-import { loginApi } from '@/api/auth'
-import type { AxiosError } from 'axios'
-import type { ApiErrorResponse } from '@/@types/auth'
 import { Alert, AlertDescription } from './ui/alert'
 import { useAuthStore } from '@/store/authStore'
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
+  console.log('[LoginForm] Component rendered')
+
   const navigate = useNavigate()
   // ========== ZUSTAND STORE ==========
-  const { setAuth, setLoading, setError, isShowPassword, setShowPassword, clearError, isLoading, error } =
-    useAuthStore()
+  const { login, isShowPassword, setShowPassword, isLoading, error } = useAuthStore()
+
+  console.log('[LoginForm] Current state - isLoading:', isLoading, '| error:', error)
+
   const {
     register,
     handleSubmit,
@@ -31,38 +32,31 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     }
   })
 
-  // Di chuyển onSubmit vào trong component
+  // Debug validation errors
+  if (Object.keys(errors).length > 0) {
+    console.log('[LoginForm] Validation errors:', errors)
+  }
+
+  // Submit handler - gọi login từ store và handle navigation
   const onSubmit = async (data: LoginFormData) => {
-    try {
-      // 1. Clear error cũ và set loading
-      clearError()
-      setLoading(true)
+    const user = await login(data)
 
-      // 2. Gọi API login
-      const response = await loginApi(data)
-      //3. Lưu thông tin vào store
-      setAuth(response.user, response.accessToken)
-
-      // 4. Redirect theo role
-      switch (response.user.role) {
-        case 'candidate':
-          navigate('/candidate/dashboard')
+    // Nếu login thành công, redirect theo role
+    if (user) {
+      console.log('[LoginForm] Login successful, redirecting based on role:', user.role)
+      switch (user.role) {
+        case 'SEEKER':
+          navigate('/seeker/dashboard')
           break
-        case 'employer':
+        case 'EMPLOYER':
           navigate('/employer/dashboard')
           break
-        case 'admin':
+        case 'ADMIN':
           navigate('/admin/dashboard')
           break
         default:
           navigate('/')
       }
-    } catch (err) {
-      const axiosError = err as AxiosError<ApiErrorResponse>
-      const errorMessage = axiosError.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.'
-
-      console.error('[Login] Error:', errorMessage)
-      setError(errorMessage)
     }
   }
 
@@ -76,12 +70,14 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                 <h1 className='text-2xl font-bold'>Welcome back</h1>
                 <p className='text-muted-foreground text-balance'>Login to your Acme Inc account</p>
               </div>
+
               {/* Hiển thị lỗi từ API */}
               {error && (
                 <Alert variant='destructive'>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
+
               <Field>
                 <FieldLabel htmlFor='email'>Email</FieldLabel>
                 <Input

@@ -10,12 +10,12 @@ export interface RegisterRequest {
   email: string
   password: string
   confirmPassword: string
-  role: 'candidate' | 'employer' | 'admin'
+  role: 'SEEKER' | 'EMPLOYER' | 'ADMIN'
 }
 
 export interface LoginResponse {
-  accessToken: string
-  refreshToken?: string
+  access_token: string
+  refresh_token?: string
   user: User
 }
 

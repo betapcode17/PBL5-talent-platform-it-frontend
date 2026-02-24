@@ -11,13 +11,13 @@ export default function LoginPage() {
   useEffect(() => {
     if (isAuthenticated && user) {
       switch (user.role) {
-        case 'candidate':
-          navigate('/candidate/dashboard')
+        case 'SEEKER':
+          navigate('/seeker/dashboard')
           break
-        case 'employer':
+        case 'EMPLOYER':
           navigate('/employer/dashboard')
           break
-        case 'admin':
+        case 'ADMIN':
           navigate('/admin/dashboard')
           break
         default:

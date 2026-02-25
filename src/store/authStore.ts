@@ -1,10 +1,9 @@
 import type { User } from '@/@types/user'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { loginApi, logoutApi } from '@/api/auth'
-import type { LoginFormData } from '@/validators'
+import { loginApi, logoutApi, registerApi } from '@/api/auth'
 import type { AxiosError } from 'axios'
-import type { ApiErrorResponse } from '@/@types/auth'
+import type { ApiErrorResponse, LoginRequest, RegisterRequest } from '@/@types/auth'
 
 interface AuthState {
   // State
@@ -20,7 +19,8 @@ interface AuthState {
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   setShowPassword: (isShowPassword: boolean) => void
-  login: (data: LoginFormData) => Promise<User | null>
+  login: (data: LoginRequest) => Promise<User | null>
+  register: (data: RegisterRequest) => Promise<void>
   logout: () => Promise<void>
   clearError: () => void
 }
@@ -130,7 +130,35 @@ export const useAuthStore = create<AuthState>()(
           return null
         }
       },
+      //register
+      register: async (data) => {
+        console.log('========== REGISTER DEBUG ==========')
+        console.log('[AuthStore] REGISTER called with:', data.email)
+        try {
+          set({ error: null, isLoading: true })
+          console.log('[AuthStore] isLoading set to true, calling API...')
 
+          console.log('[AuthStore] Calling registerApi...')
+          const response = await registerApi(data)
+          console.log('[AuthStore] API Response:', response)
+          console.log('[AuthStore] Message:', response.message)
+          set({ isLoading: false, error: null })
+          console.log('========== END REGISTER DEBUG ==========')
+        } catch (err) {
+          console.log('========== REGISTER ERROR ==========')
+          console.error('[AuthStore] Raw error:', err)
+          const axiosError = err as AxiosError<ApiErrorResponse>
+          console.error('[AuthStore] Response status:', axiosError.response?.status)
+          console.error('[AuthStore] Response data:', axiosError.response?.data)
+          const errorMessage = axiosError.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.'
+
+          console.error('[AuthStore] Error message:', errorMessage)
+          set({ error: errorMessage, isLoading: false })
+          console.log('========== END REGISTER DEBUG ==========')
+          // Throw error để component có thể catch
+          throw new Error(errorMessage)
+        }
+      },
       // Logout: clear tất cả state và gọi API
       logout: async () => {
         console.log('[AuthStore] logout called')

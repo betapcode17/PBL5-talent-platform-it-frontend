@@ -1,4 +1,4 @@
-import type { LoginRequest, LoginResponse } from '@/@types/auth'
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '@/@types/auth'
 import axiosInstance from './axiosInstance'
 import type { User } from '@/@types/user'
 
@@ -19,4 +19,10 @@ export const getMeApi = async (): Promise<User> => {
 // logout
 export const logoutApi = async (): Promise<void> => {
   await axiosInstance.post('auth/logout')
+}
+
+// register
+export const registerApi = async (data: RegisterRequest): Promise<RegisterResponse> => {
+  const response = await axiosInstance.post<RegisterResponse>('auth/register', data)
+  return response.data
 }

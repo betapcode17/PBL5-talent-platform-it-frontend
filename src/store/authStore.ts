@@ -1,7 +1,7 @@
 import type { User } from '@/@types/user'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { loginApi, logoutApi, registerApi } from '@/api/auth'
+import { googleLoginApi, loginApi, logoutApi, registerApi } from '@/api/auth'
 import type { AxiosError } from 'axios'
 import type { ApiErrorResponse, LoginRequest, RegisterRequest } from '@/@types/auth'
 
@@ -20,6 +20,7 @@ interface AuthState {
   setError: (error: string | null) => void
   setShowPassword: (isShowPassword: boolean) => void
   login: (data: LoginRequest) => Promise<User | null>
+  loginWithGoogle: (code: string) => Promise<User | null>
   register: (data: RegisterRequest) => Promise<void>
   logout: () => Promise<void>
   clearError: () => void
@@ -128,6 +129,38 @@ export const useAuthStore = create<AuthState>()(
           set({ error: errorMessage, isLoading: false })
           console.log('========== END LOGIN DEBUG ==========')
           return null
+        }
+      },
+      //
+      loginWithGoogle: async (credential: string) => {
+        console.log('[AuthStore] loginWithGoogle called with credential')
+        set({ error: null, isLoading: true })
+
+        try {
+          const response = await googleLoginApi(credential)
+          console.log('[AuthStore] loginWithGoogle success:', response)
+
+          localStorage.setItem('accessToken', response.access_token)
+
+          set({
+            user: response.user,
+            accessToken: response.access_token,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null
+          })
+
+          return response.user
+        } catch (err) {
+          console.error('[AuthStore] Raw error:', err)
+          const axiosError = err as AxiosError<ApiErrorResponse>
+          console.error('[AuthStore] Response status:', axiosError.response?.status)
+          console.error('[AuthStore] Response data:', axiosError.response?.data)
+          const errorMessage = axiosError.response?.data?.message || 'Đăng nhập Google thất bại. Vui lòng thử lại.'
+
+          console.error('[AuthStore] Error message:', errorMessage)
+          set({ error: errorMessage, isLoading: false })
+          throw new Error(errorMessage)
         }
       },
       //register

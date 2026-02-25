@@ -26,3 +26,11 @@ export const registerApi = async (data: RegisterRequest): Promise<RegisterRespon
   const response = await axiosInstance.post<RegisterResponse>('auth/register', data)
   return response.data
 }
+
+// google login api - send credential (idToken) from Google One Tap
+export const googleLoginApi = async (credential: string): Promise<LoginResponse> => {
+  console.log('[authApi] googleLoginApi called with credential')
+  const response = await axiosInstance.post<LoginResponse>('/auth/google', { credential })
+  console.log('[authApi] googleLoginApi response:', response.data)
+  return response.data
+}

@@ -161,3 +161,6 @@ export const registerSchema =
         return
       }
     })
+
+// Export type từ schema
+export type RegisterFormData = z.infer<typeof registerSchema>

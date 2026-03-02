@@ -1,8 +1,10 @@
 // src/lib/axios.ts
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
+const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:4000',
+  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json'
   },

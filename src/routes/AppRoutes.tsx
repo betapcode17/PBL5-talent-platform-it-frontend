@@ -3,8 +3,9 @@ import { Suspense, lazy } from 'react'
 import { ProtectedRoute } from './ProtectedRoute'
 
 // Lazy load pages
-const LoginPage = lazy(() => import('@/pages/LoginPage'))
-const RegisterPage = lazy(() => import('@/pages/RegisterPage'))
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
+const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
+const GoogleCallback = lazy(() => import('@/pages/auth/GoogleCallback'))
 const SeekerDashboard = lazy(() => import('@/pages/seeker/Dashboard'))
 const EmployerDashboard = lazy(() => import('@/pages/employer/Dashboard'))
 
@@ -23,6 +24,8 @@ export function AppRoutes() {
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
 
+        {/* Google OAuth Callback */}
+        <Route path='/auth/google/callback' element={<GoogleCallback />} />
         {/* Candidate/Seeker Routes */}
         <Route
           path='/seeker/*'

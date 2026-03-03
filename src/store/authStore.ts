@@ -1,7 +1,7 @@
 import type { User } from '@/@types/user'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { googleLoginApi, loginApi, logoutApi, registerApi } from '@/api/auth'
+import { forgotPasswordApi, googleLoginApi, loginApi, logoutApi, registerApi, resetPasswordApi } from '@/api/auth'
 import type { AxiosError } from 'axios'
 import type { ApiErrorResponse, LoginRequest, RegisterRequest } from '@/@types/auth'
 
@@ -13,12 +13,30 @@ interface AuthState {
   isLoading: boolean
   isShowPassword: boolean
   error: string | null
+  forgotEmail: string
+  forgotLoading: boolean
+  forgotError: string
+  forgotSuccess: boolean
+  resetNewPassword: string
+  resetConfirmPassword: string
+  resetLoading: boolean
+  resetError: string
+  resetSuccess: boolean
 
   // Actions
   setAuth: (user: User, token: string) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   setShowPassword: (isShowPassword: boolean) => void
+  setForgotEmail: (email: string) => void
+  setForgotSuccess: (success: boolean) => void
+  clearForgotState: () => void
+  submitForgotPassword: () => Promise<void>
+  setResetNewPassword: (password: string) => void
+  setResetConfirmPassword: (password: string) => void
+  setResetError: (error: string) => void
+  clearResetState: () => void
+  submitResetPassword: (token: string | null) => Promise<boolean>
   login: (data: LoginRequest) => Promise<User | null>
   loginWithGoogle: (code: string) => Promise<User | null>
   register: (data: RegisterRequest) => Promise<void>
@@ -37,6 +55,15 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       isShowPassword: false,
       error: null,
+      forgotEmail: '',
+      forgotLoading: false,
+      forgotError: '',
+      forgotSuccess: false,
+      resetNewPassword: '',
+      resetConfirmPassword: '',
+      resetLoading: false,
+      resetError: '',
+      resetSuccess: false,
 
       // action
 
@@ -82,6 +109,110 @@ export const useAuthStore = create<AuthState>()(
       setShowPassword: (showPassword) => {
         console.log('[AuthStore] setShowPassword:', showPassword)
         set({ isShowPassword: showPassword })
+      },
+
+      setForgotEmail: (email) => {
+        set({ forgotEmail: email })
+      },
+
+      setForgotSuccess: (success) => {
+        set({ forgotSuccess: success })
+      },
+
+      clearForgotState: () => {
+        set({
+          forgotEmail: '',
+          forgotLoading: false,
+          forgotError: '',
+          forgotSuccess: false
+        })
+      },
+
+      submitForgotPassword: async () => {
+        const { forgotEmail } = useAuthStore.getState()
+        set({ forgotError: '', forgotLoading: true })
+
+        if (!forgotEmail) {
+          set({ forgotError: 'Vui lòng nhập email', forgotLoading: false })
+          return
+        }
+
+        try {
+          await forgotPasswordApi({ email: forgotEmail })
+          set({ forgotSuccess: true, forgotEmail: '' })
+        } catch (err) {
+          const axiosError = err as AxiosError<ApiErrorResponse>
+          const errorMessage = axiosError.response?.data?.message || 'Không thể gửi email reset password'
+          set({ forgotError: errorMessage })
+        } finally {
+          set({ forgotLoading: false })
+        }
+      },
+
+      setResetNewPassword: (password) => {
+        set({ resetNewPassword: password })
+      },
+
+      setResetConfirmPassword: (password) => {
+        set({ resetConfirmPassword: password })
+      },
+
+      setResetError: (error) => {
+        set({ resetError: error })
+      },
+
+      clearResetState: () => {
+        set({
+          resetNewPassword: '',
+          resetConfirmPassword: '',
+          resetLoading: false,
+          resetError: '',
+          resetSuccess: false
+        })
+      },
+
+      submitResetPassword: async (token) => {
+        const { resetNewPassword, resetConfirmPassword } = useAuthStore.getState()
+        set({ resetError: '' })
+
+        if (!resetNewPassword || !resetConfirmPassword) {
+          set({ resetError: 'Vui lòng nhập đầy đủ mật khẩu' })
+          return false
+        }
+
+        if (resetNewPassword.length < 8) {
+          set({ resetError: 'Mật khẩu phải có ít nhất 8 ký tự' })
+          return false
+        }
+
+        if (resetNewPassword !== resetConfirmPassword) {
+          set({ resetError: 'Mật khẩu nhập lại không khớp' })
+          return false
+        }
+
+        if (!token) {
+          set({ resetError: 'Token reset không tồn tại' })
+          return false
+        }
+
+        set({ resetLoading: true })
+
+        try {
+          await resetPasswordApi({ token, new_password: resetNewPassword })
+          set({
+            resetSuccess: true,
+            resetNewPassword: '',
+            resetConfirmPassword: ''
+          })
+          return true
+        } catch (err) {
+          const axiosError = err as AxiosError<ApiErrorResponse>
+          const errorMessage = axiosError.response?.data?.message || 'Không thể reset mật khẩu'
+          set({ resetError: errorMessage })
+          return false
+        } finally {
+          set({ resetLoading: false })
+        }
       },
 
       // Login: gọi API và cập nhật state
@@ -214,7 +345,16 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
           isShowPassword: false,
-          error: null
+          error: null,
+          forgotEmail: '',
+          forgotLoading: false,
+          forgotError: '',
+          forgotSuccess: false,
+          resetNewPassword: '',
+          resetConfirmPassword: '',
+          resetLoading: false,
+          resetError: '',
+          resetSuccess: false
         })
         console.log('[AuthStore] User logged out, state cleared')
       }

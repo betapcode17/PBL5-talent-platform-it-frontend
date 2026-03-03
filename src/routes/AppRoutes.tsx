@@ -5,7 +5,10 @@ import { ProtectedRoute } from './ProtectedRoute'
 // Lazy load pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
+const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('@/pages/auth/ResetPasswordPage'))
 const GoogleCallback = lazy(() => import('@/pages/auth/GoogleCallback'))
+const SocialCallback = lazy(() => import('@/pages/auth/SocialCallback'))
 const SeekerDashboard = lazy(() => import('@/pages/seeker/Dashboard'))
 const EmployerDashboard = lazy(() => import('@/pages/employer/Dashboard'))
 
@@ -23,9 +26,16 @@ export function AppRoutes() {
         {/* Public Routes */}
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
+        <Route path='/forgot-password' element={<ForgotPasswordPage />} />
+        <Route path='/auth/forgot-password' element={<ForgotPasswordPage />} />
+        <Route path='/reset-password' element={<ResetPasswordPage />} />
+        <Route path='/reset-password/:token' element={<ResetPasswordPage />} />
+        <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
+        <Route path='/auth/reset-password/:token' element={<ResetPasswordPage />} />
 
         {/* Google OAuth Callback */}
         <Route path='/auth/google/callback' element={<GoogleCallback />} />
+        <Route path='/auth/:provider/callback' element={<SocialCallback />} />
         {/* Candidate/Seeker Routes */}
         <Route
           path='/seeker/*'

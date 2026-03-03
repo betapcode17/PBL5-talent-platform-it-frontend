@@ -7,6 +7,7 @@ import type { User } from '@/@types/user'
 export const useAuth = () => {
   const navigate = useNavigate()
   const googleAllowedOrigin = import.meta.env.VITE_GOOGLE_ALLOWED_ORIGIN || 'http://localhost:3000'
+  const apiBaseUrl = (import.meta.env.VITE_API_URL as string)?.replace(/\/$/, '') || 'http://localhost:4000'
   const googleInitialized = useRef(false)
   const googleScriptLoading = useRef<Promise<void> | null>(null)
   const {
@@ -143,11 +144,54 @@ export const useAuth = () => {
       scope: 'openid email profile',
       nonce: crypto.randomUUID(),
       state,
-      prompt: 'select_account'
+      prompt: 'select_account consent',
+      max_age: '0'
     })
 
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
   }, [googleAllowedOrigin])
+
+  const startSocialOAuthLogin = useCallback(
+    (provider: 'github' | 'facebook') => {
+      const state = crypto.randomUUID()
+      sessionStorage.setItem(`${provider}_oauth_state`, state)
+
+      const redirectUri = `${window.location.origin}/auth/${provider}/callback`
+      const params = new URLSearchParams({
+        redirect_uri: redirectUri,
+        state
+      })
+
+      window.location.href = `${apiBaseUrl}/auth/${provider}?${params.toString()}`
+    },
+    [apiBaseUrl]
+  )
+
+  const handleGithubLogin = useCallback(() => {
+    const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID as string | undefined
+
+    if (!githubClientId) {
+      console.error('[useAuth] Missing VITE_GITHUB_CLIENT_ID')
+      return
+    }
+
+    const state = crypto.randomUUID()
+    sessionStorage.setItem('github_oauth_state', state)
+
+    const redirectUri = `${window.location.origin}/auth/github/callback`
+    const params = new URLSearchParams({
+      client_id: githubClientId,
+      redirect_uri: redirectUri,
+      scope: 'read:user user:email',
+      state
+    })
+
+    window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`
+  }, [])
+
+  const handleFacebookLogin = useCallback(() => {
+    startSocialOAuthLogin('facebook')
+  }, [startSocialOAuthLogin])
 
   const handleLogout = useCallback(async () => {
     console.log('[useAuth] handleLogout called')
@@ -176,6 +220,8 @@ export const useAuth = () => {
     redirectByRole,
     initGoogleSignIn,
     handleGoogleLogin,
+    handleGithubLogin,
+    handleFacebookLogin,
     handleGoogleCredential,
     setShowPassword,
     toggleShowPassword

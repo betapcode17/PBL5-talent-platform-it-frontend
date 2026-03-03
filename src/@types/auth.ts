@@ -24,6 +24,32 @@ export interface RegisterResponse {
   user: User
 }
 
+export type SocialLoginBackendResponse = {
+  message?: string
+  accessToken: string
+  refreshToken: string
+  user: {
+    id: number
+    email: string
+    full_name: string
+    role: User['role']
+    user_image?: string
+  }
+}
+
+export interface ForgotPasswordRequest {
+  email: string
+}
+
+export interface ResetPasswordRequest {
+  token: string
+  new_password: string
+}
+
+export interface PasswordResetResponse {
+  message: string
+}
+
 // Response lỗi từ API
 export interface ApiErrorResponse {
   statusCode: number

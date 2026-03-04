@@ -28,7 +28,7 @@ const ResetPasswordPage = () => {
 
   useEffect(() => {
     if (!token) {
-      setResetError('Link reset mật khẩu không hợp lệ')
+      setResetError('Invalid password reset link')
     }
   }, [setResetError, token])
 
@@ -51,10 +51,8 @@ const ResetPasswordPage = () => {
               <Check className='h-8 w-8 text-green-600' />
             </div>
           </div>
-          <h2 className='text-2xl font-bold mb-2'>Đặt lại mật khẩu thành công</h2>
-          <p className='text-muted-foreground mb-6'>
-            Mật khẩu của bạn đã được thay đổi. Đang chuyển hướng đến trang đăng nhập...
-          </p>
+          <h2 className='text-2xl font-bold mb-2'>Password reset successful</h2>
+          <p className='text-muted-foreground mb-6'>Your password has been changed. Redirecting to login page...</p>
         </Card>
       </div>
     )
@@ -65,8 +63,8 @@ const ResetPasswordPage = () => {
       <Card className='w-full max-w-md p-8'>
         <div className='text-center mb-8'>
           <Lock className='h-12 w-12 mx-auto text-primary mb-4' />
-          <h1 className='text-2xl font-bold'>Đặt lại mật khẩu</h1>
-          <p className='text-muted-foreground mt-2'>Nhập mật khẩu mới của bạn</p>
+          <h1 className='text-2xl font-bold'>Reset password</h1>
+          <p className='text-muted-foreground mt-2'>Enter your new password</p>
         </div>
 
         {resetError && (
@@ -78,25 +76,25 @@ const ResetPasswordPage = () => {
 
         <form onSubmit={handleSubmit} className='space-y-6'>
           <div>
-            <Label htmlFor='password'>Mật khẩu mới</Label>
+            <Label htmlFor='password'>New password</Label>
             <Input
               id='password'
               type='password'
-              placeholder='Nhập mật khẩu mới'
+              placeholder='Enter new password'
               value={resetNewPassword}
               onChange={(e) => setResetNewPassword(e.target.value)}
               disabled={resetLoading || !token}
               className='mt-2'
             />
-            <p className='text-xs text-muted-foreground mt-1'>Tối thiểu 8 ký tự</p>
+            <p className='text-xs text-muted-foreground mt-1'>Minimum 8 characters</p>
           </div>
 
           <div>
-            <Label htmlFor='confirm'>Xác nhận mật khẩu</Label>
+            <Label htmlFor='confirm'>Confirm password</Label>
             <Input
               id='confirm'
               type='password'
-              placeholder='Nhập lại mật khẩu'
+              placeholder='Re-enter password'
               value={resetConfirmPassword}
               onChange={(e) => setResetConfirmPassword(e.target.value)}
               disabled={resetLoading || !token}
@@ -105,13 +103,13 @@ const ResetPasswordPage = () => {
           </div>
 
           <Button type='submit' className='w-full' disabled={resetLoading || !token}>
-            {resetLoading ? 'Đang đặt lại...' : 'Đặt lại mật khẩu'}
+            {resetLoading ? 'Resetting...' : 'Reset password'}
           </Button>
         </form>
 
         <div className='mt-6 text-center'>
           <button onClick={() => navigate('/login')} className='text-primary hover:underline text-sm font-medium'>
-            Quay lại đăng nhập
+            Back to login
           </button>
         </div>
       </Card>

@@ -133,7 +133,7 @@ export const useAuthStore = create<AuthState>()(
         set({ forgotError: '', forgotLoading: true })
 
         if (!forgotEmail) {
-          set({ forgotError: 'Vui lòng nhập email', forgotLoading: false })
+          set({ forgotError: 'Please enter your email', forgotLoading: false })
           return
         }
 
@@ -142,7 +142,7 @@ export const useAuthStore = create<AuthState>()(
           set({ forgotSuccess: true, forgotEmail: '' })
         } catch (err) {
           const axiosError = err as AxiosError<ApiErrorResponse>
-          const errorMessage = axiosError.response?.data?.message || 'Không thể gửi email reset password'
+          const errorMessage = axiosError.response?.data?.message || 'Unable to send password reset email'
           set({ forgotError: errorMessage })
         } finally {
           set({ forgotLoading: false })
@@ -176,29 +176,38 @@ export const useAuthStore = create<AuthState>()(
         set({ resetError: '' })
 
         if (!resetNewPassword || !resetConfirmPassword) {
-          set({ resetError: 'Vui lòng nhập đầy đủ mật khẩu' })
+          set({ resetError: 'Please fill in all password fields' })
           return false
         }
 
         if (resetNewPassword.length < 8) {
-          set({ resetError: 'Mật khẩu phải có ít nhất 8 ký tự' })
+          set({ resetError: 'Password must be at least 8 characters' })
           return false
         }
 
         if (resetNewPassword !== resetConfirmPassword) {
-          set({ resetError: 'Mật khẩu nhập lại không khớp' })
+          set({ resetError: 'Passwords do not match' })
           return false
         }
 
         if (!token) {
-          set({ resetError: 'Token reset không tồn tại' })
+          set({ resetError: 'Reset token does not exist' })
           return false
         }
 
         set({ resetLoading: true })
 
         try {
-          await resetPasswordApi({ token, new_password: resetNewPassword })
+          const payload = { token, password: resetNewPassword }
+          console.log('========== RESET PASSWORD DEBUG ==========')
+          console.log('[AuthStore] Reset password payload:', JSON.stringify(payload, null, 2))
+          console.log('[AuthStore] token:', token)
+          console.log('[AuthStore] new_password length:', resetNewPassword.length)
+
+          const result = await resetPasswordApi(payload)
+          console.log('[AuthStore] Reset password response:', result)
+          console.log('========== END RESET PASSWORD DEBUG ==========')
+
           set({
             resetSuccess: true,
             resetNewPassword: '',
@@ -206,8 +215,13 @@ export const useAuthStore = create<AuthState>()(
           })
           return true
         } catch (err) {
+          console.log('========== RESET PASSWORD ERROR ==========')
           const axiosError = err as AxiosError<ApiErrorResponse>
-          const errorMessage = axiosError.response?.data?.message || 'Không thể reset mật khẩu'
+          console.error('[AuthStore] Response status:', axiosError.response?.status)
+          console.error('[AuthStore] Response data:', axiosError.response?.data)
+          console.error('[AuthStore] Full error:', err)
+          console.log('========== END RESET PASSWORD ERROR ==========')
+          const errorMessage = axiosError.response?.data?.message || 'Unable to reset password'
           set({ resetError: errorMessage })
           return false
         } finally {

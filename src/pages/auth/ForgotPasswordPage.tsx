@@ -33,12 +33,12 @@ const ForgotPasswordPage = () => {
               <Check className='h-8 w-8 text-green-600' />
             </div>
           </div>
-          <h2 className='text-2xl font-bold mb-2'>Email gửi thành công</h2>
+          <h2 className='text-2xl font-bold mb-2'>Email sent successfully</h2>
           <p className='text-muted-foreground mb-6'>
-            Kiểm tra email của bạn để nhận hướng dẫn reset mật khẩu. Link sẽ hết hạn sau 1 giờ.
+            Check your email for password reset instructions. The link will expire in 1 hour.
           </p>
           <Button className='w-full mb-2' onClick={() => navigate('/login')}>
-            Quay lại đăng nhập
+            Back to login
           </Button>
           <Button
             variant='outline'
@@ -48,7 +48,7 @@ const ForgotPasswordPage = () => {
               setForgotEmail('')
             }}
           >
-            Gửi lại email khác
+            Send another email
           </Button>
         </Card>
       </div>
@@ -60,8 +60,8 @@ const ForgotPasswordPage = () => {
       <Card className='w-full max-w-md p-8'>
         <div className='text-center mb-8'>
           <Mail className='h-12 w-12 mx-auto text-primary mb-4' />
-          <h1 className='text-2xl font-bold'>Quên mật khẩu</h1>
-          <p className='text-muted-foreground mt-2'>Nhập email của bạn, chúng tôi sẽ gửi hướng dẫn reset mật khẩu</p>
+          <h1 className='text-2xl font-bold'>Forgot password</h1>
+          <p className='text-muted-foreground mt-2'>Enter your email and we'll send you password reset instructions</p>
         </div>
 
         {forgotError && (
@@ -86,13 +86,13 @@ const ForgotPasswordPage = () => {
           </div>
 
           <Button type='submit' className='w-full' disabled={forgotLoading}>
-            {forgotLoading ? 'Đang gửi...' : 'Gửi hướng dẫn reset'}
+            {forgotLoading ? 'Sending...' : 'Send reset instructions'}
           </Button>
         </form>
 
         <div className='mt-6 text-center'>
           <button onClick={() => navigate('/login')} className='text-primary hover:underline text-sm font-medium'>
-            Quay lại đăng nhập
+            Back to login
           </button>
         </div>
       </Card>

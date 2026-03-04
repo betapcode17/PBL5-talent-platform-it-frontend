@@ -43,7 +43,7 @@ export interface ForgotPasswordRequest {
 
 export interface ResetPasswordRequest {
   token: string
-  new_password: string
+  password: string
 }
 
 export interface PasswordResetResponse {

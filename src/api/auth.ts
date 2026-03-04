@@ -127,6 +127,7 @@ export const forgotPasswordApi = async (data: ForgotPasswordRequest): Promise<Pa
 // reset password api
 export const resetPasswordApi = async (data: ResetPasswordRequest): Promise<PasswordResetResponse> => {
   console.log('[authApi] resetPasswordApi called')
+  console.log('Data: ', data)
   const response = await axiosInstance.post<PasswordResetResponse>('/auth/reset-password', data)
   console.log('[authApi] resetPasswordApi response:', response.data)
   return response.data

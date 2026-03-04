@@ -59,9 +59,10 @@ const SocialCallback = () => {
 
         setAuth(data.user, data.access_token)
         redirectByRole(data.user)
-      } catch (callbackError: any) {
+      } catch (callbackError: unknown) {
         console.error('[SocialCallback] Error:', callbackError)
-        const errorMessage = callbackError.response?.data?.message || 'Có lỗi xảy ra'
+        const axiosErr = callbackError as import('axios').AxiosError<{ message?: string }>
+        const errorMessage = axiosErr.response?.data?.message || 'An error occurred'
         console.error(`[SocialCallback] ${typedProvider} login failed:`, errorMessage)
         navigate(`/login?error=${typedProvider}_unknown`)
       }

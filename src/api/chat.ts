@@ -7,7 +7,7 @@ export const sendMessageApi = async (data: SendMessageRequest): Promise<SendMess
   return res.data
 }
 
-export const getConversationsApi = async (): Promise<Conversation> => {
+export const getConversationsApi = async (): Promise<Conversation[]> => {
   const res = await axiosInstance.get('/chat/conversation')
   return res.data
 }
@@ -17,7 +17,7 @@ export const getMessagesApi = async (conversationId: number): Promise<ChatMessag
   return res.data
 }
 
-export const deleteConversation = async (conversationId: number): Promise<void> => {
+export const deleteConversationApi = async (conversationId: number): Promise<void> => {
   await axiosInstance.delete(`/chat/conversation/${conversationId}`)
 }
 

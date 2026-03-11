@@ -1,5 +1,5 @@
 export interface ChatMessage {
-  id: number
+  id?: number
   conversationId: number
   role: 'user' | 'assistant'
   content: string
@@ -8,18 +8,18 @@ export interface ChatMessage {
 
 export interface Conversation {
   id: number
-  title: number
+  title: string
   lastMessage: string
   createdAt: Date
   updateAt: Date
 }
 
 export interface SendMessageRequest {
-  conversationId?: string
+  conversationId?: number
   message: string
 }
 
 export interface SendMessageResponse {
   message: ChatMessage
-  conversationId: string
+  conversationId: number
 }

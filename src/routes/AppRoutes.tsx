@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 import { ProtectedRoute } from './ProtectedRoute'
 import MainLayout from '@/components/layout/MainLayout'
+import ChatPage from '@/pages/chat/ChatPage'
 
 // Lazy load pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
@@ -35,6 +36,9 @@ export function AppRoutes() {
           <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
           <Route path='/auth/reset-password/:token' element={<ResetPasswordPage />} />
         </Route>
+
+        {/* Chat Full Page - outside MainLayout */}
+        <Route path='/chat' element={<ChatPage />} />
 
         {/* Google OAuth Callback */}
         <Route path='/auth/google/callback' element={<GoogleCallback />} />

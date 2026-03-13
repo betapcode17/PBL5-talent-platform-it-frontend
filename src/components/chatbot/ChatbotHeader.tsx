@@ -15,7 +15,7 @@ const ChatHeader = ({ onClose, isFullScreen, onToggleFullScreen, onRefresh }: Ch
     if (!isFullScreen) {
       // Từ widget → chuyển sang trang full
       onClose?.()
-      navigate('/chat')
+      navigate('/chatbot')
     } else {
       onToggleFullScreen?.()
     }

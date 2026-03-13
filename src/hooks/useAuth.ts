@@ -7,7 +7,10 @@ import type { User } from '@/@types/user'
 export const useAuth = () => {
   const navigate = useNavigate()
   const googleAllowedOrigin = import.meta.env.VITE_GOOGLE_ALLOWED_ORIGIN || 'http://localhost:3000'
-  const apiBaseUrl = (import.meta.env.VITE_API_URL as string)?.replace(/\/$/, '') || 'http://localhost:4000'
+  const apiBaseUrl =
+    (import.meta.env.VITE_BACKEND_API_URL as string)?.replace(/\/$/, '') ||
+    (import.meta.env.VITE_API_URL as string)?.replace(/\/$/, '') ||
+    'http://localhost:4000'
   const googleInitialized = useRef(false)
   const googleScriptLoading = useRef<Promise<void> | null>(null)
   const {

@@ -1,12 +1,13 @@
 import { useEffect, useCallback } from 'react'
-import { useChatStore } from '@/store/chatStore'
+import { useChatbotStore } from '@/store/chatbotStore'
 import { useAuthStore } from '@/store/authStore'
 
-export const useChat = () => {
+export const useChatbot = () => {
   const { user } = useAuthStore()
   const {
     conversations,
     activeConversationId,
+    pendingConversationId,
     messages,
     isLoadingConversations,
     isLoadingMessages,
@@ -23,13 +24,19 @@ export const useChat = () => {
     createConversation,
     deleteConversation,
     clearError
-  } = useChatStore()
+  } = useChatbotStore()
 
+  // Load conversations on mount (no auth required for chatbot API)
   useEffect(() => {
-    if (user) {
+    getConversations()
+  }, [getConversations])
+
+  // Reload conversation list whenever widget is opened
+  useEffect(() => {
+    if (isWidgetOpen) {
       getConversations()
     }
-  }, [user, getConversations])
+  }, [isWidgetOpen, getConversations])
 
   const handleSendMessage = useCallback(
     async (message: string) => {
@@ -51,6 +58,7 @@ export const useChat = () => {
     user,
     conversations,
     activeConversationId,
+    pendingConversationId,
     messages,
     isLoadingConversations,
     isLoadingMessages,

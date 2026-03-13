@@ -1,13 +1,13 @@
 import { BrowserRouter, useLocation } from 'react-router-dom'
 import './App.css'
 import { AppRoutes } from './routes/AppRoutes'
-import ChatWidget from './components/chat/ChatWidget'
-import ChatWidgetToggle from './components/chat/ChatWidgetToggle'
+import ChatWidget from './components/chatbot/ChatbotWidget'
+import ChatWidgetToggle from './components/chatbot/ChatbotWidgetToggle'
 
 const ChatOverlay = () => {
   const { pathname } = useLocation()
   // Ẩn widget khi đang ở trang chat full-screen
-  if (pathname === '/chat') return null
+  if (pathname === '/chatbot') return null
   return (
     <>
       <ChatWidget />

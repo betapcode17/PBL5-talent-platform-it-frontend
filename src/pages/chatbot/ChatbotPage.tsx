@@ -1,4 +1,4 @@
-import ChatFullPage from '@/components/chat/ChatFullPage'
+import ChatFullPage from '@/components/chatbot/ChatbotFullPage'
 
 const ChatPage = () => {
   return <ChatFullPage />

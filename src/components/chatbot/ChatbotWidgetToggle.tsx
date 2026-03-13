@@ -1,7 +1,7 @@
-import { useChatStore } from '@/store/chatStore'
+import { useChatbotStore } from '@/store/chatbotStore'
 
 const ChatWidgetToggle = () => {
-  const { isWidgetOpen, setWidgetOpen } = useChatStore()
+  const { isWidgetOpen, setWidgetOpen } = useChatbotStore()
 
   if (isWidgetOpen) return null
 

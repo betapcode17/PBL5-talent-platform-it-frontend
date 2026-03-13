@@ -1,5 +1,6 @@
-import type { ChatMessage } from '@/@types/chat'
+import type { ChatMessage } from '@/@types/chatbot'
 import { cn } from '@/lib/utils'
+import ReactMarkdown from 'react-markdown'
 
 interface ChatMessageBubbleProps {
   message: ChatMessage
@@ -34,11 +35,35 @@ const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
         {/* Bubble */}
         <div
           className={cn(
-            'rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
+            'min-w-0 break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
             isUser ? 'rounded-br-md bg-purple-600 text-white' : 'rounded-bl-md bg-slate-100 text-slate-700'
           )}
         >
-          {message.content}
+          {isUser ? (
+            <span className='whitespace-pre-wrap break-words'>{message.content}</span>
+          ) : (
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => <p className='mb-2 last:mb-0 break-words'>{children}</p>,
+                strong: ({ children }) => <strong className='font-semibold'>{children}</strong>,
+                ol: ({ children }) => <ol className='mb-2 list-decimal pl-4 space-y-1'>{children}</ol>,
+                ul: ({ children }) => <ul className='mb-2 list-disc pl-4 space-y-1'>{children}</ul>,
+                li: ({ children }) => <li className='break-words'>{children}</li>,
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='break-all text-indigo-600 underline hover:text-indigo-800'
+                  >
+                    {children}
+                  </a>
+                )
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          )}
         </div>
       </div>
     </div>

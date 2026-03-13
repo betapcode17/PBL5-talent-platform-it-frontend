@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Conversation } from '@/@types/chat'
+import type { Conversation } from '@/@types/chatbot'
 import { SquarePen, Trash2, MessageCircle, Search, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

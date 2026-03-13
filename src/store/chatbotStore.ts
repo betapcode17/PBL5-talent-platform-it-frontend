@@ -2,7 +2,7 @@
 // useChat.ts
 import { create } from 'zustand'
 
-import type { ChatMessage, Conversation } from '@/@types/chat'
+import type { ChatMessage, Conversation } from '@/@types/chatbot'
 
 import {
   sendMessageApi,
@@ -10,12 +10,13 @@ import {
   getMessagesApi,
   deleteConversationApi,
   createConversationApi
-} from '@/api/chat'
+} from '@/api/chatbot'
 
 interface ChatState {
   // state
   conversations: Conversation[]
   activeConversationId: number | null
+  pendingConversationId: number | null
   messages: ChatMessage[]
   isLoadingConversations: boolean
   isLoadingMessages: boolean
@@ -28,7 +29,7 @@ interface ChatState {
   setWidgetOpen: (open: boolean) => void
   toggleWidget: () => void
   setFullScreen: (full: boolean) => void
-  setActiveConversation: (id: number | null) => void
+  setActiveConversation: (id: number | null) => Promise<void>
   getConversations: () => Promise<void>
   getMessages: (conversationId: number) => Promise<void>
   sendMessage: (message: string, conversationId?: number) => Promise<void>
@@ -37,10 +38,11 @@ interface ChatState {
   clearError: () => void
 }
 
-export const useChatStore = create<ChatState>()((set, get) => ({
+export const useChatbotStore = create<ChatState>()((set, get) => ({
   // initial state
   conversations: [],
   activeConversationId: null,
+  pendingConversationId: null,
   messages: [],
   isLoadingConversations: false,
   isLoadingMessages: false,
@@ -53,9 +55,28 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   toggleWidget: () => set((s) => ({ isWidgetOpen: !s.isWidgetOpen })),
   setFullScreen: (full) => set({ isFullScreen: full }),
 
-  setActiveConversation: (id) => {
-    set({ activeConversationId: id, messages: [] })
-    if (id) get().getMessages(id)
+  setActiveConversation: async (id) => {
+    const { activeConversationId, pendingConversationId } = get()
+
+    if (id === null) {
+      set({ activeConversationId: null, pendingConversationId: null, messages: [], error: null })
+      return
+    }
+
+    if (id === activeConversationId || id === pendingConversationId) {
+      return
+    }
+
+    set({ pendingConversationId: id, isLoadingMessages: true, error: null })
+
+    try {
+      const messages = await getMessagesApi(id)
+      set({ activeConversationId: id, pendingConversationId: null, messages })
+    } catch {
+      set({ error: 'Failed to load messages', pendingConversationId: null })
+    } finally {
+      set({ isLoadingMessages: false })
+    }
   },
 
   getConversations: async () => {
@@ -73,7 +94,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     set({ isLoadingMessages: true, error: null })
     try {
       const messages = await getMessagesApi(conversationId)
-      set({ messages })
+      set({ messages, activeConversationId: conversationId, pendingConversationId: null })
     } catch {
       set({ error: 'Failed to load messages' })
     } finally {
@@ -126,6 +147,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       const conversation = await createConversationApi()
       set((s) => ({
         activeConversationId: conversation.id,
+        pendingConversationId: null,
         messages: [],
         conversations: [conversation, ...s.conversations]
       }))
@@ -139,7 +161,9 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       await deleteConversationApi(id)
       set((s) => ({
         conversations: s.conversations.filter((c) => c.id !== id),
-        ...(s.activeConversationId === id ? { activeConversationId: null, messages: [] } : {})
+        ...(s.activeConversationId === id || s.pendingConversationId === id
+          ? { activeConversationId: null, pendingConversationId: null, messages: [] }
+          : {})
       }))
     } catch {
       set({ error: 'Failed to delete conversation' })

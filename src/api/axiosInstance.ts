@@ -8,6 +8,7 @@ const attachRequestInterceptors = (instance: AxiosInstance, requestPrefix: strin
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       const token = localStorage.getItem('accessToken')
+      console.log(token)
 
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`

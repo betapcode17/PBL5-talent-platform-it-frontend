@@ -7,10 +7,19 @@ import {
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/authStore'
+import { LogOut, MessageCircle } from 'lucide-react'
 
 const Header = () => {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, logout } = useAuthStore()
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
+  const handleChat = async () => {
+    navigate('/chat')
+  }
+
   return (
     <header className='sticky top-0 z-50 w-full border-b-2 bg-white'>
       <div className='container mx-auto flex h-16 items-center justify-between px-6 flex-row'>
@@ -77,9 +86,15 @@ const Header = () => {
         {/* Auth Actions */}
         <div className='flex items-center gap-3'>
           {isAuthenticated ? (
-            <Button variant='outline' onClick={() => navigate('/dashboard')}>
-              Dashboard
-            </Button>
+            <div className='flex items-center gap-2'>
+              <Button onClick={handleChat}>
+                <MessageCircle></MessageCircle>
+              </Button>
+              <Button variant='outline' size='sm' onClick={handleLogout}>
+                <LogOut className='mr-2 h-4 w-4' />
+                Logout
+              </Button>
+            </div>
           ) : (
             <>
               <Button variant='ghost' className='text-sm font-medium text-slate-600' onClick={() => navigate('/login')}>

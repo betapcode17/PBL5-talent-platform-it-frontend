@@ -37,6 +37,10 @@ export interface ChatSummary {
 export interface ChatDetail extends ChatSummary {
   Seeker?: {
     seeker_id: number
+    User?: {
+      user_id: number
+      full_name: string
+    }
   }
   Company: ChatCompany
   Message: ChatMessage[]

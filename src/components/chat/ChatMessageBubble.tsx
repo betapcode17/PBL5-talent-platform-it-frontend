@@ -1,14 +1,21 @@
+import { useChat } from '@/hooks/useChat'
+
 type ChatMessageBubbleProps = {
   content: string
   timestamp: string
-  sender: 'me' | 'company'
+  senderType: 'SEEKER' | 'EMPLOYEE'
   senderName?: string
   avatarText?: string
 }
 
-function ChatMessageBubble({ content, timestamp, sender, senderName, avatarText }: ChatMessageBubbleProps) {
-  const isMe = sender === 'me'
+function ChatMessageBubble({ content, timestamp, senderType, senderName, avatarText }: ChatMessageBubbleProps) {
+  const { user } = useChat()
+  const isMe = senderType === user?.role
   const hasSenderName = Boolean(senderName)
+
+  // Nếu không truyền avatarText thì lấy ký tự đầu tên user hoặc mặc định
+  const displayAvatar = avatarText || (isMe ? user?.full_name?.[0] || 'M' : senderName?.[0] || 'U')
+  const displaySenderName = senderName || (isMe ? user?.full_name : 'Unknown')
 
   return (
     <div className={`mb-4 flex ${isMe ? 'justify-end' : 'justify-start'}`}>
@@ -18,11 +25,13 @@ function ChatMessageBubble({ content, timestamp, sender, senderName, avatarText 
             isMe ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-700'
           } ${hasSenderName ? 'mt-6' : 'mt-0'}`}
         >
-          {avatarText || (isMe ? 'ME' : 'CO')}
+          {displayAvatar}
         </div>
 
         <div className={`flex ${isMe ? 'items-end' : 'items-start'} flex-col`}>
-          {senderName ? <div className='mb-1 text-sm font-semibold text-slate-700'>{senderName}</div> : null}
+          {displaySenderName ? (
+            <div className='mb-1 text-sm font-semibold text-slate-700'>{displaySenderName}</div>
+          ) : null}
 
           <div
             className={`rounded-2xl px-4 py-3 text-sm leading-7 ${

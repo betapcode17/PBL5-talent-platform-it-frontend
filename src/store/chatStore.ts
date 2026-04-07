@@ -25,6 +25,7 @@ interface ChatState {
   isLoadingChatDetail: boolean
   isSending: boolean
   error: string | null
+  messagePollingInterval: NodeJS.Timeout | null
 
   // Actions
   setActiveChatCompany: (id: number | null) => Promise<void>
@@ -33,6 +34,8 @@ interface ChatState {
   getChatMessages: (chatId: number, limit?: number, offset?: number) => Promise<void>
   sendChatMessages: (message: string) => Promise<void>
   createChatCompany: (payload: CreateChatPayload) => Promise<number | null>
+  startMessagePolling: (chatId: number, interval?: number) => void
+  stopMessagePolling: () => void
   clearError: () => void
 }
 
@@ -48,7 +51,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   isLoadingChatDetail: false,
   isSending: false,
   error: null,
-
+  messagePollingInterval: null,
   // actions
   setActiveChatCompany: async (id) => {
     const { activeChatCompaniesId, pendingChatCompaniesId } = get()
@@ -73,7 +76,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     try {
       await Promise.all([get().getChatDetail(id), get().getChatMessages(id)])
       set({ activeChatCompaniesId: id, pendingChatCompaniesId: null })
-    } catch {
+    } catch (err) {
+      console.error('setActiveChatCompany error:', err)
       set({ error: 'Failed to load messages', pendingChatCompaniesId: null })
     }
   },
@@ -96,7 +100,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
           last_message: company.Message?.[0]?.content
         }))
       })
-    } catch {
+    } catch (err) {
+      console.error('getChatCompanies error:', err)
       set({ error: 'Failed to load chat history' })
     } finally {
       set({ isLoadingChatCompanies: false })
@@ -109,23 +114,32 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     try {
       const detail = await getChatDetailApi(chatId)
       set({ activeChatDetail: detail })
-    } catch {
+    } catch (err) {
+      console.error('getChatDetail error:', err)
       set({ error: 'Failed to load chat detail' })
     } finally {
       set({ isLoadingChatDetail: false })
     }
   },
 
-  getChatMessages: async (chatId: number, limit = 50, offset = 0) => {
-    set({ isLoadingChatMessages: true, error: null })
+  getChatMessages: async (chatId: number, limit = 50, offset = 0, isPolling = false) => {
+    if (!isPolling) {
+      set({ isLoadingChatMessages: true, error: null })
+    }
 
     try {
+      // Gọi API lấy danh sách tin nhắn theo chatId
       const chatMessages = await getMessagesApi(chatId, limit, offset)
       set({ chatMessages, activeChatCompaniesId: chatId, pendingChatCompaniesId: null })
-    } catch {
-      set({ error: 'Failed to load messages' })
+    } catch (err) {
+      console.error('getChatMessages error:', err)
+      if (!isPolling) {
+        set({ error: 'Failed to load messages' })
+      }
     } finally {
-      set({ isLoadingChatMessages: false })
+      if (!isPolling) {
+        set({ isLoadingChatMessages: false })
+      }
     }
   },
   sendChatMessages: async (message: string) => {
@@ -148,7 +162,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       sent_at: new Date().toISOString(),
       sender_type: 'SEEKER',
       sender_id: 0,
-      is_read: true
+      is_read: true,
+      employee_name: ''
     }
 
     set({
@@ -178,7 +193,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
             : item
         )
       }))
-    } catch {
+    } catch (err) {
+      console.error('sendChatMessages error:', err)
       set((state) => ({
         error: 'Failed to send message. Please try again.',
         chatMessages: state.chatMessages.filter((item) => item.message_id !== tempId)
@@ -206,9 +222,37 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       await get().setActiveChatCompany(chat.chat_id)
 
       return chat.chat_id
-    } catch {
+    } catch (err) {
+      console.error('createChatCompany error:', err)
       set({ error: 'Failed to create chat conversation.' })
       return null
+    }
+  },
+
+  startMessagePolling: (chatId: number, interval = 2000) => {
+    const { messagePollingInterval, getChatMessages } = get()
+
+    // Stop existing polling nếu có
+    if (messagePollingInterval) {
+      clearInterval(messagePollingInterval)
+    }
+
+    // Start new polling
+    const newInterval = setInterval(() => {
+      // Silently fetch new messages (không show loading)
+      getChatMessages(chatId, 50, 0, true).catch((err) => {
+        console.error('Polling messages error:', err)
+      })
+    }, interval)
+
+    set({ messagePollingInterval: newInterval })
+  },
+
+  stopMessagePolling: () => {
+    const { messagePollingInterval } = get()
+    if (messagePollingInterval) {
+      clearInterval(messagePollingInterval)
+      set({ messagePollingInterval: null })
     }
   },
 

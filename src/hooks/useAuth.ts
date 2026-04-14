@@ -32,7 +32,7 @@ export const useAuth = () => {
         case 'SEEKER':
           navigate('/seeker/dashboard')
           break
-        case 'EMPLOYER':
+        case 'EMPLOYEE':
           navigate('/employer/dashboard')
           break
         case 'ADMIN':

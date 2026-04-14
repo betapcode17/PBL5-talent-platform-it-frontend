@@ -1,8 +1,17 @@
+export interface FileAttachment {
+  id?: string
+  name: string
+  size: number
+  type: string
+  url?: string
+}
+
 export interface ChatMessage {
   id?: number
   conversationId: number
   role: 'user' | 'assistant'
   content: string
+  attachments?: FileAttachment[]
   createdAt: Date
 }
 
@@ -17,6 +26,7 @@ export interface Conversation {
 export interface SendMessageRequest {
   conversationId?: number
   message: string
+  attachments?: File[]
 }
 
 export interface SendMessageResponse {

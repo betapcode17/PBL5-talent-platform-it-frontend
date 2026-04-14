@@ -5,7 +5,7 @@ import ChatMessageList from './ChatbotMessageList'
 import ChatInput from './ChatbotInput'
 import ChatSuggestions from './ChatbotSuggestions'
 
-const ChatFullPage = () => {
+const ChatbotFullPage = () => {
   const {
     user,
     conversations,
@@ -56,4 +56,4 @@ const ChatFullPage = () => {
   )
 }
 
-export default ChatFullPage
+export default ChatbotFullPage

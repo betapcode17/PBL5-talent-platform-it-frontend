@@ -14,7 +14,7 @@ export default function LoginPage() {
         case 'SEEKER':
           navigate('/seeker/dashboard')
           break
-        case 'EMPLOYER':
+        case 'EMPLOYEE':
           navigate('/employer/dashboard')
           break
         case 'ADMIN':

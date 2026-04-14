@@ -261,10 +261,14 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
               </Field>
 
               <FieldDescription className='text-center'>
-                Đã có tài khoản?{' '}
-                <a href='/login' className='text-primary hover:underline'>
-                  Đăng nhập
-                </a>
+                Have a account?{' '}
+                <button
+                  type='button'
+                  onClick={() => navigate('/login')}
+                  className='ml-auto text-sm underline-offset-2 hover:underline text-primary'
+                >
+                  Login
+                </button>
               </FieldDescription>
             </FieldGroup>
           </form>

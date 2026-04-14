@@ -1,6 +1,7 @@
 import type { ChatMessage } from '@/@types/chatbot'
 import { cn } from '@/lib/utils'
 import ReactMarkdown from 'react-markdown'
+import { FileText } from 'lucide-react'
 
 interface ChatMessageBubbleProps {
   message: ChatMessage
@@ -8,6 +9,14 @@ interface ChatMessageBubbleProps {
 
 const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
   const isUser = message.role === 'user'
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
 
   return (
     <div className={cn('flex w-full', isUser ? 'justify-end' : 'justify-start')}>
@@ -33,12 +42,7 @@ const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
         )}
 
         {/* Bubble */}
-        <div
-          className={cn(
-            'min-w-0 break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
-            isUser ? 'rounded-br-md bg-purple-600 text-white' : 'rounded-bl-md bg-slate-100 text-slate-700'
-          )}
-        >
+        <div className={cn('min-w-0 break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed', isUser ? 'rounded-br-md bg-purple-600 text-white' : 'rounded-bl-md bg-slate-100 text-slate-700')}>
           {isUser ? (
             <span className='whitespace-pre-wrap break-words'>{message.content}</span>
           ) : (
@@ -63,6 +67,39 @@ const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
             >
               {message.content}
             </ReactMarkdown>
+          )}
+
+          {/* Attachments Display */}
+          {message.attachments && message.attachments.length > 0 && (
+            <div className={cn('mt-3 space-y-2 border-t', isUser ? 'border-purple-500 pt-3' : 'border-slate-300 pt-3')}>
+              {message.attachments.map((attachment, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    'flex items-center gap-2 rounded-lg p-2',
+                    isUser ? 'bg-purple-500' : 'bg-white'
+                  )}
+                >
+                  <FileText className='h-4 w-4 flex-shrink-0' />
+                  <div className='min-w-0 flex-1'>
+                    <p className='truncate text-xs font-medium'>{attachment.name}</p>
+                    <p className='text-xs opacity-75'>{formatFileSize(attachment.size)}</p>
+                  </div>
+                  {attachment.url && (
+                    <a
+                      href={attachment.url}
+                      download
+                      className={cn(
+                        'flex-shrink-0 rounded px-2 py-1 text-xs font-semibold',
+                        isUser ? 'bg-white text-purple-600 hover:bg-purple-100' : 'bg-purple-600 text-white hover:bg-purple-700'
+                      )}
+                    >
+                      Download
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>

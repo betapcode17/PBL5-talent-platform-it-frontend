@@ -1,7 +1,7 @@
-import ChatFullPage from '@/components/chatbot/ChatbotFullPage'
+import ChatbotFullPage from '@/components/chatbot/ChatbotFullPage'
 
-const ChatPage = () => {
-  return <ChatFullPage />
+const ChatbotPage = () => {
+  return <ChatbotFullPage />
 }
 
-export default ChatPage
+export default ChatbotPage

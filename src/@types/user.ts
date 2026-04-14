@@ -3,7 +3,7 @@ export interface User {
   id: number
   email: string
   full_name: string
-  role: 'SEEKER' | 'EMPLOYER' | 'ADMIN'
+  role: 'SEEKER' | 'EMPLOYEE' | 'ADMIN'
   user_image?: string
   phone?: string
   registration_date: string

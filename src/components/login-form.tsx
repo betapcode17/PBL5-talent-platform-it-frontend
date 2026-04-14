@@ -204,8 +204,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                   <span className='sr-only'>Login with Meta</span>
                 </Button>
               </Field>
-              <FieldDescription className='text-center text-slate-500'>
-                Don&apos;t have an account? <a href='/register'>Sign up</a>
+              <FieldDescription className='text-center'>
+                Don&apos;t have an account?
+                <button
+                  type='button'
+                  onClick={() => navigate('/register')}
+                  className='ml-auto text-sm underline-offset-2 hover:underline text-primary'
+                >
+                  Sign up
+                </button>
               </FieldDescription>
             </FieldGroup>
           </form>

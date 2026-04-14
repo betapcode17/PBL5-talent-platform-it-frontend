@@ -39,10 +39,10 @@ export const useChatbot = () => {
   }, [isWidgetOpen, getConversations])
 
   const handleSendMessage = useCallback(
-    async (message: string) => {
+    async (message: string, files?: File[]) => {
       const trimmed = message.trim()
       if (!trimmed || isSending) return
-      await sendMessage(trimmed)
+      await sendMessage(trimmed, files)
     },
     [isSending, sendMessage]
   )

@@ -32,7 +32,7 @@ interface ChatState {
   setActiveConversation: (id: number | null) => Promise<void>
   getConversations: () => Promise<void>
   getMessages: (conversationId: number) => Promise<void>
-  sendMessage: (message: string, conversationId?: number) => Promise<void>
+  sendMessage: (message: string, files?: File[], conversationId?: number) => Promise<void>
   createConversation: () => Promise<void>
   deleteConversation: (id: number) => Promise<void>
   clearError: () => void
@@ -101,7 +101,7 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       set({ isLoadingMessages: false })
     }
   },
-  sendMessage: async (message: string, conversationId?: number) => {
+  sendMessage: async (message: string, files?: File[], conversationId?: number) => {
     const { activeConversationId, messages } = get()
     const targetConvId = conversationId ?? activeConversationId
 
@@ -110,6 +110,7 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       id: tempId,
       role: 'user',
       content: message,
+      attachments: files ? files.map((f) => ({ name: f.name, size: f.size, type: f.type })) : undefined,
       createdAt: new Date(),
       conversationId: targetConvId ?? 0
     }
@@ -119,7 +120,8 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
     try {
       const res = await sendMessageApi({
         conversationId: targetConvId ?? undefined,
-        message
+        message,
+        attachments: files
       })
 
       // Nếu chưa có conversation → set active

@@ -12,6 +12,7 @@ function ChatInput() {
 
   const handleSend = async () => {
     if (!message.trim() || isSending) return
+    console.log('[ChatInput] Sending message:', message)
     await handleSendMessage(message)
     setMessage('')
   }
@@ -50,7 +51,7 @@ function ChatInput() {
           disabled={isSending}
         >
           <SendHorizontal className='h-4 w-4' />
-          Send
+          {isSending ? 'Sending...' : 'Send'}
         </button>
       </div>
     </div>

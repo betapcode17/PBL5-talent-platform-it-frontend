@@ -1,32 +1,68 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
+import { useChatWebSocket } from './useChatWebSocket'
+import type { ChatMessage } from '@/@types/chat'
 
 export const useChat = () => {
   const { user, isAuthenticated } = useAuthStore()
   const userId = user?.id ?? null
 
-  const {
-    chatCompanies,
-    activeChatCompaniesId,
-    pendingChatCompaniesId,
-    activeChatDetail,
-    chatMessages,
-    isLoadingChatCompanies,
-    isLoadingChatMessages,
-    isLoadingChatDetail,
-    isSending,
-    error,
-    setActiveChatCompany,
-    getChatCompanies,
-    getChatDetail,
-    getChatMessages,
-    sendChatMessages,
-    createChatCompany,
-    startMessagePolling,
-    stopMessagePolling,
-    clearError
-  } = useChatStore()
+  // Force re-render by watching message count
+  const [messageCount, setMessageCount] = useState(0)
+
+  // Use selectors explicitly to ensure React sees updates
+  const chatCompanies = useChatStore((state) => state.chatCompanies)
+  const activeChatCompaniesId = useChatStore((state) => state.activeChatCompaniesId)
+  const pendingChatCompaniesId = useChatStore((state) => state.pendingChatCompaniesId)
+  const activeChatDetail = useChatStore((state) => state.activeChatDetail)
+  const chatMessages = useChatStore((state) => state.chatMessages)
+  const isLoadingChatCompanies = useChatStore((state) => state.isLoadingChatCompanies)
+  const isLoadingChatMessages = useChatStore((state) => state.isLoadingChatMessages)
+  const isLoadingChatDetail = useChatStore((state) => state.isLoadingChatDetail)
+  const isSending = useChatStore((state) => state.isSending)
+  const error = useChatStore((state) => state.error)
+  const isWebSocketConnected = useChatStore((state) => state.isWebSocketConnected)
+
+  const setActiveChatCompany = useChatStore((state) => state.setActiveChatCompany)
+  const getChatCompanies = useChatStore((state) => state.getChatCompanies)
+  const getChatDetail = useChatStore((state) => state.getChatDetail)
+  const getChatMessages = useChatStore((state) => state.getChatMessages)
+  const sendChatMessages = useChatStore((state) => state.sendChatMessages)
+  const createChatCompany = useChatStore((state) => state.createChatCompany)
+  const addMessageReceived = useChatStore((state) => state.addMessageReceived)
+  const joinChatRoom = useChatStore((state) => state.joinChatRoom)
+  const leaveChatRoom = useChatStore((state) => state.leaveChatRoom)
+  const clearError = useChatStore((state) => state.clearError)
+
+  // Subscribe directly to Zustand store for message updates
+  useEffect(() => {
+    const unsubscribe = useChatStore.subscribe(
+      (state) => state.chatMessages,
+      (messages) => {
+        setMessageCount(messages.length)
+      }
+    )
+    return unsubscribe
+  }, [])
+
+  // Debug: log everything returned from Zustand
+  useEffect(() => {
+    // Apenas uma verificação, sem logs excessivos
+    if (chatMessages?.length > 0) {
+      console.log('[useChat] Messages count:', chatMessages.length)
+    }
+  }, [chatMessages?.length])
+
+  // Setup WebSocket and handle real-time messages
+  const onMessageReceived = useCallback(
+    (message: ChatMessage) => {
+      addMessageReceived(message)
+    },
+    [addMessageReceived]
+  )
+
+  const { joinChat, leaveChat } = useChatWebSocket(onMessageReceived, undefined, undefined)
 
   // Load chat sidebar when user is authenticated
   useEffect(() => {
@@ -43,20 +79,22 @@ export const useChat = () => {
     void setActiveChatCompany(chatCompanies[0].chat_id)
   }, [isAuthenticated, activeChatCompaniesId, chatCompanies, setActiveChatCompany])
 
-  // Start polling when chat is active, stop when inactive
+  // Join/Leave chat room via WebSocket when active chat changes
   useEffect(() => {
     if (!activeChatCompaniesId) {
-      stopMessagePolling()
       return
     }
 
-    // Start polling mỗi 2 giây
-    startMessagePolling(activeChatCompaniesId, 2000)
+    joinChat(activeChatCompaniesId)
+    joinChatRoom(activeChatCompaniesId)
 
     return () => {
-      stopMessagePolling()
+      if (activeChatCompaniesId) {
+        leaveChat(activeChatCompaniesId)
+        leaveChatRoom(activeChatCompaniesId)
+      }
     }
-  }, [activeChatCompaniesId, startMessagePolling, stopMessagePolling])
+  }, [activeChatCompaniesId, joinChat, leaveChat, joinChatRoom, leaveChatRoom])
 
   const handleSelectChat = useCallback(
     async (chatId: number) => {
@@ -101,6 +139,7 @@ export const useChat = () => {
     isLoadingChatDetail,
     isSending,
     error,
+    isWebSocketConnected,
     setActiveChatCompany,
     getChatCompanies,
     getChatDetail,

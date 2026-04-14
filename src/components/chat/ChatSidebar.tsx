@@ -7,24 +7,28 @@ const ChatSidebar = () => {
   const { user } = useAuthStore()
 
   // Nếu là EMPLOYEE thì hiển thị danh sách ứng viên (seeker)
-  type SidebarItem = (typeof chatCompanies)[number] & {
-    seeker_name?: string
-    seeker_id?: number
-  }
-  let sidebarList: SidebarItem[] = chatCompanies
+  // Map chatCompanies to include seeker info
+  const itemsWithSeeker = chatCompanies.map((item) => ({
+    ...item,
+    seeker_name: item.seeker_name,
+    seeker_id: item.seeker_id
+  }))
+
+  type SidebarItem = (typeof itemsWithSeeker)[number]
+  let sidebarList: SidebarItem[] = itemsWithSeeker
   let getTitle: (item: SidebarItem) => string = (item) => item.company_name
   let getSubtitle: (item: SidebarItem) => string = (item) => item.last_message || 'No messages yet'
   if (user?.role === 'EMPLOYEE') {
-    sidebarList = [...chatCompanies].sort((a, b) => {
+    sidebarList = [...itemsWithSeeker].sort((a, b) => {
       if (!a.last_message_at && !b.last_message_at) return 0
       if (!a.last_message_at) return 1
       if (!b.last_message_at) return -1
       return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
     })
     getTitle = (item) => item.seeker_name || `Seeker #${item.seeker_id ?? ''}`
-    getSubtitle = (item) => item.last_message || ''
+    getSubtitle = (item) => item.last_message || 'No messages yet'
   } else {
-    sidebarList = [...chatCompanies].sort((a, b) => {
+    sidebarList = [...itemsWithSeeker].sort((a, b) => {
       if (!a.last_message_at && !b.last_message_at) return 0
       if (!a.last_message_at) return 1
       if (!b.last_message_at) return -1

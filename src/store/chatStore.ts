@@ -1,9 +1,12 @@
 import type { ChatCompany, ChatDetail, ChatMessage } from '@/@types/chat'
 import { createChatApi, getChatDetailApi, getMessagesApi, getMyChatApi, sendMessageApi } from '@/api/chat'
+import { addToCache, getCachedMessages } from '@/utils/messageCache'
 import { create } from 'zustand'
 
 type SidebarCompany = ChatCompany & {
   chat_id: number
+  seeker_id?: number
+  seeker_name?: string
   last_message_at: string | null
   last_message?: string
 }
@@ -25,7 +28,7 @@ interface ChatState {
   isLoadingChatDetail: boolean
   isSending: boolean
   error: string | null
-  messagePollingInterval: NodeJS.Timeout | null
+  isWebSocketConnected: boolean
 
   // Actions
   setActiveChatCompany: (id: number | null) => Promise<void>
@@ -34,8 +37,10 @@ interface ChatState {
   getChatMessages: (chatId: number, limit?: number, offset?: number) => Promise<void>
   sendChatMessages: (message: string) => Promise<void>
   createChatCompany: (payload: CreateChatPayload) => Promise<number | null>
-  startMessagePolling: (chatId: number, interval?: number) => void
-  stopMessagePolling: () => void
+  addMessageReceived: (message: ChatMessage) => void
+  joinChatRoom: (chatId: number) => void
+  leaveChatRoom: (chatId: number) => void
+  setWebSocketConnected: (connected: boolean) => void
   clearError: () => void
 }
 
@@ -51,7 +56,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   isLoadingChatDetail: false,
   isSending: false,
   error: null,
-  messagePollingInterval: null,
+  isWebSocketConnected: false,
   // actions
   setActiveChatCompany: async (id) => {
     const { activeChatCompaniesId, pendingChatCompaniesId } = get()
@@ -90,15 +95,28 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       const companies = Array.isArray(chatSummaries) ? chatSummaries : [chatSummaries]
 
       set({
-        chatCompanies: companies.map((company) => ({
-          chat_id: company.chat_id,
-          company_id: company.company_id,
-          company_name: company.Company?.company_name || `Company #${company.company_id}`,
-          company_email: company.Company?.company_email,
-          company_image: company.Company?.company_image,
-          last_message_at: company.last_message_at,
-          last_message: company.Message?.[0]?.content
-        }))
+        chatCompanies: companies.map((company) => {
+          // Get the latest message based on sent_at timestamp
+          let latestMessage: string | undefined
+          if (company.Message && company.Message.length > 0) {
+            const sortedMessages = [...company.Message].sort(
+              (a, b) => new Date(b.sent_at).getTime() - new Date(a.sent_at).getTime()
+            )
+            latestMessage = sortedMessages[0]?.content
+          }
+
+          return {
+            chat_id: company.chat_id,
+            company_id: company.company_id,
+            seeker_id: company.Seeker?.seeker_id,
+            company_name: company.Company?.company_name || `Company #${company.company_id}`,
+            seeker_name: company.Seeker?.User?.full_name,
+            company_email: company.Company?.company_email,
+            company_image: company.Company?.company_image,
+            last_message_at: company.last_message_at,
+            last_message: latestMessage
+          }
+        })
       })
     } catch (err) {
       console.error('getChatCompanies error:', err)
@@ -113,6 +131,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
     try {
       const detail = await getChatDetailApi(chatId)
+      console.log('Chat Detail: ', detail)
+
       set({ activeChatDetail: detail })
     } catch (err) {
       console.error('getChatDetail error:', err)
@@ -122,28 +142,38 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     }
   },
 
-  getChatMessages: async (chatId: number, limit = 50, offset = 0, isPolling = false) => {
-    if (!isPolling) {
-      set({ isLoadingChatMessages: true, error: null })
-    }
+  getChatMessages: async (chatId: number, limit = 50, offset = 0) => {
+    set({ isLoadingChatMessages: true, error: null })
 
     try {
-      // Gọi API lấy danh sách tin nhắn theo chatId
+      // Load from cache first for quick display
+      const cachedMessages = getCachedMessages(chatId)
+      if (cachedMessages.length > 0) {
+        console.log('[Store] Loaded from cache:', cachedMessages.length, 'messages')
+        // Sort ascending by sent_at for display
+        set({
+          chatMessages: cachedMessages.sort((a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime())
+        })
+      }
+
+      // Then fetch full data from API
       const chatMessages = await getMessagesApi(chatId, limit, offset)
-      set({ chatMessages, activeChatCompaniesId: chatId, pendingChatCompaniesId: null })
+      console.log('[Store] Loaded from API:', chatMessages.length, 'messages')
+
+      set({
+        chatMessages: chatMessages.sort((a, b) => new Date(a.sent_at).getTime() - new Date(b.sent_at).getTime()),
+        activeChatCompaniesId: chatId,
+        pendingChatCompaniesId: null
+      })
     } catch (err) {
       console.error('getChatMessages error:', err)
-      if (!isPolling) {
-        set({ error: 'Failed to load messages' })
-      }
+      set({ error: 'Failed to load messages' })
     } finally {
-      if (!isPolling) {
-        set({ isLoadingChatMessages: false })
-      }
+      set({ isLoadingChatMessages: false })
     }
   },
   sendChatMessages: async (message: string) => {
-    const { activeChatCompaniesId, chatMessages, isSending } = get()
+    const { activeChatCompaniesId, isSending } = get()
 
     const content = message.trim()
     if (!content) return
@@ -155,50 +185,24 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
     if (isSending) return
 
-    const tempId = -Date.now()
-    const optimisticMessage: ChatMessage = {
-      message_id: tempId,
-      content,
-      sent_at: new Date().toISOString(),
-      sender_type: 'SEEKER',
-      sender_id: 0,
-      is_read: true,
-      employee_name: ''
-    }
-
     set({
       isSending: true,
-      error: null,
-      chatMessages: [...chatMessages, optimisticMessage]
+      error: null
     })
 
     try {
-      const sentMessage = await sendMessageApi({
+      // Send message via API - will be received back via WebSocket broadcast
+      await sendMessageApi({
         chatId: activeChatCompaniesId,
         content
       })
-
-      set((state) => ({
-        chatMessages: state.chatMessages.map((item) => (item.message_id === tempId ? sentMessage : item))
-      }))
-
-      set((state) => ({
-        chatCompanies: state.chatCompanies.map((item) =>
-          item.chat_id === activeChatCompaniesId
-            ? {
-                ...item,
-                last_message_at: sentMessage.sent_at,
-                last_message: sentMessage.content
-              }
-            : item
-        )
-      }))
+      // Message will appear via WebSocket listener (addMessageReceived)
+      console.log('[Store] Message sent, awaiting WebSocket broadcast...')
     } catch (err) {
       console.error('sendChatMessages error:', err)
-      set((state) => ({
-        error: 'Failed to send message. Please try again.',
-        chatMessages: state.chatMessages.filter((item) => item.message_id !== tempId)
-      }))
+      set({
+        error: 'Failed to send message. Please try again.'
+      })
     } finally {
       set({ isSending: false })
     }
@@ -229,31 +233,55 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     }
   },
 
-  startMessagePolling: (chatId: number, interval = 2000) => {
-    const { messagePollingInterval, getChatMessages } = get()
+  addMessageReceived: (message: ChatMessage) => {
+    set((state) => {
+      const chatId = message.chat_id
 
-    // Stop existing polling nếu có
-    if (messagePollingInterval) {
-      clearInterval(messagePollingInterval)
-    }
+      // Save to cache
+      addToCache(chatId, message)
 
-    // Start new polling
-    const newInterval = setInterval(() => {
-      // Silently fetch new messages (không show loading)
-      getChatMessages(chatId, 50, 0, true).catch((err) => {
-        console.error('Polling messages error:', err)
-      })
-    }, interval)
+      // Always update sidebar with last message (regardless of active chat)
+      const updatedChatCompanies = state.chatCompanies.map((item) =>
+        item.chat_id === chatId
+          ? {
+              ...item,
+              last_message_at: message.sent_at,
+              last_message: message.content
+            }
+          : item
+      )
 
-    set({ messagePollingInterval: newInterval })
+      // Only add to chatMessages if it's the active chat
+      if (chatId && chatId === state.activeChatCompaniesId) {
+        // Check for duplicates
+        const isDuplicate = state.chatMessages.some((m) => m.message_id === message.message_id)
+        if (isDuplicate) {
+          return { chatCompanies: updatedChatCompanies }
+        }
+
+        return {
+          chatMessages: [...state.chatMessages, message],
+          chatCompanies: updatedChatCompanies
+        }
+      }
+
+      // Even if not active chat, update sidebar
+      return { chatCompanies: updatedChatCompanies }
+    })
   },
 
-  stopMessagePolling: () => {
-    const { messagePollingInterval } = get()
-    if (messagePollingInterval) {
-      clearInterval(messagePollingInterval)
-      set({ messagePollingInterval: null })
-    }
+  joinChatRoom: (chatId: number) => {
+    console.log('Joining chat room via WebSocket:', chatId)
+    // WebSocket join akan được xử lý ở hook useChatWebSocket
+  },
+
+  leaveChatRoom: (chatId: number) => {
+    console.log('Leaving chat room via WebSocket:', chatId)
+    // WebSocket leave sẽ được xử lý ở hook useChatWebSocket
+  },
+
+  setWebSocketConnected: (connected: boolean) => {
+    set({ isWebSocketConnected: connected })
   },
 
   clearError: () => set({ error: null })

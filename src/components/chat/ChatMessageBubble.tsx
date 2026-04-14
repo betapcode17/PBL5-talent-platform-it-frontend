@@ -14,7 +14,9 @@ function ChatMessageBubble({ content, timestamp, senderType, senderName, avatarT
   const hasSenderName = Boolean(senderName)
 
   // Nếu không truyền avatarText thì lấy ký tự đầu tên user hoặc mặc định
-  const displayAvatar = avatarText || (isMe ? user?.full_name?.[0] || 'M' : senderName?.[0] || 'U')
+  const displayAvatar =
+    avatarText?.toUpperCase() ||
+    (isMe ? user?.full_name?.[0]?.toUpperCase() || 'M' : senderName?.[0]?.toUpperCase() || 'U')
   const displaySenderName = senderName || (isMe ? user?.full_name : 'Unknown')
 
   return (

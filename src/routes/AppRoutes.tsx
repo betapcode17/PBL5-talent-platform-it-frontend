@@ -38,6 +38,26 @@ export function AppRoutes() {
           <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
           <Route path='/auth/reset-password/:token' element={<ResetPasswordPage />} />
           <Route path='/chat' element={<ChatPage></ChatPage>}></Route>
+
+          {/* Candidate/Seeker Routes */}
+          <Route
+            path='/seeker/*'
+            element={
+              <ProtectedRoute allowedRoles={['SEEKER']}>
+                <SeekerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Employer Routes */}
+          <Route
+            path='/employer/*'
+            element={
+              <ProtectedRoute allowedRoles={['EMPLOYEE']}>
+                <EmployerDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Chat Full Page - outside MainLayout */}
@@ -46,25 +66,6 @@ export function AppRoutes() {
         {/* Google OAuth Callback */}
         <Route path='/auth/google/callback' element={<GoogleCallback />} />
         <Route path='/auth/:provider/callback' element={<SocialCallback />} />
-        {/* Candidate/Seeker Routes */}
-        <Route
-          path='/seeker/*'
-          element={
-            <ProtectedRoute allowedRoles={['SEEKER']}>
-              <SeekerDashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Employer Routes */}
-        <Route
-          path='/employer/*'
-          element={
-            <ProtectedRoute allowedRoles={['EMPLOYEE']}>
-              <EmployerDashboard />
-            </ProtectedRoute>
-          }
-        />
 
         {/* Default */}
         <Route path='/' element={<Navigate to='/login' replace />} />

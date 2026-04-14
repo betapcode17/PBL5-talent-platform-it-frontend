@@ -8,10 +8,13 @@ export const createChatApi = async (data: CreateChatRequest): Promise<ChatSummar
 }
 export const getChatDetailApi = async (chatId: number): Promise<ChatDetail> => {
   const res = await axiosInstance.get<ChatDetail>(`/chat/${chatId}`)
+  console.log('Chat Detail: ', res.data)
+
   return res.data
 }
 export const getMyChatApi = async (): Promise<ChatSummary[]> => {
   const res = await axiosInstance.get<ChatSummary[]>('/chat/me')
+  console.log(res.data)
   return res.data
 }
 
@@ -28,6 +31,7 @@ export const getMessagesApi = async (
   const res = await axiosInstance.get<ChatMessage[]>('/message', {
     params: { chatId, limit, offset }
   })
+  console.log(res.data)
   return res.data
 }
 

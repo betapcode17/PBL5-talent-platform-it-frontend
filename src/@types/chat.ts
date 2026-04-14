@@ -9,6 +9,7 @@ export interface SendMessageRequest {
 }
 
 export interface ChatMessage {
+  chat_id: any
   message_id: number
   content: string
   sent_at: string
@@ -31,12 +32,23 @@ export interface ChatSummary {
   created_date: string
   last_message_at: string | null
   Company?: ChatCompany
+  Seeker?: {
+    seeker_id: number
+    User?: {
+      user_id: number
+      full_name: string
+    }
+  }
   Message?: Array<Pick<ChatMessage, 'message_id' | 'content' | 'sent_at' | 'sender_type'>>
 }
 
 export interface ChatDetail extends ChatSummary {
   Seeker?: {
     seeker_id: number
+    User?: {
+      user_id: number
+      full_name: string
+    }
   }
   Company: ChatCompany
   Message: ChatMessage[]

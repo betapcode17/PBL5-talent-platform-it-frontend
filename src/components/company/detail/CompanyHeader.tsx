@@ -1,7 +1,10 @@
 import type { Company } from '@/@types/company'
 import { Users, Heart } from 'lucide-react'
+import { useFollow } from '@/hooks/useFollow'
 
 export const CompanyHeader = ({ company }: { company: Company }) => {
+  const { isFollowed, isLoading, toggleFollow } = useFollow(company.company_id)
+
   return (
     <div className='relative'>
       {/* Cover */}
@@ -37,8 +40,16 @@ export const CompanyHeader = ({ company }: { company: Company }) => {
 
         {/* CỘT PHẢI: Các nút hành động */}
         <div className='flex items-center gap-3 mb-2'>
-          <button className='px-10 py-4 bg-purple-600 text-white font-medium text-base rounded-lg hover:bg-purple-700 transition-colors shadow-sm'>
-            + Theo dõi công ty
+          <button
+            onClick={toggleFollow}
+            disabled={isLoading}
+            className={`px-10 py-4 font-medium text-base rounded-lg transition-colors shadow-sm ${
+              isFollowed
+                ? 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-500'
+                : 'bg-purple-600 text-white hover:bg-purple-700 disabled:bg-purple-500'
+            }`}
+          >
+            {isLoading ? 'Đang xử lý...' : isFollowed ? '- Hủy theo dõi' : '+ Theo dõi công ty'}
           </button>
 
           <button className='p-2.5 border border-gray-300 bg-white rounded-lg hover:bg-gray-50 text-gray-600 transition-colors shadow-sm flex items-center justify-center'>

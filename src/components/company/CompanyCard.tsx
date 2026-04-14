@@ -1,5 +1,6 @@
 import type { Company } from '@/@types/company'
 import { Card } from '@/components/ui/card'
+import { useFollow } from '@/hooks/useFollow'
 import { Link, useNavigate } from 'react-router-dom'
 
 type Props = {
@@ -8,18 +9,19 @@ type Props = {
 
 export const CompanyCard = ({ company }: Props) => {
   const navigate = useNavigate()
+  const { followerCount } = useFollow(company.company_id)
 
   return (
     <Card
       onClick={() => navigate(`/companies/${company.company_id}`)}
       className='p-5 flex flex-row gap-4 border hover:border-primary hover:shadow-md transition group cursor-pointer'
     >
-      {/* CỘT 1: Logo */}
+      {/* COT 1: Logo */}
       <div className='w-36 h-36 shrink-0 rounded-xl overflow-hidden border bg-gray-50'>
-        <img src={company.company_image} alt={company.company_name} className='object-contain w-full h-full' />
+        <img src={company.company_image} alt={company.company_name} className='object-cover w-full h-full' />
       </div>
 
-      {/* CỘT 2: Nội dung văn bản */}
+      {/* COT 2: Noi dung van ban */}
       <div className='flex flex-col flex-1 w-full'>
         {/* Name */}
         <h3 className='text-lg font-bold group-hover:text-primary'>{company.company_name}</h3>
@@ -45,14 +47,17 @@ export const CompanyCard = ({ company }: Props) => {
         <div className='flex justify-between items-center mt-auto'>
           <span className='text-sm text-gray-600'>{company.company_size}</span>
 
-          {/*INTERNAL NAVIGATION */}
-          <Link
-            to={`/companies/${company.company_id}`}
-            onClick={(e) => e.stopPropagation()}
-            className='bg-primary text-white px-4 py-2 rounded-lg text-sm'
-          >
-            Xem công ty
-          </Link>
+          <div className='flex flex-col items-end gap-2'>
+            <span className='text-sm text-gray-500'>{followerCount} người Follows</span>
+
+            <Link
+              to={`/companies/${company.company_id}`}
+              onClick={(e) => e.stopPropagation()}
+              className='bg-primary text-white px-4 py-2 rounded-lg text-sm'
+            >
+              Xem công ty
+            </Link>
+          </div>
         </div>
       </div>
     </Card>

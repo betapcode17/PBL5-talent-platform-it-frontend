@@ -6,6 +6,12 @@ import BrowseJobsPage from '@/pages/BrowseJobsPage'
 import HomePage from '@/pages/HomePage'
 import ChatbotPage from '@/pages/chatbot/ChatbotPage'
 import ChatPage from '@/pages/chat/ChatPage'
+import EmployerOverviewPage from '@/pages/employer/OverviewPage'
+import EmployerJobsPage from '@/pages/employer/JobsPage'
+import EmployerCandidatesPage from '@/pages/employer/CandidatesPage'
+import EmployerInterviewsPage from '@/pages/employer/InterviewsPage'
+import CreateJobPage from '@/pages/employer/CreateJobPage'
+import CreateInterviewPage from '@/pages/employer/CreateInterviewPage'
 
 // Lazy load pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
@@ -29,9 +35,10 @@ export function AppRoutes() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* Public Routes */}
-        <Route path='/' element={<HomePage />} />
-        <Route path='/jobs' element={<BrowseJobsPage />} />
+
         <Route element={<MainLayout></MainLayout>}>
+          <Route path='/' element={<HomePage />} />
+          <Route path='/jobs' element={<BrowseJobsPage />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/forgot-password' element={<ForgotPasswordPage />} />
@@ -54,13 +61,20 @@ export function AppRoutes() {
 
           {/* Employer Routes */}
           <Route
-            path='/employer/*'
+            path='/employer'
             element={
               <ProtectedRoute allowedRoles={['EMPLOYEE']}>
                 <EmployerDashboard />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<EmployerOverviewPage />} />
+            <Route path='jobs' element={<EmployerJobsPage />} />
+            <Route path='jobs/create' element={<CreateJobPage />} />
+            <Route path='candidates' element={<EmployerCandidatesPage />} />
+            <Route path='interviews' element={<EmployerInterviewsPage />} />
+            <Route path='interviews/create' element={<CreateInterviewPage />} />
+          </Route>
         </Route>
 
         {/* Chat Full Page - outside MainLayout */}

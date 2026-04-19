@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
 import { useChatWebSocket } from './useChatWebSocket'
@@ -7,9 +7,6 @@ import type { ChatMessage } from '@/@types/chat'
 export const useChat = () => {
   const { user, isAuthenticated } = useAuthStore()
   const userId = user?.id ?? null
-
-  // Force re-render by watching message count
-  const [messageCount, setMessageCount] = useState(0)
 
   // Use selectors explicitly to ensure React sees updates
   const chatCompanies = useChatStore((state) => state.chatCompanies)
@@ -34,17 +31,6 @@ export const useChat = () => {
   const joinChatRoom = useChatStore((state) => state.joinChatRoom)
   const leaveChatRoom = useChatStore((state) => state.leaveChatRoom)
   const clearError = useChatStore((state) => state.clearError)
-
-  // Subscribe directly to Zustand store for message updates
-  useEffect(() => {
-    const unsubscribe = useChatStore.subscribe(
-      (state) => state.chatMessages,
-      (messages) => {
-        setMessageCount(messages.length)
-      }
-    )
-    return unsubscribe
-  }, [])
 
   // Debug: log everything returned from Zustand
   useEffect(() => {

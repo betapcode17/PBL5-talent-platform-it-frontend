@@ -30,13 +30,13 @@ export const useAuth = () => {
       console.log('[useAuth] redirectByRole:', user.role)
       switch (user.role) {
         case 'SEEKER':
-          navigate('/seeker/dashboard')
+          navigate('/seeker')
           break
         case 'EMPLOYEE':
-          navigate('/employer/dashboard')
+          navigate('/employer')
           break
         case 'ADMIN':
-          navigate('/admin/dashboard')
+          navigate('/')
           break
         default:
           navigate('/')

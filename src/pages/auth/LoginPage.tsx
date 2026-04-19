@@ -12,13 +12,13 @@ export default function LoginPage() {
     if (isAuthenticated && user) {
       switch (user.role) {
         case 'SEEKER':
-          navigate('/seeker/dashboard')
+          navigate('/seeker')
           break
         case 'EMPLOYEE':
-          navigate('/employer/dashboard')
+          navigate('/employer')
           break
         case 'ADMIN':
-          navigate('/admin/dashboard')
+          navigate('/')
           break
         default:
           navigate('/')

@@ -17,7 +17,7 @@ const Header = () => {
     switch (user?.role) {
       case 'ADMIN':
         return '/admin'
-      case 'EMPLOYER':
+      case 'EMPLOYEE':
         return '/employer'
       case 'SEEKER':
         return '/seeker'

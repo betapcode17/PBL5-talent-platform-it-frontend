@@ -1,5 +1,6 @@
+import { memo } from 'react'
 import { cn } from '@/lib/utils'
-import type { FilterOption } from '@/types'
+import type { FilterOption } from '@/types/browse-jobs'
 
 type WorkTypeChipsProps = {
   options: FilterOption[]
@@ -9,7 +10,7 @@ type WorkTypeChipsProps = {
 
 const WorkTypeChips = ({ options, selected, onToggle }: WorkTypeChipsProps) => {
   return (
-    <div className='flex flex-wrap gap-3'>
+    <div className='flex flex-wrap gap-2.5'>
       {options.map((option) => {
         const isActive = selected.includes(option.value)
 
@@ -19,9 +20,9 @@ const WorkTypeChips = ({ options, selected, onToggle }: WorkTypeChipsProps) => {
             type='button'
             onClick={() => onToggle(option.value)}
             className={cn(
-              'rounded-xl border px-4 py-2 text-base transition',
+              'rounded-2xl border px-3.5 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-200',
               isActive
-                ? 'border-violet-500 bg-violet-50 text-violet-700 shadow-[0_8px_20px_rgba(124,58,237,0.08)]'
+                ? 'border-violet-200 bg-violet-50 text-violet-700 shadow-[0_8px_20px_rgba(124,58,237,0.08)]'
                 : 'border-slate-200 bg-white text-slate-700 hover:border-violet-200 hover:bg-violet-50'
             )}
           >
@@ -33,4 +34,4 @@ const WorkTypeChips = ({ options, selected, onToggle }: WorkTypeChipsProps) => {
   )
 }
 
-export default WorkTypeChips
+export default memo(WorkTypeChips)

@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 const SkeletonJobCard = () => {
   return (
     <div className='animate-pulse rounded-[28px] border border-slate-200/80 bg-white p-7 shadow-[0_18px_55px_rgba(15,23,42,0.04)]'>
@@ -29,4 +31,4 @@ const SkeletonJobCard = () => {
   )
 }
 
-export default SkeletonJobCard
+export default memo(SkeletonJobCard)

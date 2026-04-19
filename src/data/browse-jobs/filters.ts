@@ -1,4 +1,4 @@
-import type { FilterOption } from '@/types'
+import type { FilterOption } from '@/types/browse-jobs'
 
 export const programmingLanguageOptions: FilterOption[] = [
   { label: 'JavaScript', value: 'JavaScript', count: '1.2k' },

@@ -1,4 +1,4 @@
-import type { BrowseJob } from '@/types'
+import type { BrowseJob } from '@/types/browse-jobs'
 
 export const browseJobs: BrowseJob[] = [
   {

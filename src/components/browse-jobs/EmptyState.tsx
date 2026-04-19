@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { SearchX } from 'lucide-react'
 import { OutlineButton } from '@/components/ui/Buttons'
 
@@ -24,4 +25,4 @@ const EmptyState = ({ onReset }: EmptyStateProps) => {
   )
 }
 
-export default EmptyState
+export default memo(EmptyState)

@@ -1,4 +1,4 @@
-import type { TopCompany } from '@/types'
+import type { TopCompany } from '@/types/browse-jobs'
 
 export const topCompanies: TopCompany[] = [
   {

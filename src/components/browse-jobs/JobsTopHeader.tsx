@@ -52,7 +52,7 @@ const JobsTopHeader = ({ searchQuery, onSearchChange }: JobsTopHeaderProps) => {
               </button>
 
               <Link
-                to='/seeker/dashboard'
+                to='/seeker'
                 className='flex h-11 w-11 items-center justify-center rounded-full border border-violet-200 bg-gradient-to-br from-orange-100 to-violet-100 text-sm font-semibold text-slate-700 shadow-[0_10px_24px_rgba(124,58,237,0.08)]'
               >
                 L

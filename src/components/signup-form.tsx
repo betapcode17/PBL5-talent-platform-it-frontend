@@ -39,7 +39,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
     try {
       await registerUser({
-        fullname: data.fullName,
+        full_name: data.fullName,
         email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,

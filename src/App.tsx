@@ -7,7 +7,9 @@ import ChatWidgetToggle from './components/chatbot/ChatbotWidgetToggle'
 const ChatOverlay = () => {
   const { pathname } = useLocation()
   // Ẩn widget khi đang ở trang chat full-screen
+
   if (pathname === '/chatbot' || pathname === '/' || pathname === '/jobs') return null
+
   return (
     <>
       <ChatWidget />

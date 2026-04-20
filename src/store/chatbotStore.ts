@@ -9,18 +9,20 @@ import {
   getConversationsApi,
   getMessagesApi,
   deleteConversationApi,
-  createConversationApi
+  createConversationApi,
+  renameConversationApi
 } from '@/api/chatbot'
 
 interface ChatState {
   // state
   conversations: Conversation[]
-  activeConversationId: number | null
-  pendingConversationId: number | null
+  activeConversationId: string | number | null
+  pendingConversationId: string | number | null
   messages: ChatMessage[]
   isLoadingConversations: boolean
   isLoadingMessages: boolean
   isSending: boolean
+  deletingConversationId: string | null
   isWidgetOpen: boolean
   isFullScreen: boolean
   error: string | null
@@ -29,12 +31,13 @@ interface ChatState {
   setWidgetOpen: (open: boolean) => void
   toggleWidget: () => void
   setFullScreen: (full: boolean) => void
-  setActiveConversation: (id: number | null) => Promise<void>
+  setActiveConversation: (id: string | number | null) => Promise<void>
   getConversations: () => Promise<void>
-  getMessages: (conversationId: number) => Promise<void>
-  sendMessage: (message: string, files?: File[], conversationId?: number) => Promise<void>
+  getMessages: (conversationId: string | number) => Promise<void>
+  sendMessage: (message: string, files?: File[], conversationId?: string | number) => Promise<void>
   createConversation: () => Promise<void>
-  deleteConversation: (id: number) => Promise<void>
+  deleteConversation: (id: string | number) => Promise<void>
+  renameConversation: (id: string, newTitle: string) => Promise<void>
   clearError: () => void
 }
 
@@ -47,6 +50,7 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
   isLoadingConversations: false,
   isLoadingMessages: false,
   isSending: false,
+  deletingConversationId: null,
   isWidgetOpen: false,
   isFullScreen: false,
   error: null,
@@ -101,7 +105,7 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       set({ isLoadingMessages: false })
     }
   },
-  sendMessage: async (message: string, files?: File[], conversationId?: number) => {
+  sendMessage: async (message: string, files?: File[], conversationId?: string | number) => {
     const { activeConversationId, messages } = get()
     const targetConvId = conversationId ?? activeConversationId
 
@@ -112,7 +116,7 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       content: message,
       attachments: files ? files.map((f) => ({ name: f.name, size: f.size, type: f.type })) : undefined,
       createdAt: new Date(),
-      conversationId: targetConvId ?? 0
+      conversationId: (targetConvId ?? '') as string | number
     }
 
     set({ messages: [...messages, tempUserMsg], isSending: true, error: null })
@@ -159,16 +163,34 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
   },
 
   deleteConversation: async (id) => {
+    set({ deletingConversationId: String(id), error: null })
     try {
       await deleteConversationApi(id)
       set((s) => ({
         conversations: s.conversations.filter((c) => c.id !== id),
+        deletingConversationId: null,
         ...(s.activeConversationId === id || s.pendingConversationId === id
           ? { activeConversationId: null, pendingConversationId: null, messages: [] }
           : {})
       }))
+    } catch (err) {
+      set({
+        deletingConversationId: null,
+        error: `Không thể xóa đoạn chat: ${err instanceof Error ? err.message : 'Unknown error'}`
+      })
+    }
+  },
+
+  renameConversation: async (id, newTitle) => {
+    try {
+      const result = await renameConversationApi(id, newTitle)
+      set((s) => ({
+        conversations: s.conversations.map((c) =>
+          String(c.id) === String(id) ? { ...c, title: result.newTitle, updateAt: result.updatedAt } : c
+        )
+      }))
     } catch {
-      set({ error: 'Failed to delete conversation' })
+      set({ error: 'Failed to rename conversation' })
     }
   },
 

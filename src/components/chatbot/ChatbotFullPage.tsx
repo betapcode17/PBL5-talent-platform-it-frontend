@@ -15,9 +15,11 @@ const ChatbotFullPage = () => {
     isLoadingConversations,
     isLoadingMessages,
     isSending,
+    deletingConversationId,
     setActiveConversation,
     createConversation,
     deleteConversation,
+    renameConversation,
     handleSendMessage,
     handleSuggestionClick
   } = useChatbot()
@@ -32,9 +34,11 @@ const ChatbotFullPage = () => {
         conversations={conversations}
         activeId={selectedConversationId}
         isLoading={isLoadingConversations}
+        isDeletingId={deletingConversationId}
         onSelect={setActiveConversation}
         onNew={createConversation}
         onDelete={deleteConversation}
+        onRename={renameConversation}
         userName={user?.full_name}
       />
 

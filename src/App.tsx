@@ -8,7 +8,7 @@ const ChatOverlay = () => {
   const { pathname } = useLocation()
   // Ẩn widget khi đang ở trang chat full-screen
 
-  if (pathname === '/chatbot' || pathname === '/' || pathname === '/jobs') return null
+  if (pathname === '/chatbot') return null
 
   return (
     <>

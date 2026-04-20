@@ -8,7 +8,7 @@ export interface FileAttachment {
 
 export interface ChatMessage {
   id?: number
-  conversationId: number
+  conversationId: string | number
   role: 'user' | 'assistant'
   content: string
   attachments?: FileAttachment[]
@@ -16,7 +16,7 @@ export interface ChatMessage {
 }
 
 export interface Conversation {
-  id: number
+  id: string | number
   title: string
   lastMessage: string
   createdAt: Date
@@ -24,12 +24,12 @@ export interface Conversation {
 }
 
 export interface SendMessageRequest {
-  conversationId?: number
+  conversationId?: string | number
   message: string
   attachments?: File[]
 }
 
 export interface SendMessageResponse {
   message: ChatMessage
-  conversationId: number
+  conversationId: string | number
 }

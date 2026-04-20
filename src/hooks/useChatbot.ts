@@ -12,6 +12,7 @@ export const useChatbot = () => {
     isLoadingConversations,
     isLoadingMessages,
     isSending,
+    deletingConversationId,
     isWidgetOpen,
     isFullScreen,
     error,
@@ -23,6 +24,7 @@ export const useChatbot = () => {
     sendMessage,
     createConversation,
     deleteConversation,
+    renameConversation,
     clearError
   } = useChatbotStore()
 
@@ -63,6 +65,7 @@ export const useChatbot = () => {
     isLoadingConversations,
     isLoadingMessages,
     isSending,
+    deletingConversationId,
     isWidgetOpen,
     isFullScreen,
     error,
@@ -72,6 +75,7 @@ export const useChatbot = () => {
     setActiveConversation,
     createConversation,
     deleteConversation,
+    renameConversation,
     clearError,
     handleSendMessage,
     handleSuggestionClick

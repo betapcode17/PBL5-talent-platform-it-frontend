@@ -30,13 +30,21 @@ export const getConversationsApi = async (): Promise<Conversation[]> => {
   return res.data
 }
 
-export const getMessagesApi = async (conversationId: number): Promise<ChatMessage[]> => {
+export const getMessagesApi = async (conversationId: string | number): Promise<ChatMessage[]> => {
   const res = await aiAxiosInstance.get(`/chatbot/conversation/${conversationId}/message`)
   return res.data
 }
 
-export const deleteConversationApi = async (conversationId: number): Promise<void> => {
+export const deleteConversationApi = async (conversationId: string | number): Promise<void> => {
   await aiAxiosInstance.delete(`/chatbot/conversation/${conversationId}`)
+}
+
+export const renameConversationApi = async (conversationId: string, newTitle: string) => {
+  const res = await aiAxiosInstance.post('/chatbot/conversation/rename', {
+    conversationId,
+    newTitle
+  })
+  return res.data
 }
 
 export const createConversationApi = async (): Promise<Conversation> => {

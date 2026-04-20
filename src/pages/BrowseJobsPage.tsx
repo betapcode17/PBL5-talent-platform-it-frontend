@@ -11,7 +11,6 @@ import JobsSearchBar from '@/components/browse-jobs/JobsSearchBar'
 import Pagination from '@/components/browse-jobs/Pagination'
 import SkeletonJobCard from '@/components/browse-jobs/SkeletonJobCard'
 import TopCompaniesCard from '@/components/browse-jobs/TopCompaniesCard'
-import Navbar from '@/components/layout/Navbar'
 import Container from '@/components/ui/Container'
 import { useBrowseJobs } from '@/hooks/useBrowseJobs'
 import { topCompanies } from '@/data/browse-jobs/companies'
@@ -88,8 +87,6 @@ const BrowseJobsPage = () => {
 
   return (
     <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.10),_transparent_26%),linear-gradient(180deg,#f7f4ff_0%,#fafafc_100%)]'>
-      <Navbar />
-
       <Container className='max-w-[1380px] py-5 sm:py-6'>
         <div className='mb-5 flex justify-center'>
           <BrowseJobsSearch />

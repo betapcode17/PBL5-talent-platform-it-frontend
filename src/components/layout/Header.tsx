@@ -47,10 +47,9 @@ const Header = () => {
   }
 
   const navigationItems = [
-    { label: 'Find Jobs', href: '/jobs' },
-    { label: 'Companies', href: '/companies' },
-    { label: 'Career Advice', href: '/career-advice' },
-    { label: 'For Employers', href: '/for-employers' }
+    { label: 'Home', href: '/' },
+    { label: 'Jobs', href: '/jobs' },
+    { label: 'Companies', href: '/companies' }
   ]
 
   return (
@@ -83,9 +82,6 @@ const Header = () => {
                 >
                   <MessageCircle className='h-5 w-5' />
                 </button>
-                <PrimaryButton className='rounded-xl px-5 py-2.5 text-sm' onClick={() => navigate(dashboardPath)}>
-                  Dashboard
-                </PrimaryButton>
                 <button
                   onClick={handleLogout}
                   className='flex items-center px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:text-violet-700'

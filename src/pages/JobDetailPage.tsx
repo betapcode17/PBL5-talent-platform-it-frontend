@@ -19,7 +19,6 @@ import JobDetailSkeleton from '@/components/job-detail/JobDetailSkeleton'
 import JobDetailState from '@/components/job-detail/JobDetailState'
 import JobDetailTabs from '@/components/job-detail/JobDetailTabs'
 import SimilarJobsList from '@/components/job-detail/SimilarJobsList'
-import Navbar from '@/components/layout/Navbar'
 import { OutlineButton, PrimaryButton } from '@/components/ui/Buttons'
 import Container from '@/components/ui/Container'
 import Tag from '@/components/ui/Tag'
@@ -60,8 +59,18 @@ const JobDetailPage = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const { job, similarJobs, status, errorMessage, isBookmarked, isBookmarkLoading, canManageBookmarks, isAuthenticated, toggleBookmark, refetch } =
-    useJobDetail(id)
+  const {
+    job,
+    similarJobs,
+    status,
+    errorMessage,
+    isBookmarked,
+    isBookmarkLoading,
+    canManageBookmarks,
+    isAuthenticated,
+    toggleBookmark,
+    refetch
+  } = useJobDetail(id)
   const [activeSection, setActiveSection] = useState<JobDetailSectionId>('description')
   const [actionNotice, setActionNotice] = useState<string | null>(null)
   const sectionRefs = useRef<Partial<Record<JobDetailSectionId, HTMLElement | null>>>({})
@@ -73,7 +82,10 @@ const JobDetailPage = () => {
   const techStack = useMemo(() => extractTechStack(job, browseJob), [browseJob, job])
   const salaryLabel = useMemo(() => formatSalary(job, browseJob), [browseJob, job])
   const locationLabel = useMemo(() => getJobLocation(job, browseJob), [browseJob, job])
-  const companyInitials = useMemo(() => getCompanyInitials(job?.company?.company_name ?? browseJob?.company), [browseJob?.company, job?.company?.company_name])
+  const companyInitials = useMemo(
+    () => getCompanyInitials(job?.company?.company_name ?? browseJob?.company),
+    [browseJob?.company, job?.company?.company_name]
+  )
   const companyLocation = useMemo(
     () => [job?.company?.city, job?.company?.country].filter(Boolean).join(', ') || browseJob?.location || null,
     [browseJob?.location, job?.company?.city, job?.company?.country]
@@ -148,7 +160,14 @@ const JobDetailPage = () => {
             }
           : null
       ].filter(isDefined),
-    [additionalInfo.length, benefits.length, bulletPoints.length, paragraphs.length, requirements.length, techStack.length]
+    [
+      additionalInfo.length,
+      benefits.length,
+      bulletPoints.length,
+      paragraphs.length,
+      requirements.length,
+      techStack.length
+    ]
   )
 
   const sectionIdSet = useMemo(() => new Set(availableSections.map((section) => section.id)), [availableSections])
@@ -176,6 +195,7 @@ const JobDetailPage = () => {
       top: 0,
       behavior: 'auto'
     })
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActionNotice(null)
   }, [id])
 
@@ -187,6 +207,7 @@ const JobDetailPage = () => {
     const hasCurrentSection = availableSections.some((section) => section.id === activeSection)
 
     if (!hasCurrentSection) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveSection(availableSections[0].id)
     }
   }, [activeSection, availableSections])
@@ -268,7 +289,9 @@ const JobDetailPage = () => {
       return
     }
 
-    setActionNotice(result.message ?? (result.bookmarked ? 'Job saved to your bookmarks.' : 'Job removed from your bookmarks.'))
+    setActionNotice(
+      result.message ?? (result.bookmarked ? 'Job saved to your bookmarks.' : 'Job removed from your bookmarks.')
+    )
   }
 
   const handleApply = () => {
@@ -288,7 +311,9 @@ const JobDetailPage = () => {
       return
     }
 
-    setActionNotice('Direct application flow is being finalized. For now, you can save this job and review the company profile for the next step.')
+    setActionNotice(
+      'Direct application flow is being finalized. For now, you can save this job and review the company profile for the next step.'
+    )
   }
 
   const handleCopyLink = async () => {
@@ -316,7 +341,6 @@ const JobDetailPage = () => {
   if (status === 'loading') {
     return (
       <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.10),_transparent_28%),linear-gradient(180deg,#f7f4ff_0%,#fafafc_100%)]'>
-        <Navbar />
         <Container className='max-w-[1380px] py-6 sm:py-8'>
           <JobDetailSkeleton />
         </Container>
@@ -327,7 +351,6 @@ const JobDetailPage = () => {
   if (status === 'error') {
     return (
       <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.10),_transparent_28%),linear-gradient(180deg,#f7f4ff_0%,#fafafc_100%)]'>
-        <Navbar />
         <Container className='max-w-[1380px] py-10 sm:py-14'>
           <JobDetailState
             tone='error'
@@ -343,7 +366,6 @@ const JobDetailPage = () => {
   if (!job || status === 'not-found') {
     return (
       <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.10),_transparent_28%),linear-gradient(180deg,#f7f4ff_0%,#fafafc_100%)]'>
-        <Navbar />
         <Container className='max-w-[1380px] py-10 sm:py-14'>
           <JobDetailState
             title='This job is no longer available'
@@ -356,8 +378,6 @@ const JobDetailPage = () => {
 
   return (
     <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.10),_transparent_28%),linear-gradient(180deg,#f7f4ff_0%,#fafafc_100%)] pb-28 lg:pb-10'>
-      <Navbar />
-
       <Container className='max-w-[1380px] py-5 sm:py-6'>
         <div className='space-y-6'>
           <nav aria-label='Breadcrumb' className='overflow-x-auto'>
@@ -409,7 +429,11 @@ const JobDetailPage = () => {
 
               {availableSections.length > 0 ? (
                 <div className='sticky top-[78px] z-30 py-1'>
-                  <JobDetailTabs sections={availableSections} activeSection={activeSection} onNavigate={scrollToSection} />
+                  <JobDetailTabs
+                    sections={availableSections}
+                    activeSection={activeSection}
+                    onNavigate={scrollToSection}
+                  />
                 </div>
               ) : null}
 
@@ -436,7 +460,10 @@ const JobDetailPage = () => {
                         <h3 className='text-lg font-semibold text-slate-900'>Responsibilities</h3>
                         <ul className='mt-4 space-y-3'>
                           {bulletPoints.map((item) => (
-                            <li key={item} className='flex items-start gap-3 text-sm leading-7 text-slate-700 sm:text-[15px]'>
+                            <li
+                              key={item}
+                              className='flex items-start gap-3 text-sm leading-7 text-slate-700 sm:text-[15px]'
+                            >
                               <CircleCheckBig className='mt-1 h-5 w-5 shrink-0 text-violet-600' />
                               <span>{item}</span>
                             </li>
@@ -586,7 +613,9 @@ const JobDetailPage = () => {
                 companyOverview={companyOverview}
                 companyWebsiteUrl={job.company?.company_website_url}
                 onFallbackViewCompany={() =>
-                  setActionNotice('A dedicated company profile route is not available yet. You can still use the company website or save this job for later.')
+                  setActionNotice(
+                    'A dedicated company profile route is not available yet. You can still use the company website or save this job for later.'
+                  )
                 }
               />
 
@@ -601,7 +630,10 @@ const JobDetailPage = () => {
           <OutlineButton
             onClick={handleBookmark}
             disabled={isBookmarkLoading}
-            className={cn('h-12 flex-1 rounded-2xl border-slate-200 text-slate-700', isBookmarked ? 'border-violet-200 bg-violet-50 text-violet-700' : '')}
+            className={cn(
+              'h-12 flex-1 rounded-2xl border-slate-200 text-slate-700',
+              isBookmarked ? 'border-violet-200 bg-violet-50 text-violet-700' : ''
+            )}
           >
             {isBookmarked ? 'Saved' : 'Save Job'}
           </OutlineButton>

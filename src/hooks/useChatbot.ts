@@ -1,9 +1,11 @@
 import { useEffect, useCallback } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useChatbotStore } from '@/store/chatbotStore'
 import { useAuthStore } from '@/store/authStore'
 
 export const useChatbot = () => {
   const { user } = useAuthStore()
+  const { pathname } = useLocation()
   const {
     conversations,
     activeConversationId,
@@ -28,17 +30,11 @@ export const useChatbot = () => {
     clearError
   } = useChatbotStore()
 
-  // Load conversations on mount (no auth required for chatbot API)
   useEffect(() => {
-    getConversations()
-  }, [getConversations])
-
-  // Reload conversation list whenever widget is opened
-  useEffect(() => {
-    if (isWidgetOpen) {
+    if (pathname === '/chatbot' || isWidgetOpen) {
       getConversations()
     }
-  }, [isWidgetOpen, getConversations])
+  }, [pathname, isWidgetOpen, getConversations])
 
   const handleSendMessage = useCallback(
     async (message: string, files?: File[]) => {

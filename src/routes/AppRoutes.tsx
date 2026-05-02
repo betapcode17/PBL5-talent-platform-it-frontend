@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 import { ProtectedRoute } from './ProtectedRoute'
 import MainLayout from '@/components/layout/MainLayout'
-import ChatPage from '@/pages/chatbot/ChatbotPage'
+import ChatPage from '@/pages/chat/ChatPage'
 import CompanyListPage from '@/pages/company/CompanyListPage'
 import CompanyDetailPage from '@/pages/company/CompanyDetailPage'
 import BrowseJobsPage from '@/pages/BrowseJobsPage'
@@ -25,6 +25,7 @@ const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('@/pages/auth/ResetPasswordPage'))
 const GoogleCallback = lazy(() => import('@/pages/auth/GoogleCallback'))
 const SocialCallback = lazy(() => import('@/pages/auth/SocialCallback'))
+const RegisterEmployerPage = lazy(() => import('@/pages/employer/RegisterEmployerPage'))
 const SeekerDashboard = lazy(() => import('@/pages/seeker/Dashboard'))
 const EmployerDashboard = lazy(() => import('@/pages/employer/Dashboard'))
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'))
@@ -49,6 +50,8 @@ export function AppRoutes() {
           <Route path='/jobs/:id' element={<JobDetailPage />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
+          <Route path='//register/employer' element={<RegisterEmployerPage></RegisterEmployerPage>}></Route>
+          <Route path='/register/employer' element={<RegisterEmployerPage />} />
           <Route path='/forgot-password' element={<ForgotPasswordPage />} />
           <Route path='/auth/forgot-password' element={<ForgotPasswordPage />} />
           <Route path='/reset-password' element={<ResetPasswordPage />} />

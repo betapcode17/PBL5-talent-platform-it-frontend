@@ -142,6 +142,87 @@
     "tryAgain": "Thử lại",
     "backToJobs": "Quay lại việc làm"
   },
+  "employerSignup": {
+    "badge": "Quy trình gia nhập nhà tuyển dụng",
+    "badgeSecondary": "Luồng tuyển dụng cao cấp",
+    "heroTitle": "Xây dựng sự hiện diện tuyển dụng với hồ sơ nhà tuyển dụng chuyên nghiệp.",
+    "heroDescription": "Đăng ký tài khoản tuyển dụng, tạo hoặc tham gia hồ sơ công ty của bạn và bắt đầu đăng tin với cùng ngôn ngữ thiết kế tông tím của dự án.",
+    "stats": {
+      "techCandidates": "ứng viên công nghệ",
+      "accountSetup": "thiết lập tài khoản",
+      "companyProfile": "hồ sơ công ty"
+    },
+    "whatHappens": {
+      "title": "Điều gì xảy ra sau khi đăng ký?",
+      "items": {
+        "accountCreated": "Tài khoản nhân viên được tạo tự động.",
+        "credentialsSent": "Thông tin đăng nhập được gửi tới email đã đăng ký.",
+        "companyLinked": "Hồ sơ công ty được liên kết hoặc tạo mới khi cần."
+      }
+    },
+    "page": {
+      "eyebrow": "Đăng ký nhà tuyển dụng",
+      "title": "Tạo không gian làm việc cho nhà tuyển dụng",
+      "description": "Hoàn thành biểu mẫu bên dưới để tạo tài khoản nhà tuyển dụng phù hợp với nhận diện công ty và hệ thống thiết kế của dự án."
+    },
+    "sections": {
+      "representative": {
+        "title": "Người đại diện",
+        "subtitle": "Thông tin người phụ trách tuyển dụng"
+      },
+      "company": {
+        "title": "Công ty",
+        "subtitle": "Thông tin công ty hiển thị trong hệ thống"
+      }
+    },
+    "labels": {
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "role": "Vai trò",
+      "joinedDate": "Ngày tham gia",
+      "companyName": "Tên công ty",
+      "companyAddress": "Địa chỉ công ty",
+      "companyWebsite": "Website công ty"
+    },
+    "placeholders": {
+      "fullName": "Nguyen Van A",
+      "email": "recruiter@company.com",
+      "phone": "+84 912 345 678",
+      "companyName": "ACME Inc.",
+      "companyAddress": "123 Lê Lợi, Quận 1, TP.HCM",
+      "companyWebsite": "https://company.com"
+    },
+    "roleOptions": {
+      "hr": "Nhân sự",
+      "admin": "Quản trị viên",
+      "recruiter": "Nhà tuyển dụng",
+      "hiringManager": "Trưởng phòng tuyển dụng"
+    },
+    "companyMatching": {
+      "title": "Ghép công ty",
+      "description": "Nếu đã có công ty trùng tên, nhân viên sẽ được liên kết với công ty đó. Nếu chưa, hồ sơ công ty mới sẽ được tạo tự động."
+    },
+    "activation": {
+      "title": "Sẵn sàng kích hoạt tài khoản nhà tuyển dụng?",
+      "description": "Chúng tôi sẽ tạo đăng nhập nhân viên và liên kết ngay với hồ sơ công ty của bạn."
+    },
+    "actions": {
+      "reset": "Đặt lại biểu mẫu",
+      "register": "Đăng ký nhà tuyển dụng",
+      "creating": "Đang tạo nhà tuyển dụng..."
+    },
+    "success": "Tài khoản nhà tuyển dụng cho {{companyName}} đã được tạo thành công. Thông tin đăng nhập đã được gửi đến email đã đăng ký.",
+    "errors": {
+      "fullNameRequired": "Vui lòng nhập họ và tên",
+      "invalidEmail": "Vui lòng nhập email hợp lệ",
+      "invalidPhone": "Số điện thoại không hợp lệ",
+      "companyNameRequired": "Vui lòng nhập tên công ty",
+      "companyAddressRequired": "Vui lòng nhập địa chỉ công ty",
+      "websiteProtocolRequired": "Vui lòng thêm https:// hoặc http://",
+      "unableToRegister": "Không thể đăng ký nhà tuyển dụng"
+    }
+  },
   "employer": {
     "searchPlaceholder": "Tìm ứng viên, việc làm hoặc thao tác...",
     "roleLabel": "Tuyển dụng",

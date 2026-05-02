@@ -22,12 +22,13 @@ type NavbarProps = {
 
 const navItems = [
   { labelKey: 'nav.jobs', href: '/jobs' },
-  { labelKey: 'nav.companies' },
+  { labelKey: 'nav.companies', href: '/companies' },
   { labelKey: 'nav.categories', href: '/categories' },
   { labelKey: 'nav.resources', href: '/resources' }
 ]
 
-const baseFocusClassName = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2'
+const baseFocusClassName =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2'
 
 const getDashboardPath = (role?: string) => {
   switch (role) {
@@ -209,7 +210,9 @@ const Navbar = ({
                     {isProfileOpen ? (
                       <div className='absolute right-0 mt-3 w-64 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.14)]'>
                         <div className='border-b border-slate-100 bg-slate-50 px-4 py-4'>
-                          <p className='truncate text-sm font-semibold text-slate-900'>{user?.full_name || 'Account'}</p>
+                          <p className='truncate text-sm font-semibold text-slate-900'>
+                            {user?.full_name || 'Account'}
+                          </p>
                           <p className='mt-1 truncate text-xs text-slate-500'>{user?.email}</p>
                         </div>
                         <div className='p-2'>
@@ -254,6 +257,15 @@ const Navbar = ({
                   >
                     {t('nav.signUp')}
                   </Link>
+                  <Link
+                    to='/register/employer'
+                    className={cn(
+                      'inline-flex h-11 min-w-[8.5rem] items-center justify-center rounded-full border border-violet-600 bg-white px-4 text-sm font-semibold text-violet-700 whitespace-nowrap shadow-[0_8px_22px_rgba(124,58,237,0.06)] transition hover:-translate-y-0.5 hover:bg-violet-50',
+                      baseFocusClassName
+                    )}
+                  >
+                    Đăng ký Nhà tuyển dụng
+                  </Link>
                 </>
               )
             ) : null}
@@ -285,7 +297,10 @@ const Navbar = ({
         >
           <div className='rounded-[28px] border border-slate-200 bg-white p-3 shadow-[0_18px_60px_rgba(15,23,42,0.10)]'>
             {showSearch ? (
-              <form onSubmit={handleSearchSubmit} className='mb-2 flex h-12 items-center gap-2 rounded-2xl bg-slate-50 px-4'>
+              <form
+                onSubmit={handleSearchSubmit}
+                className='mb-2 flex h-12 items-center gap-2 rounded-2xl bg-slate-50 px-4'
+              >
                 <Search className='h-4 w-4 text-slate-400' />
                 <input
                   type='search'
@@ -307,7 +322,9 @@ const Navbar = ({
                     className={({ isActive }) =>
                       cn(
                         'block rounded-2xl px-4 py-3 text-sm font-semibold transition',
-                        isActive ? 'bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_10px_26px_rgba(124,58,237,0.22)]' : 'text-slate-700 hover:bg-slate-50'
+                        isActive
+                          ? 'bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_10px_26px_rgba(124,58,237,0.22)]'
+                          : 'text-slate-700 hover:bg-slate-50'
                       )
                     }
                   >
@@ -373,6 +390,13 @@ const Navbar = ({
                       className='inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 text-sm font-semibold text-white'
                     >
                       {t('nav.signUp')}
+                    </Link>
+                    <Link
+                      to='/register/employer'
+                      onClick={closeMenu}
+                      className='inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50'
+                    >
+                      Đăng ký Nhà tuyển dụng
                     </Link>
                   </>
                 )

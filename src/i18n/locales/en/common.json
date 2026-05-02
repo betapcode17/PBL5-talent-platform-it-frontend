@@ -142,6 +142,87 @@
     "tryAgain": "Try Again",
     "backToJobs": "Back to Jobs"
   },
+  "employerSignup": {
+    "badge": "Employer onboarding",
+    "badgeSecondary": "Premium recruiting flow",
+    "heroTitle": "Build your hiring presence with a polished employer profile.",
+    "heroDescription": "Register your recruiter account, create or join your company profile, and start posting jobs with the same violet-first visual language used across the project.",
+    "stats": {
+      "techCandidates": "tech candidates",
+      "accountSetup": "account setup",
+      "companyProfile": "company profile"
+    },
+    "whatHappens": {
+      "title": "What happens after registration?",
+      "items": {
+        "accountCreated": "Employee account is created automatically.",
+        "credentialsSent": "Credentials are sent to the registered email.",
+        "companyLinked": "Company profile is linked or created on demand."
+      }
+    },
+    "page": {
+      "eyebrow": "Employer registration",
+      "title": "Create your recruiter workspace",
+      "description": "Complete the form below to create an employer account that matches your company identity and the project's visual system."
+    },
+    "sections": {
+      "representative": {
+        "title": "Representative",
+        "subtitle": "Information about the person handling recruitment"
+      },
+      "company": {
+        "title": "Company",
+        "subtitle": "Company details shown inside the system"
+      }
+    },
+    "labels": {
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "joinedDate": "Joined date",
+      "companyName": "Company name",
+      "companyAddress": "Company address",
+      "companyWebsite": "Company website"
+    },
+    "placeholders": {
+      "fullName": "Nguyen Van A",
+      "email": "recruiter@company.com",
+      "phone": "+84 912 345 678",
+      "companyName": "ACME Inc.",
+      "companyAddress": "123 Le Loi, District 1, HCMC",
+      "companyWebsite": "https://company.com"
+    },
+    "roleOptions": {
+      "hr": "HR",
+      "admin": "Admin",
+      "recruiter": "Recruiter",
+      "hiringManager": "Hiring Manager"
+    },
+    "companyMatching": {
+      "title": "Company matching",
+      "description": "If a company with the same name already exists, the employee will be linked to it. Otherwise, a new company profile is created automatically."
+    },
+    "activation": {
+      "title": "Ready to activate your employer account?",
+      "description": "We'll create the employee login and connect it to your company profile immediately."
+    },
+    "actions": {
+      "reset": "Reset form",
+      "register": "Register Employer",
+      "creating": "Creating employer..."
+    },
+    "success": "Employer account for {{companyName}} has been created successfully. Login credentials were sent to the registered email.",
+    "errors": {
+      "fullNameRequired": "Full name is required",
+      "invalidEmail": "Enter a valid email",
+      "invalidPhone": "Invalid phone",
+      "companyNameRequired": "Company name required",
+      "companyAddressRequired": "Company address required",
+      "websiteProtocolRequired": "Include https:// or http://",
+      "unableToRegister": "Unable to register employer"
+    }
+  },
   "employer": {
     "searchPlaceholder": "Search candidates, jobs, or actions...",
     "roleLabel": "Recruitment",

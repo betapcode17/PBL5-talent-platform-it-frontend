@@ -71,6 +71,7 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const status = error.response?.status
     const requestUrl = error.config?.url
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const originalRequest = error.config as RetriableRequestConfig | undefined
 
     console.error(`[API Error] Status: ${status}, URL: ${requestUrl}`)

@@ -30,6 +30,9 @@ const RegisterEmployerPage = lazy(() => import('@/pages/employer/RegisterEmploye
 const SeekerDashboard = lazy(() => import('@/pages/seeker/Dashboard'))
 const EmployerDashboard = lazy(() => import('@/pages/employer/Dashboard'))
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'))
+const AdminUsersPage = lazy(() => import('@/pages/admin/UsersPage'))
+const AdminCompaniesPage = lazy(() => import('@/pages/admin/CompaniesPage'))
+const AdminJobsPage = lazy(() => import('@/pages/admin/JobsPage'))
 
 // Loading component
 const PageLoader = () => (
@@ -113,7 +116,7 @@ export function AppRoutes() {
           path='/admin/users'
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
-              <AdminDashboard />
+              <AdminUsersPage />
             </ProtectedRoute>
           }
         />
@@ -121,7 +124,15 @@ export function AppRoutes() {
           path='/admin/companies'
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
-              <AdminDashboard />
+              <AdminCompaniesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/admin/jobs'
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminJobsPage />
             </ProtectedRoute>
           }
         />

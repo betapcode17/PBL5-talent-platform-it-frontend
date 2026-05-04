@@ -1,6 +1,7 @@
 import {
   BarChart3,
   BellDot,
+  BriefcaseBusiness,
   Building2,
   ChevronDown,
   ChevronLeft,
@@ -32,6 +33,7 @@ const menuItems = [
   { labelKey: 'admin.menu.dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
   { labelKey: 'admin.menu.users', icon: UsersRound, path: '/admin/users' },
   { labelKey: 'admin.menu.companies', icon: Building2, path: '/admin/companies' },
+  { labelKey: 'admin.menu.jobs', icon: BriefcaseBusiness, path: '/admin/jobs' },
   { labelKey: 'admin.menu.reports', icon: BarChart3, path: '/admin/reports' },
   { labelKey: 'admin.menu.settings', icon: Settings, path: '/admin/settings' }
 ]

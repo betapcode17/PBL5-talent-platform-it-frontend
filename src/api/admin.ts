@@ -2,10 +2,13 @@ import { Bot, BriefcaseBusiness, Code2, GraduationCap, Landmark, Palette } from 
 import axiosInstance from '@/api/axiosInstance'
 import type {
   AdminChartPoint,
+  AdminCompanyListItem,
   AdminDistributionItem,
   AdminIndustryItem,
+  AdminJobListItem,
   AdminRecentUser,
-  AdminStatCardData
+  AdminStatCardData,
+  AdminUserListItem
 } from '@/types/admin'
 
 type AdminStatisticsResponse = {
@@ -19,23 +22,62 @@ type AdminStatisticsResponse = {
 }
 
 type AdminUsersResponse = {
-  users: Array<{
-    id: number
-    email: string
-    fullName?: string | null
-    role: 'ADMIN' | 'SEEKER' | 'EMPLOYEE'
-    isActive: boolean
-    registrationDate: string
-  }>
+  users: AdminUserListItem[]
   total: number
+  page: number
+  limit: number
+  totalPages: number
 }
 
 type AdminCompaniesResponse = {
-  companies: Array<{
-    id: number
-    industry?: string | null
-  }>
+  companies: AdminCompanyListItem[]
   total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+type AdminJobsResponse = {
+  jobs: AdminJobListItem[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+}
+
+type AdminUsersQuery = {
+  page?: number
+  limit?: number
+  search?: string
+  role?: 'ADMIN' | 'SEEKER' | 'EMPLOYEE'
+  active?: boolean
+}
+
+type AdminCompaniesQuery = {
+  page?: number
+  limit?: number
+  search?: string
+  industry?: string
+  active?: boolean
+}
+
+type AdminJobsQuery = {
+  page?: number
+  limit?: number
+  search?: string
+  industry?: string
+  level?: string
+  categoryId?: number
+  jobTypeId?: number
+  minSalary?: string
+  maxSalary?: string
+  deadlineFrom?: string
+  deadlineTo?: string
+  active?: boolean
+  sortBy?: 'createdDate' | 'deadline' | 'salary' | 'numberOfHires' | 'updatedDate'
+  sortOrder?: 'asc' | 'desc'
 }
 
 export type AdminDashboardData = {
@@ -64,7 +106,10 @@ const roleFor = (role: AdminUsersResponse['users'][number]['role']): AdminRecent
   return 'Developer'
 }
 
-const buildSparkline = (data: AdminChartPoint[], key: keyof Pick<AdminChartPoint, 'users' | 'jobs' | 'applications'>) => {
+const buildSparkline = (
+  data: AdminChartPoint[],
+  key: keyof Pick<AdminChartPoint, 'users' | 'jobs' | 'applications'>
+) => {
   const values = data.slice(-12).map((item) => item[key])
   return values.length > 1 ? values : [0, ...values, 0]
 }
@@ -191,4 +236,37 @@ export const getAdminDashboardApi = async (): Promise<AdminDashboardData> => {
     userDistribution,
     topIndustries: buildIndustries(companies.data.companies)
   }
+}
+
+export const getAdminUsersApi = async (params: AdminUsersQuery = {}) => {
+  const response = await axiosInstance.get<AdminUsersResponse>('/admin/users', { params })
+  return response.data
+}
+
+export const getAdminCompaniesApi = async (params: AdminCompaniesQuery = {}) => {
+  const response = await axiosInstance.get<AdminCompaniesResponse>('/admin/companies', { params })
+  return response.data
+}
+
+export const getAdminJobsApi = async (params: AdminJobsQuery = {}) => {
+  const response = await axiosInstance.get<AdminJobsResponse>('/admin/jobs', { params })
+  return response.data
+}
+
+export const toggleAdminUserStatusApi = async (userId: number, shouldActivate: boolean) => {
+  const action = shouldActivate ? 'activate' : 'deactivate'
+  const response = await axiosInstance.patch(`/admin/users/${userId}/${action}`)
+  return response.data
+}
+
+export const toggleAdminCompanyStatusApi = async (companyId: number, shouldActivate: boolean) => {
+  const action = shouldActivate ? 'activate' : 'deactivate'
+  const response = await axiosInstance.patch(`/admin/companies/${companyId}/${action}`)
+  return response.data
+}
+
+export const toggleAdminJobStatusApi = async (jobId: number, shouldActivate: boolean) => {
+  const action = shouldActivate ? 'activate' : 'deactivate'
+  const response = await axiosInstance.patch(`/admin/jobs/${jobId}/${action}`)
+  return response.data
 }

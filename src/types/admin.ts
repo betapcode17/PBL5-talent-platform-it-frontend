@@ -45,3 +45,98 @@ export interface AdminIndustryItem {
   value: number
   icon: LucideIcon
 }
+
+export interface AdminUserListItem {
+  id: number
+  email: string
+  fullName?: string | null
+  phone?: string | null
+  gender?: string | null
+  userImage?: string | null
+  role: 'ADMIN' | 'SEEKER' | 'EMPLOYEE'
+  isActive: boolean
+  registrationDate: string
+  employee?: {
+    id: number
+    role: string
+    joinedDate?: string | null
+    company: {
+      id: number
+      name: string
+      isActive: boolean
+    }
+  } | null
+  seeker?: {
+    id: number
+    fileCv?: string | null
+    createdDate: string
+  } | null
+}
+
+export interface AdminCompanyListItem {
+  id: number
+  name: string
+  description?: string | null
+  type?: string | null
+  industry?: string | null
+  establishmentDate?: string | null
+  size?: string | null
+  country?: string | null
+  city?: string | null
+  websiteUrl?: string | null
+  email?: string | null
+  image?: string | null
+  coverImage?: string | null
+  isActive: boolean
+  createdDate: string
+  totalEmployees: number
+  totalJobs: number
+  totalFollowers: number
+}
+
+export interface AdminJobListItem {
+  id: number
+  title: string
+  name: string
+  description?: string | null
+  salary?: string | null
+  level?: string | null
+  experience?: string | null
+  education?: string | null
+  numberOfHires?: number | null
+  deadline?: string | null
+  workLocation?: string | null
+  workType?: string | null
+  applicationsCount: number
+  isActive: boolean
+  createdDate: string
+  updatedDate: string
+  company: {
+    id: number
+    name: string
+    email?: string | null
+    image?: string | null
+    industry?: string | null
+    city?: string | null
+  }
+  category: {
+    id: number
+    name: string
+  }
+  jobType: {
+    id: number
+    name: string
+  }
+  createdBy?: {
+    id: number
+    name?: string | null
+    email?: string | null
+  } | null
+}
+
+export interface AdminPaginatedResponse<T> {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}

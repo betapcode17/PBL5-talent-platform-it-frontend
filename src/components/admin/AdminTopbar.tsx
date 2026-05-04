@@ -6,16 +6,21 @@ import { Input } from '@/components/ui/input'
 
 type AdminTopbarProps = {
   adminName?: string
+  title?: string
+  subtitle?: string
 }
 
-export function AdminTopbar({ adminName = 'Super Admin' }: AdminTopbarProps) {
+export function AdminTopbar({ adminName = 'Super Admin', title, subtitle }: AdminTopbarProps) {
   const { t } = useTranslation()
+
+  const heading = title || t('admin.dashboard')
+  const description = subtitle || t('admin.welcomeBack', { name: adminName })
 
   return (
     <header className='flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between'>
       <div>
-        <h2 className='text-3xl font-bold tracking-tight text-slate-950 dark:text-white'>{t('admin.dashboard')}</h2>
-        <p className='mt-2 text-sm font-medium text-slate-500 dark:text-slate-400'>{t('admin.welcomeBack', { name: adminName })}</p>
+        <h2 className='text-3xl font-bold tracking-tight text-slate-950 dark:text-white'>{heading}</h2>
+        <p className='mt-2 text-sm font-medium text-slate-500 dark:text-slate-400'>{description}</p>
       </div>
 
       <div className='flex items-center gap-3'>
@@ -27,7 +32,10 @@ export function AdminTopbar({ adminName = 'Super Admin' }: AdminTopbarProps) {
           />
         </div>
 
-        <LanguageSwitcher compact className='rounded-full dark:border-white/8 dark:bg-[#121423]/90 dark:text-slate-200 dark:hover:text-white' />
+        <LanguageSwitcher
+          compact
+          className='rounded-full dark:border-white/8 dark:bg-[#121423]/90 dark:text-slate-200 dark:hover:text-white'
+        />
 
         <button
           type='button'

@@ -257,10 +257,16 @@
       "jobs": "Jobs",
       "candidates": "Candidates",
       "interviews": "Interviews",
+      "company": "Company info",
       "workspace": "Workspace",
       "console": "Employer Console",
       "consoleDescription": "Built for recruiting operations and daily hiring workflow.",
-      "closeSidebar": "Close sidebar"
+      "closeSidebar": "Close sidebar",
+      "companyCard": {
+        "eyebrow": "Company info",
+        "fallbackDescription": "No additional company details yet.",
+        "manage": "Manage profile"
+      }
     },
     "header": {
       "openNavigation": "Open navigation",
@@ -283,6 +289,22 @@
       "PAUSED": "Paused",
       "SCHEDULED": "Scheduled",
       "COMPLETED": "Completed"
+    },
+    "company": {
+      "eyebrow": "Company Management",
+      "title": "Company Information",
+      "noCompanyDescription": "View and manage your company details",
+      "noCompany": "No company data available",
+      "noDescription": "No company description provided",
+      "industry": "Industry",
+      "size": "Company Size",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "website": "Website",
+      "about": "About Company",
+      "staffCount": "Staff Count",
+      "notSpecified": "Not specified"
     },
     "overview": {
       "eyebrow": "Recruitment command center",

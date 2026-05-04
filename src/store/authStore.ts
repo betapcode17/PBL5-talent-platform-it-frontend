@@ -258,20 +258,39 @@ export const useAuthStore = create<AuthState>()(
             localStorage.setItem('refreshToken', response.refresh_token)
           }
 
-          // 4. Cập nhật state
-          set({
-            user: response.user,
-            accessToken: response.access_token,
-            refreshToken: response.refresh_token ?? null,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null
-          })
-          console.log('[AuthStore] Auth state updated successfully')
-          console.log('========== END LOGIN DEBUG ==========')
+          // 4. Fetch full user data kèm employee info
+          try {
+            const { getMeApi } = await import('@/api/auth')
+            const fullUserData = await getMeApi()
+            console.log('[AuthStore] Full user data from /auth/me:', fullUserData)
 
-          // 5. Return user để component handle navigation
-          return response.user
+            // 5. Cập nhật state với full user data
+            set({
+              user: fullUserData,
+              accessToken: response.access_token,
+              refreshToken: response.refresh_token ?? null,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null
+            })
+            console.log('[AuthStore] Auth state updated with full user data')
+            console.log('========== END LOGIN DEBUG ==========')
+            return fullUserData
+          } catch (meError) {
+            console.warn('[AuthStore] Failed to fetch /auth/me, using login response:', meError)
+            // Fallback to login response if /auth/me fails
+            set({
+              user: response.user,
+              accessToken: response.access_token,
+              refreshToken: response.refresh_token ?? null,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null
+            })
+            console.log('[AuthStore] Auth state updated with login response (fallback)')
+            console.log('========== END LOGIN DEBUG ==========')
+            return response.user
+          }
         } catch (err) {
           console.log('========== LOGIN ERROR ==========')
           console.error('[AuthStore] Raw error:', err)

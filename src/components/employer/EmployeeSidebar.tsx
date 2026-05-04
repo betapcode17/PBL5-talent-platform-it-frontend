@@ -1,4 +1,13 @@
-import { BriefcaseBusiness, CalendarClock, LayoutDashboard, PanelLeftClose, PanelLeftOpen, Users, X } from 'lucide-react'
+import {
+  BriefcaseBusiness,
+  Building2,
+  CalendarClock,
+  LayoutDashboard,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Users,
+  X
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
@@ -13,11 +22,12 @@ type EmployeeSidebarProps = {
   onToggleCollapse?: () => void
 }
 
-const navigationItems = [
+const baseNavigationItems = [
   { labelKey: 'employer.sidebar.overview', href: '/employer', icon: LayoutDashboard, end: true },
   { labelKey: 'employer.sidebar.jobs', href: '/employer/jobs', icon: BriefcaseBusiness },
   { labelKey: 'employer.sidebar.candidates', href: '/employer/candidates', icon: Users },
-  { labelKey: 'employer.sidebar.interviews', href: '/employer/interviews', icon: CalendarClock }
+  { labelKey: 'employer.sidebar.interviews', href: '/employer/interviews', icon: CalendarClock },
+  { labelKey: 'employer.sidebar.company', href: '/employer/companyInfo', icon: Building2 }
 ]
 
 const EmployeeSidebar = ({
@@ -30,6 +40,7 @@ const EmployeeSidebar = ({
   const { t } = useTranslation()
   const isMobile = variant === 'mobile'
   const compact = isCollapsed && !isMobile
+  const navigationItems = baseNavigationItems
 
   return (
     <aside
@@ -83,7 +94,7 @@ const EmployeeSidebar = ({
         ) : null}
 
         <nav className='min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden pr-1'>
-          {navigationItems.map((item) => {
+          {navigationItems?.map((item) => {
             const Icon = item.icon
 
             return (
@@ -96,9 +107,7 @@ const EmployeeSidebar = ({
                 className={({ isActive }) =>
                   cn(
                     'group flex items-center rounded-2xl border text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/35',
-                    compact
-                      ? 'justify-center px-0 py-3.5'
-                      : 'justify-start gap-3 px-3.5 py-3.5',
+                    compact ? 'justify-center px-0 py-3.5' : 'justify-start gap-3 px-3.5 py-3.5',
                     isActive
                       ? 'border-violet-200 bg-violet-50/90 text-violet-700 shadow-[0_10px_25px_rgba(124,58,237,0.09)] dark:border-violet-400/20 dark:bg-violet-500/13 dark:text-violet-100'
                       : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:border-white/8 dark:hover:bg-white/6 dark:hover:text-white'
@@ -126,7 +135,6 @@ const EmployeeSidebar = ({
             )
           })}
         </nav>
-
       </div>
     </aside>
   )

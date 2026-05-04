@@ -257,10 +257,16 @@
       "jobs": "Việc làm",
       "candidates": "Ứng viên",
       "interviews": "Phỏng vấn",
+      "company": "Thông tin công ty",
       "workspace": "Không gian làm việc",
       "console": "Bảng tuyển dụng",
       "consoleDescription": "Hỗ trợ vận hành tuyển dụng và quy trình tuyển hằng ngày.",
-      "closeSidebar": "Đóng thanh điều hướng"
+      "closeSidebar": "Đóng thanh điều hướng",
+      "companyCard": {
+        "eyebrow": "Thông tin công ty",
+        "fallbackDescription": "Chưa có dữ liệu công ty bổ sung.",
+        "manage": "Quản lý hồ sơ"
+      }
     },
     "header": {
       "openNavigation": "Mở điều hướng",
@@ -283,6 +289,22 @@
       "PAUSED": "Tạm dừng",
       "SCHEDULED": "Đã lên lịch",
       "COMPLETED": "Đã hoàn tất"
+    },
+    "company": {
+      "eyebrow": "Quản lý công ty",
+      "title": "Thông tin công ty",
+      "noCompanyDescription": "Xem và quản lý thông tin công ty của bạn",
+      "noCompany": "Không có dữ liệu công ty",
+      "noDescription": "Chưa có mô tả công ty",
+      "industry": "Ngành công nghiệp",
+      "size": "Quy mô công ty",
+      "email": "Email",
+      "phone": "Điện thoại",
+      "location": "Địa chỉ",
+      "website": "Website",
+      "about": "Giới thiệu công ty",
+      "staffCount": "Số nhân viên",
+      "notSpecified": "Chưa xác định"
     },
     "overview": {
       "eyebrow": "Trung tâm điều phối tuyển dụng",

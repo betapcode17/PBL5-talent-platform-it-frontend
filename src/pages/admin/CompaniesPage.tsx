@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Eye, RefreshCw, ShieldBan, ShieldCheck } from 'lucide-react'
 import { AdminShell } from '@/components/admin/AdminShell'
+import { AdminDetailModal } from '@/components/admin/AdminDetailModal'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -48,8 +49,8 @@ const CompaniesPage = () => {
       setError(null)
 
       setSelectedCompany((current) => {
-        if (!current) return response.companies[0] || null
-        return response.companies.find((item) => item.id === current.id) || response.companies[0] || null
+        if (!current) return null
+        return response.companies.find((item) => item.id === current.id) || null
       })
     } catch {
       setError('Không thể tải danh sách công ty.')
@@ -99,7 +100,7 @@ const CompaniesPage = () => {
       title='Quản lý công ty'
       subtitle='Theo dõi hồ sơ công ty, số lượng nhân sự và trạng thái vận hành tuyển dụng.'
     >
-      <section className='grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]'>
+      <section className='space-y-5'>
         <Card className='border-slate-200/80 bg-white/90 py-0 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/8 dark:bg-[#121423]/88'>
           <CardContent className='p-5 sm:p-6'>
             <div className='flex flex-wrap items-center gap-3'>
@@ -253,66 +254,57 @@ const CompaniesPage = () => {
           </CardContent>
         </Card>
 
-        <Card className='border-slate-200/80 bg-white/90 py-0 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/8 dark:bg-[#121423]/88'>
-          <CardContent className='space-y-4 p-5 sm:p-6'>
-            <h3 className='text-lg font-bold text-slate-950 dark:text-white'>Chi tiết công ty</h3>
-            {selectedCompany ? (
-              <>
-                <div className='rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5'>
-                  <p className='text-sm text-slate-500 dark:text-slate-400'>Tên công ty</p>
-                  <p className='text-base font-bold text-slate-900 dark:text-white'>{selectedCompany.name}</p>
-                  <p className='mt-1 text-sm text-slate-600 dark:text-slate-300'>{selectedCompany.email || 'N/A'}</p>
-                </div>
+        <AdminDetailModal
+          open={Boolean(selectedCompany)}
+          title={selectedCompany ? selectedCompany.name : ''}
+          onClose={() => setSelectedCompany(null)}
+        >
+          {selectedCompany ? (
+            <>
+              <div className='rounded-2xl border border-white/10 bg-white/4 p-4'>
+                <p className='text-sm text-slate-400'>Tên công ty</p>
+                <p className='text-base font-bold text-white'>{selectedCompany.name}</p>
+                <p className='mt-1 text-sm text-slate-300'>{selectedCompany.email || 'N/A'}</p>
+              </div>
 
-                <dl className='space-y-3 text-sm'>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Ngành</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>
-                      {selectedCompany.industry || 'N/A'}
-                    </dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Địa điểm</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>
-                      {[selectedCompany.city, selectedCompany.country].filter(Boolean).join(', ') || 'N/A'}
-                    </dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Website</dt>
-                    <dd className='truncate font-semibold text-slate-900 dark:text-white'>
-                      {selectedCompany.websiteUrl || 'N/A'}
-                    </dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Nhân sự</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>{selectedCompany.totalEmployees}</dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Tin tuyển dụng</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>{selectedCompany.totalJobs}</dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Trạng thái</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>
-                      {selectedCompany.isActive ? 'Active' : 'Banned'}
-                    </dd>
-                  </div>
-                </dl>
-
-                <div className='rounded-xl border border-violet-200/70 bg-violet-50/70 p-4 dark:border-violet-400/20 dark:bg-violet-500/10'>
-                  <p className='text-xs font-bold uppercase tracking-[0.14em] text-violet-600 dark:text-violet-300'>
-                    Mô tả
-                  </p>
-                  <p className='mt-2 text-sm text-slate-700 dark:text-slate-200'>
-                    {selectedCompany.description || 'Chưa có mô tả chi tiết.'}
-                  </p>
+              <dl className='mt-4 space-y-3 text-sm'>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Ngành</dt>
+                  <dd className='font-semibold text-white'>{selectedCompany.industry || 'N/A'}</dd>
                 </div>
-              </>
-            ) : (
-              <p className='text-sm text-slate-500 dark:text-slate-400'>Chọn một công ty trong bảng để xem chi tiết.</p>
-            )}
-          </CardContent>
-        </Card>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Địa điểm</dt>
+                  <dd className='font-semibold text-white'>
+                    {[selectedCompany.city, selectedCompany.country].filter(Boolean).join(', ') || 'N/A'}
+                  </dd>
+                </div>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Website</dt>
+                  <dd className='truncate font-semibold text-white'>{selectedCompany.websiteUrl || 'N/A'}</dd>
+                </div>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Nhân sự</dt>
+                  <dd className='font-semibold text-white'>{selectedCompany.totalEmployees}</dd>
+                </div>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Tin tuyển dụng</dt>
+                  <dd className='font-semibold text-white'>{selectedCompany.totalJobs}</dd>
+                </div>
+                <div className='flex justify-between gap-4'>
+                  <dt className='text-slate-400'>Trạng thái</dt>
+                  <dd className='font-semibold text-white'>{selectedCompany.isActive ? 'Active' : 'Banned'}</dd>
+                </div>
+              </dl>
+
+              <div className='mt-4 rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4'>
+                <p className='text-xs font-bold uppercase tracking-[0.14em] text-violet-300'>Mô tả</p>
+                <p className='mt-2 text-sm text-slate-300'>
+                  {selectedCompany.description || 'Chưa có mô tả chi tiết.'}
+                </p>
+              </div>
+            </>
+          ) : null}
+        </AdminDetailModal>
       </section>
     </AdminShell>
   )

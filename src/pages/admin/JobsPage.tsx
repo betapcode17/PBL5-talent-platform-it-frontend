@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Eye, RefreshCw, ShieldBan, ShieldCheck } from 'lucide-react'
 import { AdminShell } from '@/components/admin/AdminShell'
+import { AdminDetailModal } from '@/components/admin/AdminDetailModal'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,24 @@ const formatDate = (value?: string | null) => {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return 'N/A'
   return date.toLocaleDateString('vi-VN')
+}
+
+const formatSalaryRange = (value?: string | null) => {
+  if (!value) return 'Thoả thuận'
+
+  const parts = value
+    .split(/\s*-\s*/)
+    .map((part) => part.replace(/[^\d]/g, ''))
+    .filter(Boolean)
+
+  if (parts.length === 0) return value
+
+  return parts
+    .map((part) => {
+      const amount = Number.parseInt(part, 10)
+      return Number.isNaN(amount) ? part : amount.toLocaleString('vi-VN')
+    })
+    .join(' - ')
 }
 
 const JobsPage = () => {
@@ -44,14 +63,13 @@ const JobsPage = () => {
 
       setPage(response.page)
       setTotalPages(Math.max(1, response.totalPages))
-
       setJobs(response.jobs)
       setTotal(response.total)
       setError(null)
 
       setSelectedJob((current) => {
-        if (!current) return response.jobs[0] || null
-        return response.jobs.find((item) => item.id === current.id) || response.jobs[0] || null
+        if (!current) return null
+        return response.jobs.find((item) => item.id === current.id) || null
       })
     } catch {
       setError('Không thể tải danh sách công việc.')
@@ -101,7 +119,7 @@ const JobsPage = () => {
       title='Quản lý công việc'
       subtitle='Theo dõi tin tuyển dụng, trạng thái hiển thị và thông tin vị trí chi tiết.'
     >
-      <section className='grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]'>
+      <section className='space-y-5'>
         <Card className='border-slate-200/80 bg-white/90 py-0 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/8 dark:bg-[#121423]/88'>
           <CardContent className='p-5 sm:p-6'>
             <div className='flex flex-wrap items-center gap-3'>
@@ -179,7 +197,7 @@ const JobsPage = () => {
                         {job.company.name}
                       </td>
                       <td className='border-b border-slate-200/80 py-3 text-sm text-slate-700 dark:border-white/10 dark:text-slate-200'>
-                        {job.salary || 'Thoả thuận'}
+                        {formatSalaryRange(job.salary)}
                       </td>
                       <td className='border-b border-slate-200/80 py-3 text-sm text-slate-700 dark:border-white/10 dark:text-slate-200'>
                         {job.applicationsCount}
@@ -261,62 +279,53 @@ const JobsPage = () => {
           </CardContent>
         </Card>
 
-        <Card className='border-slate-200/80 bg-white/90 py-0 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/8 dark:bg-[#121423]/88'>
-          <CardContent className='space-y-4 p-5 sm:p-6'>
-            <h3 className='text-lg font-bold text-slate-950 dark:text-white'>Chi tiết công việc</h3>
-            {selectedJob ? (
-              <>
-                <div className='rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5'>
-                  <p className='text-sm text-slate-500 dark:text-slate-400'>Tiêu đề</p>
-                  <p className='text-base font-bold text-slate-900 dark:text-white'>{selectedJob.title}</p>
-                  <p className='mt-1 text-sm text-slate-600 dark:text-slate-300'>{selectedJob.company.name}</p>
-                </div>
+        <AdminDetailModal
+          open={Boolean(selectedJob)}
+          title={selectedJob ? selectedJob.title : ''}
+          onClose={() => setSelectedJob(null)}
+        >
+          {selectedJob ? (
+            <>
+              <div className='rounded-2xl border border-white/10 bg-white/4 p-4'>
+                <p className='text-sm text-slate-400'>Tiêu đề</p>
+                <p className='text-base font-bold text-white'>{selectedJob.title}</p>
+                <p className='mt-1 text-sm text-slate-300'>{selectedJob.company.name}</p>
+              </div>
 
-                <dl className='space-y-3 text-sm'>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Loại công việc</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>{selectedJob.jobType.name}</dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Danh mục</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>{selectedJob.category.name}</dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Mức lương</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>
-                      {selectedJob.salary || 'Thoả thuận'}
-                    </dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Số lượng tuyển</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>
-                      {selectedJob.numberOfHires ?? 'N/A'}
-                    </dd>
-                  </div>
-                  <div className='flex justify-between gap-4'>
-                    <dt className='text-slate-500 dark:text-slate-400'>Trạng thái</dt>
-                    <dd className='font-semibold text-slate-900 dark:text-white'>
-                      {selectedJob.isActive ? 'Active' : 'Banned'}
-                    </dd>
-                  </div>
-                </dl>
-
-                <div className='rounded-xl border border-violet-200/70 bg-violet-50/70 p-4 dark:border-violet-400/20 dark:bg-violet-500/10'>
-                  <p className='text-xs font-bold uppercase tracking-[0.14em] text-violet-600 dark:text-violet-300'>
-                    Mô tả công việc
-                  </p>
-                  <p className='mt-2 text-sm text-slate-700 dark:text-slate-200'>
-                    {selectedJob.description || 'Chưa có mô tả chi tiết.'}
-                  </p>
+              <dl className='mt-4 space-y-3 text-sm'>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Loại công việc</dt>
+                  <dd className='font-semibold text-white'>{selectedJob.jobType.name}</dd>
                 </div>
-              </>
-            ) : (
-              <p className='text-sm text-slate-500 dark:text-slate-400'>
-                Chọn một công việc trong bảng để xem chi tiết.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Danh mục</dt>
+                  <dd className='font-semibold text-white'>{selectedJob.category.name}</dd>
+                </div>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Mức lương</dt>
+                  <dd className='font-semibold text-white'>{formatSalaryRange(selectedJob.salary)}</dd>
+                </div>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Số lượng tuyển</dt>
+                  <dd className='font-semibold text-white'>{selectedJob.numberOfHires ?? 'N/A'}</dd>
+                </div>
+                <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
+                  <dt className='text-slate-400'>Deadline</dt>
+                  <dd className='font-semibold text-white'>{formatDate(selectedJob.deadline)}</dd>
+                </div>
+                <div className='flex justify-between gap-4'>
+                  <dt className='text-slate-400'>Trạng thái</dt>
+                  <dd className='font-semibold text-white'>{selectedJob.isActive ? 'Active' : 'Banned'}</dd>
+                </div>
+              </dl>
+
+              <div className='mt-4 rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4'>
+                <p className='text-xs font-bold uppercase tracking-[0.14em] text-violet-300'>Mô tả công việc</p>
+                <p className='mt-2 text-sm text-slate-300'>{selectedJob.description || 'Chưa có mô tả chi tiết.'}</p>
+              </div>
+            </>
+          ) : null}
+        </AdminDetailModal>
       </section>
     </AdminShell>
   )

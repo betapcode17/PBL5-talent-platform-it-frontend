@@ -7,11 +7,12 @@ export const checkFollowStatusApi = async (company_id: number): Promise<CheckFol
     const response = await axiosInstance.get('/follows/check', {
       params: {
         company_id
-      }
+      },
+      skipAuthRedirect: true,
+      skipErrorLog: true
     })
     return response.data
-  } catch (error) {
-    console.error('Error checking follow status:', error)
+  } catch {
     return false
   }
 }

@@ -1,5 +1,12 @@
 import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    skipAuthRedirect?: boolean
+    skipErrorLog?: boolean
+  }
+}
+
 // Base URLs
 const apiBaseUrl = import.meta.env.VITE_BACKEND_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
@@ -69,14 +76,20 @@ axiosInstance.interceptors.response.use(
     return response
   },
   async (error: AxiosError) => {
+    if (axios.isCancel(error) || error.code === 'ERR_CANCELED') {
+      return Promise.reject(error)
+    }
+
     const status = error.response?.status
     const requestUrl = error.config?.url
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const originalRequest = error.config as RetriableRequestConfig | undefined
+    const skipAuthRedirect = error.config?.skipAuthRedirect === true
+    const skipErrorLog = error.config?.skipErrorLog === true
 
-    console.error(`[API Error] Status: ${status}, URL: ${requestUrl}`)
+    if (!skipErrorLog) {
+      console.error(`[API Error] Status: ${status}, URL: ${requestUrl}`)
+    }
 
-    if (status === 401 && !requestUrl?.includes('/auth/login')) {
+    if (status === 401 && !requestUrl?.includes('/auth/login') && !skipAuthRedirect) {
       console.warn('[API] Unauthorized - Redirecting to login')
 
       localStorage.removeItem('accessToken')
@@ -86,11 +99,11 @@ axiosInstance.interceptors.response.use(
       window.location.href = '/login'
     }
 
-    if (status === 403) {
+    if (status === 403 && !skipErrorLog) {
       console.warn('[API] Forbidden')
     }
 
-    if (status && status >= 500) {
+    if (status && status >= 500 && !skipErrorLog) {
       console.error('[API] Server error')
     }
 

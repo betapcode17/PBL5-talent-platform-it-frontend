@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { checkFollowStatusApi, followCompanyApi, getFollowCountApi, unfollowCompanyApi } from '@/api/follow'
+import { useAuthStore } from '@/store/authStore'
 
 export const useFollow = (company_id: number) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const [isFollowed, setIsFollowed] = useState(false)
   const [followerCount, setFollowerCount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
@@ -20,11 +22,18 @@ export const useFollow = (company_id: number) => {
   useEffect(() => {
     const loadFollowData = async () => {
       try {
-        const [status, count] = await Promise.all([
-          checkFollowStatusApi(company_id),
-          getFollowCountApi(company_id)
-        ])
-        setIsFollowed(status)
+        const countPromise = getFollowCountApi(company_id)
+
+        if (!isAuthenticated) {
+          const count = await countPromise
+          setIsFollowed(false)
+          setFollowerCount(count)
+          setError(null)
+          return
+        }
+
+        const [status, count] = await Promise.all([checkFollowStatusApi(company_id), countPromise])
+        setIsFollowed(Boolean(status))
         setFollowerCount(count)
         setError(null)
       } catch (err) {
@@ -34,11 +43,16 @@ export const useFollow = (company_id: number) => {
     }
 
     loadFollowData()
-  }, [company_id])
+  }, [company_id, isAuthenticated])
 
   // Handle follow/unfollow
   const toggleFollow = async () => {
-    if (isLoading) return
+    if (isLoading || !isAuthenticated) {
+      if (!isAuthenticated) {
+        setError('Vui lòng đăng nhập để theo dõi công ty')
+      }
+      return
+    }
 
     setIsLoading(true)
     setError(null)

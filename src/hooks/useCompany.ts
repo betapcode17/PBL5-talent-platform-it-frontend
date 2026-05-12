@@ -1,9 +1,28 @@
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useCompanyFilterStore } from '@/store/companyFilterStore'
 import { getCompaniesApi, getCompanyByIdApi } from '@/api/company'
+import { useCompanyFilterStore } from '@/store/companyFilterStore'
 
 export const useCompany = () => {
-  const filters = useCompanyFilterStore()
+  const keyword = useCompanyFilterStore((state) => state.keyword)
+  const industry = useCompanyFilterStore((state) => state.industry)
+  const city = useCompanyFilterStore((state) => state.city)
+  const size = useCompanyFilterStore((state) => state.size)
+  const page = useCompanyFilterStore((state) => state.page)
+  const limit = useCompanyFilterStore((state) => state.limit)
+  const setFilter = useCompanyFilterStore((state) => state.setFilter)
+
+  const filters = useMemo(
+    () => ({
+      keyword,
+      industry,
+      city,
+      size,
+      page,
+      limit
+    }),
+    [city, industry, keyword, limit, page, size]
+  )
 
   const query = useQuery({
     queryKey: ['companies', filters],
@@ -16,9 +35,10 @@ export const useCompany = () => {
     isLoading: query.isLoading,
     isError: query.isError,
     refetch: query.refetch,
-
-    // expose filters luôn (giống auth hook expose state)
-    filters
+    filters: {
+      ...filters,
+      setFilter
+    }
   }
 }
 

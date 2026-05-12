@@ -66,7 +66,7 @@ export const CompanyCard = ({ company }: Props) => {
     return () => {
       controller.abort()
     }
-  }, [company.company_id, showMoreJobs])
+  }, [company.company_id])
 
   return (
     <Card

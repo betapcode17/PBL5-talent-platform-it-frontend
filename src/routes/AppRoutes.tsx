@@ -18,6 +18,7 @@ import EmployerCompanyInfoPage from '@/pages/employer/CompanyInfoPage'
 import CreateJobPage from '@/pages/employer/CreateJobPage'
 import CreateInterviewPage from '@/pages/employer/CreateInterviewPage'
 import ResourcesPage from '@/pages/ResourcesPage'
+import ProfilePage from '@/pages/seeker/ProfilePage'
 
 // Lazy load pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
@@ -68,13 +69,16 @@ export function AppRoutes() {
 
           {/* Candidate/Seeker Routes */}
           <Route
-            path='/seeker/*'
+            path='/seeker'
             element={
               <ProtectedRoute allowedRoles={['SEEKER']}>
                 <SeekerDashboard />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<Navigate to='profile' replace />} />
+            <Route path='profile' element={<ProfilePage />} />
+          </Route>
 
           {/* Employer Routes */}
           <Route

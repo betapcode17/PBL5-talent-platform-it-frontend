@@ -37,7 +37,7 @@ const getDashboardPath = (role?: string) => {
     case 'EMPLOYEE':
       return '/employer'
     case 'SEEKER':
-      return '/seeker'
+      return '/seeker/profile'
     default:
       return '/login'
   }
@@ -222,7 +222,7 @@ const Navbar = ({
                             className='flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50'
                           >
                             <User className='h-4 w-4 text-slate-500' />
-                            {t('nav.dashboard')}
+                            {user?.role === 'SEEKER' ? 'Hồ sơ & CV' : t('nav.dashboard')}
                           </Link>
                           <button
                             type='button'

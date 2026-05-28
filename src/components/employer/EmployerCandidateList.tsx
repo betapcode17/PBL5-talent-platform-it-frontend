@@ -5,15 +5,19 @@ import { useTranslation } from 'react-i18next'
 import type { EmployerCandidateItem } from '@/@types/employer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import CandidateLikeButton from '@/components/likes/CandidateLikeButton'
+import { useCompanyLikes } from '@/hooks/useCompanyLikes'
 import EmployerEmptyState from './EmployerEmptyState'
 import ViewCandidateModal from './ViewCandidateModal'
 
 type EmployerCandidateListProps = {
   candidates: EmployerCandidateItem[]
+  companyId?: number | null
 }
 
-const EmployerCandidateList = ({ candidates }: EmployerCandidateListProps) => {
+const EmployerCandidateList = ({ candidates, companyId }: EmployerCandidateListProps) => {
   const { i18n, t } = useTranslation()
+  const { error: likesError, isLoading: isLoadingLikes } = useCompanyLikes(companyId)
   const [searchTerm, setSearchTerm] = useState('')
   const [stageFilter, setStageFilter] = useState<string>('__ALL__')
   const [jobFilter, setJobFilter] = useState<string>('__ALL__')
@@ -108,6 +112,8 @@ const EmployerCandidateList = ({ candidates }: EmployerCandidateListProps) => {
             ))}
           </select>
         </div>
+        {likesError ? <p className='rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700'>{likesError}</p> : null}
+        {isLoadingLikes ? <p className='text-sm font-medium text-slate-500'>{t('employer.candidates.like.loading')}</p> : null}
 
         {filteredCandidates.length === 0 ? (
           <EmployerEmptyState
@@ -179,15 +185,18 @@ const EmployerCandidateList = ({ candidates }: EmployerCandidateListProps) => {
                     </div>
                   </div>
 
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className='mt-4 w-full rounded-lg'
-                    onClick={() => handleViewCandidate(candidate)}
-                  >
-                    <Eye className='h-4 w-4' />
-                    {t('employer.candidates.table.view')}
-                  </Button>
+                  <div className='mt-4 grid gap-2 sm:grid-cols-2'>
+                    <CandidateLikeButton seekerId={candidate.seeker.id} />
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      className='w-full rounded-lg'
+                      onClick={() => handleViewCandidate(candidate)}
+                    >
+                      <Eye className='h-4 w-4' />
+                      {t('employer.candidates.table.view')}
+                    </Button>
+                  </div>
                 </article>
               ))}
             </div>
@@ -259,15 +268,18 @@ const EmployerCandidateList = ({ candidates }: EmployerCandidateListProps) => {
                         })}
                       </td>
                       <td className='px-4 py-4 text-right'>
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          className='rounded-lg'
-                          onClick={() => handleViewCandidate(candidate)}
-                        >
-                          <Eye className='h-4 w-4' />
-                          {t('employer.candidates.table.view')}
-                        </Button>
+                        <div className='flex justify-end gap-2'>
+                          <CandidateLikeButton seekerId={candidate.seeker.id} compact />
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            className='rounded-lg'
+                            onClick={() => handleViewCandidate(candidate)}
+                          >
+                            <Eye className='h-4 w-4' />
+                            {t('employer.candidates.table.view')}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}

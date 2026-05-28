@@ -571,6 +571,12 @@
         "view": "View",
         "unknown": "Unknown"
       },
+      "like": {
+        "like": "Like",
+        "liked": "Liked",
+        "updating": "Saving...",
+        "loading": "Loading liked candidates..."
+      },
       "modal": {
         "closeDetails": "Close candidate details",
         "appliedFor": "Applied for: {{job}}",

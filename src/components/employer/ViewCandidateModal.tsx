@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { acceptEmployerApplicationApi, rejectEmployerApplicationApi } from '@/api/employer'
 import type { EmployerCandidateItem } from '@/@types/employer'
 import { Button } from '@/components/ui/button'
+import CandidateLikeButton from '@/components/likes/CandidateLikeButton'
 
 type ViewCandidateModalProps = {
   candidate: EmployerCandidateItem
@@ -190,6 +191,7 @@ const ViewCandidateModal = ({ candidate, isOpen, onClose }: ViewCandidateModalPr
           <Button variant='outline' onClick={onClose} className='w-full rounded-lg sm:w-auto'>
             {t('employer.candidates.modal.close')}
           </Button>
+          <CandidateLikeButton seekerId={candidate.seeker.id} />
           <Button
             type='button'
             variant='outline'

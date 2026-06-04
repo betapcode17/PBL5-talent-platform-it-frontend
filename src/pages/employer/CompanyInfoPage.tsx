@@ -1,15 +1,104 @@
+import { useEffect, useState, type ComponentType, type FormEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQuery } from '@tanstack/react-query'
-import { Building2, Mail, MapPin, Globe, Users, Briefcase, TrendingUp } from 'lucide-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Briefcase, Building2, Edit3, Globe, Mail, MapPin, Save, TrendingUp, Users, X } from 'lucide-react'
 
+import type { CompanyDetail, UpdateCompanyRequest } from '@/@types/company'
+import { getCompanyByIdApi, updateCompanyApi } from '@/api/company'
 import EmployerPageHeader from '@/components/employer/EmployerPageHeader'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
-import { getCompanyByIdApi } from '@/api/company'
+
+type CompanyFormState = {
+  company_name: string
+  profile_description: string
+  company_type: string
+  company_industry: string
+  company_size: string
+  country: string
+  city: string
+  working_days: string
+  working_time: string
+  overtime_policy: string
+  company_website_url: string
+  company_email: string
+  company_image: string
+  cover_image: string
+  key_skills: string
+  why_love_working_here: string
+}
+
+const emptyCompanyForm: CompanyFormState = {
+  company_name: '',
+  profile_description: '',
+  company_type: '',
+  company_industry: '',
+  company_size: '',
+  country: '',
+  city: '',
+  working_days: '',
+  working_time: '',
+  overtime_policy: '',
+  company_website_url: '',
+  company_email: '',
+  company_image: '',
+  cover_image: '',
+  key_skills: '',
+  why_love_working_here: ''
+}
+
+const optionalValue = (value: string) => {
+  const trimmed = value.trim()
+  return trimmed ? trimmed : null
+}
+
+const toCompanyForm = (company: CompanyDetail): CompanyFormState => ({
+  company_name: company.company_name ?? '',
+  profile_description: company.profile_description ?? '',
+  company_type: company.company_type ?? '',
+  company_industry: company.company_industry ?? '',
+  company_size: company.company_size ?? '',
+  country: company.country ?? '',
+  city: company.city ?? '',
+  working_days: company.working_days ?? '',
+  working_time: company.working_time ?? '',
+  overtime_policy: company.overtime_policy ?? '',
+  company_website_url: company.company_website_url ?? '',
+  company_email: company.company_email ?? '',
+  company_image: company.company_image ?? '',
+  cover_image: company.cover_image ?? '',
+  key_skills: company.key_skills ?? '',
+  why_love_working_here: company.why_love_working_here ?? ''
+})
+
+const buildUpdatePayload = (form: CompanyFormState): UpdateCompanyRequest => ({
+  company_name: form.company_name.trim(),
+  profile_description: optionalValue(form.profile_description),
+  company_type: optionalValue(form.company_type),
+  company_industry: optionalValue(form.company_industry),
+  company_size: optionalValue(form.company_size),
+  country: optionalValue(form.country),
+  city: optionalValue(form.city),
+  working_days: optionalValue(form.working_days),
+  working_time: optionalValue(form.working_time),
+  overtime_policy: optionalValue(form.overtime_policy),
+  company_website_url: optionalValue(form.company_website_url),
+  company_email: optionalValue(form.company_email),
+  company_image: optionalValue(form.company_image),
+  cover_image: optionalValue(form.cover_image),
+  key_skills: optionalValue(form.key_skills),
+  why_love_working_here: optionalValue(form.why_love_working_here)
+})
 
 const EmployerCompanyInfoPage = () => {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const { user } = useAuthStore()
   const companyId = user?.employee?.company?.company_id
+  const [isEditing, setIsEditing] = useState(false)
+  const [form, setForm] = useState<CompanyFormState>(emptyCompanyForm)
+  const [message, setMessage] = useState<string | null>(null)
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['company', companyId],
@@ -18,6 +107,52 @@ const EmployerCompanyInfoPage = () => {
   })
 
   const company = data?.company
+
+  useEffect(() => {
+    if (company) {
+      setForm(toCompanyForm(company))
+    }
+  }, [company])
+
+  const updateMutation = useMutation({
+    mutationFn: (payload: UpdateCompanyRequest) => updateCompanyApi(companyId!, payload),
+    onSuccess: async () => {
+      setIsEditing(false)
+      setMessage('Cập nhật thông tin công ty thành công.')
+      await queryClient.invalidateQueries({ queryKey: ['company', companyId] })
+    },
+    onError: (mutationError) => {
+      const apiMessage =
+        mutationError && typeof mutationError === 'object' && 'response' in mutationError
+          ? (mutationError as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+      setMessage(apiMessage || 'Không thể cập nhật thông tin công ty lúc này.')
+    }
+  })
+
+  const updateFormValue = (key: keyof CompanyFormState, value: string) => {
+    setForm((current) => ({ ...current, [key]: value }))
+  }
+
+  const cancelEdit = () => {
+    if (company) {
+      setForm(toCompanyForm(company))
+    }
+    setMessage(null)
+    setIsEditing(false)
+  }
+
+  const submitCompanyForm = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setMessage(null)
+
+    if (!form.company_name.trim()) {
+      setMessage('Tên công ty không được để trống.')
+      return
+    }
+
+    updateMutation.mutate(buildUpdatePayload(form))
+  }
 
   if (isLoading) {
     return (
@@ -28,10 +163,10 @@ const EmployerCompanyInfoPage = () => {
           description={t('employer.company.noCompanyDescription')}
         />
         <div className='animate-pulse space-y-6'>
-          <div className='h-48 rounded-3xl bg-gradient-to-r from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-800' />
+          <div className='h-48 rounded-3xl bg-slate-200 dark:bg-slate-800' />
           <div className='grid gap-6 lg:grid-cols-3'>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className='h-32 rounded-2xl bg-slate-200 dark:bg-slate-700' />
+            {[1, 2, 3].map((item) => (
+              <div key={item} className='h-32 rounded-2xl bg-slate-200 dark:bg-slate-800' />
             ))}
           </div>
         </div>
@@ -47,7 +182,7 @@ const EmployerCompanyInfoPage = () => {
           title={t('employer.company.title')}
           description={t('employer.company.noCompanyDescription')}
         />
-        <div className='rounded-3xl border-2 border-dashed border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-12 text-center dark:border-red-900/30 dark:from-red-950/20 dark:to-orange-950/20'>
+        <div className='rounded-3xl border-2 border-dashed border-red-200 bg-red-50 p-12 text-center dark:border-red-900/30 dark:bg-red-950/20'>
           <div className='mx-auto mb-4 inline-flex h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/30'>
             <Building2 className='m-auto h-8 w-8 text-red-500 dark:text-red-400' />
           </div>
@@ -62,217 +197,266 @@ const EmployerCompanyInfoPage = () => {
     )
   }
 
+  const infoItems = [
+    { label: t('employer.company.industry'), value: company.company_industry, icon: Briefcase },
+    { label: t('employer.company.size'), value: company.company_size, icon: Users },
+    { label: t('employer.company.location'), value: [company.city, company.country].filter(Boolean).join(', '), icon: MapPin },
+    { label: t('employer.company.email'), value: company.company_email, icon: Mail }
+  ]
+
   return (
     <div className='min-w-0 space-y-8'>
-      {/* Hero Banner */}
-      <div className='relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-8 shadow-2xl dark:from-violet-900 dark:via-purple-900 dark:to-indigo-900 lg:p-12'>
-        {/* Background decoration */}
-        <div className='absolute inset-0 opacity-20'>
-          <div className='absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10' />
-          <div className='absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white/10' />
-        </div>
+      <EmployerPageHeader
+        eyebrow={t('employer.company.eyebrow')}
+        title={t('employer.company.title')}
+        description='HR thuộc công ty này có thể cập nhật hồ sơ công ty hiển thị cho ứng viên.'
+      />
 
-        <div className='relative z-10'>
-          <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
-            <div className='flex-1'>
-              <h1 className='text-4xl font-bold text-white lg:text-5xl'>{company.company_name}</h1>
-              <p className='mt-3 text-lg text-violet-100'>{company.profile_description || 'Welcome to our company'}</p>
+      <section className='flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30 sm:flex-row sm:items-center sm:justify-between'>
+        <div>
+          <p className='text-sm font-semibold uppercase tracking-[0.14em] text-violet-600'>Company profile</p>
+          <h2 className='mt-1 text-xl font-bold text-slate-950 dark:text-white'>Quản lý thông tin công ty</h2>
+          <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>Chỉnh sửa tên, mô tả, liên hệ, địa điểm và các thông tin tuyển dụng.</p>
+        </div>
+        <Button
+          type='button'
+          variant={isEditing ? 'outline' : 'default'}
+          className='rounded-lg'
+          onClick={() => {
+            setMessage(null)
+            setIsEditing((current) => !current)
+          }}
+        >
+          {isEditing ? <X className='h-4 w-4' /> : <Edit3 className='h-4 w-4' />}
+          {isEditing ? 'Đóng chỉnh sửa' : 'Chỉnh sửa'}
+        </Button>
+      </section>
+
+      {isEditing ? (
+        <form onSubmit={submitCompanyForm} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'>
+          <div className='grid gap-4 md:grid-cols-2'>
+            <CompanyInput label='Tên công ty *' value={form.company_name} onChange={(value) => updateFormValue('company_name', value)} />
+            <CompanyInput label='Email công ty' type='email' value={form.company_email} onChange={(value) => updateFormValue('company_email', value)} />
+            <CompanyInput label='Ngành' value={form.company_industry} onChange={(value) => updateFormValue('company_industry', value)} />
+            <CompanyInput label='Quy mô' value={form.company_size} onChange={(value) => updateFormValue('company_size', value)} />
+            <CompanyInput label='Loại công ty' value={form.company_type} onChange={(value) => updateFormValue('company_type', value)} />
+            <CompanyInput label='Website' value={form.company_website_url} onChange={(value) => updateFormValue('company_website_url', value)} />
+            <CompanyInput label='Thành phố' value={form.city} onChange={(value) => updateFormValue('city', value)} />
+            <CompanyInput label='Quốc gia' value={form.country} onChange={(value) => updateFormValue('country', value)} />
+            <CompanyInput label='Ngày làm việc' value={form.working_days} onChange={(value) => updateFormValue('working_days', value)} />
+            <CompanyInput label='Giờ làm việc' value={form.working_time} onChange={(value) => updateFormValue('working_time', value)} />
+            <CompanyInput label='URL logo' value={form.company_image} onChange={(value) => updateFormValue('company_image', value)} wide />
+            <CompanyInput label='URL ảnh bìa' value={form.cover_image} onChange={(value) => updateFormValue('cover_image', value)} wide />
+            <CompanyTextarea label='Mô tả công ty' value={form.profile_description} onChange={(value) => updateFormValue('profile_description', value)} rows={4} />
+            <CompanyTextarea label='Kỹ năng chính' value={form.key_skills} onChange={(value) => updateFormValue('key_skills', value)} rows={3} />
+            <CompanyTextarea label='Lý do yêu thích môi trường này' value={form.why_love_working_here} onChange={(value) => updateFormValue('why_love_working_here', value)} rows={3} />
+            <CompanyTextarea label='Chính sách OT' value={form.overtime_policy} onChange={(value) => updateFormValue('overtime_policy', value)} rows={3} />
+          </div>
+
+          {message ? <p className='mt-4 rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 dark:bg-white/5 dark:text-slate-200'>{message}</p> : null}
+
+          <div className='mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end'>
+            <Button type='button' variant='outline' className='rounded-lg' onClick={cancelEdit}>
+              Hủy
+            </Button>
+            <Button type='submit' className='rounded-lg' disabled={updateMutation.isPending}>
+              <Save className='h-4 w-4' />
+              {updateMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+            </Button>
+          </div>
+        </form>
+      ) : null}
+
+      {message && !isEditing ? <p className='rounded-lg bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700'>{message}</p> : null}
+
+      <section
+        className='relative overflow-hidden rounded-3xl bg-slate-950 p-8 shadow-2xl lg:p-12'
+        style={
+          company.cover_image
+            ? {
+                backgroundImage: `linear-gradient(90deg, rgba(15, 23, 42, 0.88), rgba(88, 28, 135, 0.72)), url(${company.cover_image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }
+            : undefined
+        }
+      >
+        <div className='relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
+          <div className='flex min-w-0 gap-5'>
+            {company.company_image ? (
+              <img src={company.company_image} alt={company.company_name} className='h-20 w-20 rounded-2xl border border-white/20 object-cover' />
+            ) : (
+              <div className='flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 text-2xl font-bold text-white'>
+                {company.company_name.charAt(0)}
+              </div>
+            )}
+            <div className='min-w-0'>
+              <h1 className='break-words text-4xl font-bold text-white lg:text-5xl'>{company.company_name}</h1>
+              <p className='mt-3 max-w-3xl text-lg text-violet-100'>{company.profile_description || 'Welcome to our company'}</p>
               <div className='mt-6 flex flex-wrap gap-2'>
-                {company.company_industry && (
-                  <span className='rounded-full bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm'>
-                    {company.company_industry}
+                {[company.company_industry, company.company_size, company.company_type].filter(Boolean).map((item) => (
+                  <span key={item} className='rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm'>
+                    {item}
                   </span>
-                )}
-                {company.company_size && (
-                  <span className='rounded-full bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm'>
-                    {company.company_size} {t('employer.company.staffCount').toLowerCase()}
-                  </span>
-                )}
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Key Info Grid */}
-      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-        {[
-          {
-            label: t('employer.company.industry'),
-            value: company.company_industry,
-            icon: Briefcase,
-            color: 'from-blue-600 to-cyan-600'
-          },
-          {
-            label: t('employer.company.size'),
-            value: company.company_size,
-            icon: Users,
-            color: 'from-purple-600 to-pink-600'
-          },
-          {
-            label: t('employer.company.location'),
-            value: company.city,
-            icon: MapPin,
-            color: 'from-orange-600 to-red-600'
-          },
-          {
-            label: t('employer.company.email'),
-            value: company.company_email,
-            icon: Mail,
-            color: 'from-green-600 to-emerald-600'
-          }
-        ].map((info, idx) => {
+      <section className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+        {infoItems.map((info) => {
           const Icon = info.icon
           return (
-            <div
-              key={idx}
-              className='group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 p-6 transition-all duration-300 hover:shadow-lg dark:from-slate-800/50 dark:to-slate-900/50'
-            >
-              <div
-                className={`absolute inset-0 bg-gradient-to-br ${info.color} opacity-0 transition-opacity duration-300 group-hover:opacity-10`}
-              />
-              <div className='relative z-10'>
-                <div className={`mb-3 inline-flex rounded-xl bg-gradient-to-br ${info.color} p-3 text-white`}>
-                  <Icon className='h-5 w-5' />
-                </div>
-                <p className='text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400'>
-                  {info.label}
-                </p>
-                <p className='mt-2 text-sm font-bold text-slate-900 dark:text-white line-clamp-2'>
-                  {info.value || t('employer.company.notSpecified')}
-                </p>
+            <article key={info.label} className='rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'>
+              <div className='mb-3 inline-flex rounded-xl bg-violet-100 p-3 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300'>
+                <Icon className='h-5 w-5' />
               </div>
-            </div>
+              <p className='text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400'>{info.label}</p>
+              <p className='mt-2 break-words text-sm font-bold text-slate-900 dark:text-white'>{info.value || t('employer.company.notSpecified')}</p>
+            </article>
           )
         })}
-      </div>
+      </section>
 
-      {/* Main Content Sections */}
-      <div className='grid gap-8 lg:grid-cols-3'>
-        {/* About Section - Span 2 columns */}
-        {company.profile_description && (
-          <div className='lg:col-span-2'>
-            <div className='overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-slate-700/50 dark:bg-slate-900/30'>
-              <div className='border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100 px-8 py-6 dark:border-slate-700/50 dark:from-slate-800/50 dark:to-slate-900/50'>
-                <div className='flex items-center gap-3'>
-                  <div className='rounded-lg bg-violet-100 p-2 dark:bg-violet-900/30'>
-                    <Briefcase className='h-5 w-5 text-violet-600 dark:text-violet-400' />
-                  </div>
-                  <h2 className='text-xl font-bold text-slate-900 dark:text-white'>{t('employer.company.about')}</h2>
-                </div>
-              </div>
-              <div className='px-8 py-6'>
-                <p className='whitespace-pre-wrap leading-relaxed text-slate-600 dark:text-slate-300'>
-                  {company.profile_description}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+      <section className='grid gap-8 lg:grid-cols-3'>
+        <div className='space-y-6 lg:col-span-2'>
+          <CompanyPanel title={t('employer.company.about')} icon={Briefcase}>
+            <p className='whitespace-pre-wrap leading-relaxed text-slate-600 dark:text-slate-300'>
+              {company.profile_description || t('employer.company.noDescription')}
+            </p>
+          </CompanyPanel>
 
-        {/* Sidebar - Stats */}
-        <div className='space-y-6'>
-          {/* Staff Count Card */}
-          <div className='overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-blue-50 to-cyan-50 shadow-sm dark:border-slate-700/50 dark:from-blue-950/20 dark:to-cyan-950/20'>
-            <div className='bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4'>
-              <div className='flex items-center gap-2'>
-                <Users className='h-5 w-5 text-white' />
-                <p className='text-sm font-semibold uppercase tracking-widest text-white/80'>
-                  {t('employer.company.staffCount')}
-                </p>
+          {(company.key_skills || company.why_love_working_here || company.overtime_policy) && (
+            <CompanyPanel title='Thông tin tuyển dụng' icon={TrendingUp}>
+              <div className='space-y-4 text-sm text-slate-600 dark:text-slate-300'>
+                {company.key_skills ? <InfoBlock label='Kỹ năng chính' value={company.key_skills} /> : null}
+                {company.why_love_working_here ? <InfoBlock label='Vì sao yêu thích môi trường này' value={company.why_love_working_here} /> : null}
+                {company.overtime_policy ? <InfoBlock label='Chính sách OT' value={company.overtime_policy} /> : null}
               </div>
-            </div>
-            <div className='px-6 py-6'>
-              <p className='text-3xl font-bold text-blue-600 dark:text-blue-400'>
-                {company.company_size || t('employer.company.notSpecified')}
-              </p>
-              <p className='mt-2 text-xs text-slate-500 dark:text-slate-400'>Total employees</p>
-            </div>
-          </div>
-
-          {/* Industry Card */}
-          <div className='overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-purple-50 to-pink-50 shadow-sm dark:border-slate-700/50 dark:from-purple-950/20 dark:to-pink-950/20'>
-            <div className='bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4'>
-              <div className='flex items-center gap-2'>
-                <TrendingUp className='h-5 w-5 text-white' />
-                <p className='text-sm font-semibold uppercase tracking-widest text-white/80'>
-                  {t('employer.company.industry')}
-                </p>
-              </div>
-            </div>
-            <div className='px-6 py-6'>
-              <p className='text-lg font-bold text-purple-600 dark:text-purple-400'>
-                {company.company_industry || t('employer.company.notSpecified')}
-              </p>
-              <p className='mt-2 text-xs text-slate-500 dark:text-slate-400'>Primary sector</p>
-            </div>
-          </div>
-
-          {/* Website Card */}
-          {company.company_website_url && (
-            <div className='overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-green-50 to-emerald-50 shadow-sm dark:border-slate-700/50 dark:from-green-950/20 dark:to-emerald-950/20'>
-              <div className='bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4'>
-                <div className='flex items-center gap-2'>
-                  <Globe className='h-5 w-5 text-white' />
-                  <p className='text-sm font-semibold uppercase tracking-widest text-white/80'>
-                    {t('employer.company.website')}
-                  </p>
-                </div>
-              </div>
-              <div className='px-6 py-6'>
-                <a
-                  href={company.company_website_url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-sm font-medium text-green-600 transition-colors hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 line-clamp-2 break-all'
-                >
-                  {company.company_website_url}
-                </a>
-              </div>
-            </div>
+            </CompanyPanel>
           )}
         </div>
-      </div>
 
-      {/* Contact Section */}
-      {(company.company_email || company.city) && (
-        <div className='overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'>
-          <div className='border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100 px-8 py-6 dark:border-slate-700/50 dark:from-slate-800/50 dark:to-slate-900/50'>
-            <h2 className='text-lg font-bold text-slate-900 dark:text-white'>Contact Information</h2>
+        <aside className='space-y-6'>
+          <CompanyStat icon={Users} label={t('employer.company.staffCount')} value={company.company_size || t('employer.company.notSpecified')} />
+          <CompanyStat icon={TrendingUp} label={t('employer.company.industry')} value={company.company_industry || t('employer.company.notSpecified')} />
+          {company.company_website_url ? (
+            <CompanyStat icon={Globe} label={t('employer.company.website')} value={company.company_website_url} href={company.company_website_url} />
+          ) : null}
+        </aside>
+      </section>
+
+      {(company.company_email || company.city || company.country || company.working_days || company.working_time) && (
+        <CompanyPanel title='Contact Information' icon={Mail}>
+          <div className='grid gap-5 sm:grid-cols-2'>
+            {company.company_email ? <ContactItem icon={Mail} label='Email' value={company.company_email} href={`mailto:${company.company_email}`} /> : null}
+            {[company.city, company.country].filter(Boolean).length > 0 ? (
+              <ContactItem icon={MapPin} label='Location' value={[company.city, company.country].filter(Boolean).join(', ')} />
+            ) : null}
+            {company.working_days ? <ContactItem icon={Briefcase} label='Ngày làm việc' value={company.working_days} /> : null}
+            {company.working_time ? <ContactItem icon={Users} label='Giờ làm việc' value={company.working_time} /> : null}
           </div>
-          <div className='grid gap-6 px-8 py-6 sm:grid-cols-2'>
-            {company.company_email && (
-              <div className='flex gap-4'>
-                <div className='rounded-lg bg-blue-100 p-3 dark:bg-blue-900/30'>
-                  <Mail className='h-5 w-5 text-blue-600 dark:text-blue-400' />
-                </div>
-                <div>
-                  <p className='text-xs font-semibold uppercase text-slate-500 dark:text-slate-400'>Email</p>
-                  <a
-                    href={`mailto:${company.company_email}`}
-                    className='mt-1 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
-                  >
-                    {company.company_email}
-                  </a>
-                </div>
-              </div>
-            )}
-            {company.city && (
-              <div className='flex gap-4'>
-                <div className='rounded-lg bg-red-100 p-3 dark:bg-red-900/30'>
-                  <MapPin className='h-5 w-5 text-red-600 dark:text-red-400' />
-                </div>
-                <div>
-                  <p className='text-xs font-semibold uppercase text-slate-500 dark:text-slate-400'>Location</p>
-                  <p className='mt-1 text-sm font-medium text-slate-900 dark:text-white'>{company.city}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        </CompanyPanel>
       )}
     </div>
   )
 }
+
+type CompanyInputProps = {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  type?: string
+  wide?: boolean
+}
+
+const CompanyInput = ({ label, value, onChange, type = 'text', wide = false }: CompanyInputProps) => (
+  <label className={`space-y-2 ${wide ? 'md:col-span-2' : ''}`}>
+    <span className='text-sm font-semibold text-slate-700 dark:text-slate-200'>{label}</span>
+    <Input type={type} value={value} onChange={(event) => onChange(event.target.value)} />
+  </label>
+)
+
+type CompanyTextareaProps = {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  rows: number
+}
+
+const CompanyTextarea = ({ label, value, onChange, rows }: CompanyTextareaProps) => (
+  <label className='space-y-2 md:col-span-2'>
+    <span className='text-sm font-semibold text-slate-700 dark:text-slate-200'>{label}</span>
+    <textarea
+      value={value}
+      rows={rows}
+      onChange={(event) => onChange(event.target.value)}
+      className='w-full rounded-lg border border-slate-200 bg-transparent px-3 py-2 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 dark:border-slate-700 dark:text-white'
+    />
+  </label>
+)
+
+type IconComponent = ComponentType<{ className?: string }>
+
+const CompanyPanel = ({ title, icon: Icon, children }: { title: string; icon: IconComponent; children: ReactNode }) => (
+  <section className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'>
+    <div className='border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-slate-700/50 dark:bg-white/5'>
+      <div className='flex items-center gap-3'>
+        <div className='rounded-lg bg-violet-100 p-2 dark:bg-violet-900/30'>
+          <Icon className='h-5 w-5 text-violet-600 dark:text-violet-400' />
+        </div>
+        <h2 className='text-lg font-bold text-slate-900 dark:text-white'>{title}</h2>
+      </div>
+    </div>
+    <div className='px-6 py-5'>{children}</div>
+  </section>
+)
+
+const CompanyStat = ({ icon: Icon, label, value, href }: { icon: IconComponent; label: string; value: string; href?: string }) => (
+  <article className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'>
+    <div className='bg-violet-600 px-6 py-4'>
+      <div className='flex items-center gap-2'>
+        <Icon className='h-5 w-5 text-white' />
+        <p className='text-sm font-semibold uppercase tracking-widest text-white/80'>{label}</p>
+      </div>
+    </div>
+    <div className='px-6 py-5'>
+      {href ? (
+        <a href={href} target='_blank' rel='noopener noreferrer' className='break-all text-sm font-semibold text-violet-700 hover:text-violet-800 dark:text-violet-300'>
+          {value}
+        </a>
+      ) : (
+        <p className='break-words text-lg font-bold text-slate-900 dark:text-white'>{value}</p>
+      )}
+    </div>
+  </article>
+)
+
+const InfoBlock = ({ label, value }: { label: string; value: string }) => (
+  <div>
+    <p className='font-semibold text-slate-900 dark:text-white'>{label}</p>
+    <p className='mt-1 whitespace-pre-wrap'>{value}</p>
+  </div>
+)
+
+const ContactItem = ({ icon: Icon, label, value, href }: { icon: IconComponent; label: string; value: string; href?: string }) => (
+  <div className='flex gap-4'>
+    <div className='rounded-lg bg-violet-100 p-3 dark:bg-violet-900/30'>
+      <Icon className='h-5 w-5 text-violet-600 dark:text-violet-400' />
+    </div>
+    <div className='min-w-0'>
+      <p className='text-xs font-semibold uppercase text-slate-500 dark:text-slate-400'>{label}</p>
+      {href ? (
+        <a href={href} className='mt-1 block break-all text-sm font-medium text-violet-700 hover:text-violet-800 dark:text-violet-300'>
+          {value}
+        </a>
+      ) : (
+        <p className='mt-1 break-words text-sm font-medium text-slate-900 dark:text-white'>{value}</p>
+      )}
+    </div>
+  </div>
+)
 
 export default EmployerCompanyInfoPage

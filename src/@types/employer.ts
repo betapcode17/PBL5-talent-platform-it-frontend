@@ -39,10 +39,10 @@ export interface EmployerPipelineSummary {
 }
 
 export interface EmployerJobItem {
-  requirements: import('react/jsx-runtime').JSX.Element
-  description: import('react/jsx-runtime').JSX.Element
-  numberOfPositions: number
-  experienceRequired: string
+  requirements?: string | null
+  description?: string | null
+  numberOfPositions?: number | null
+  experienceRequired?: string | null
   id: number
   title: string
   salary: string | null
@@ -70,8 +70,8 @@ export interface EmployerCandidateItem {
   status: string
   rejectionReason?: string | null
   seeker: {
-    location: import('react/jsx-runtime').JSX.Element
-    experience: import('react/jsx-runtime').JSX.Element
+    location?: string | null
+    experience?: string | null
     id: number
     fullName?: string
     email?: string

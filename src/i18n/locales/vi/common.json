@@ -18,6 +18,8 @@
     "account": "Tài khoản",
     "openChat": "Mở trò chuyện",
     "openAccountMenu": "Mở menu tài khoản",
+    "appliedCompanies": "Danh sách công ty đã ứng tuyển",
+    "savedCompanies": "Danh sách công ty đã lưu",
     "searchJobs": "Tìm việc làm...",
     "mobileNavigation": "Điều hướng di động",
     "primaryNavigation": "Điều hướng chính"
@@ -604,6 +606,74 @@
         "INTERVIEW_COMPLETED": "Đã phỏng vấn xong",
         "INTERVIEW_CANCELLED": "Đã hủy phỏng vấn"
       }
+    }
+  },
+  "seekerCompanies": {
+    "common": {
+      "searchLabel": "Tìm công ty",
+      "pageLabel": "Trang {{page}} / {{total}}",
+      "previous": "Trước",
+      "next": "Sau",
+      "viewCompany": "Xem công ty",
+      "showAppliedJobs": "Xem job đã ứng tuyển",
+      "hideAppliedJobs": "Ẩn job đã ứng tuyển",
+      "statusFilter": "Trạng thái ứng tuyển",
+      "allStatuses": "Tất cả trạng thái",
+      "appliedDate": "Ngày ứng tuyển",
+      "updatedDate": "Ngày cập nhật",
+      "salary": "Mức lương",
+      "location": "Địa điểm",
+      "jobType": "Loại công việc",
+      "category": "Danh mục",
+      "viewJob": "Xem job",
+      "notSpecified": "Chưa xác định"
+    },
+    "applied": {
+      "eyebrow": "Công ty đã ứng tuyển",
+      "title": "Các công ty bạn đã ứng tuyển",
+      "description": "Theo dõi những công ty bạn đã nộp hồ sơ, lọc theo trạng thái hiện tại và xem ngay chi tiết từng job đã apply mà không cần rời trang.",
+      "searchPlaceholder": "Tìm công ty đã ứng tuyển...",
+      "totalLabel": "Công ty đã ứng tuyển",
+      "emptyTitle": "Chưa có công ty nào đã ứng tuyển",
+      "emptyDescription": "Khi bạn ứng tuyển vào các job trong hệ thống, công ty sẽ hiển thị tại đây.",
+      "loadError": "Không thể tải danh sách công ty đã ứng tuyển",
+      "meta": {
+        "latestApplied": "Lần ứng tuyển gần nhất",
+        "positionsApplied": "Số vị trí đã ứng tuyển",
+        "relatedRoles": "Số role liên quan"
+      },
+      "jobs": {
+        "title": "Danh sách job đã ứng tuyển",
+        "empty": "Không có job nào khớp với trạng thái hiện tại trong công ty này."
+      }
+    },
+    "saved": {
+      "eyebrow": "Công ty đã lưu",
+      "title": "Các công ty bạn đã lưu",
+      "description": "Quản lý danh sách công ty bạn đang theo dõi để quay lại xem hồ sơ và các cơ hội tuyển dụng bất cứ lúc nào.",
+      "searchPlaceholder": "Tìm công ty đã lưu...",
+      "totalLabel": "Công ty đã lưu",
+      "emptyTitle": "Chưa có công ty nào đã lưu",
+      "emptyDescription": "Khi bạn theo dõi công ty trong hệ thống, danh sách sẽ hiển thị tại đây.",
+      "loadError": "Không thể tải danh sách công ty đã lưu",
+      "meta": {
+        "savedDate": "Ngày lưu",
+        "companyStatus": "Trạng thái công ty",
+        "relatedRoles": "Số role liên quan"
+      }
+    },
+    "statuses": {
+      "FOLLOWED": "Đã lưu",
+      "ACTIVE": "Đang hoạt động",
+      "INACTIVE": "Tạm dừng",
+      "APPLIED": "Đã nộp",
+      "PENDING": "Đang chờ",
+      "PASSED": "Đã qua vòng lọc",
+      "ACCEPTED": "Đã duyệt",
+      "REJECTED": "Đã từ chối",
+      "INTERVIEW_SCHEDULED": "Đã lên lịch phỏng vấn",
+      "INTERVIEW_COMPLETED": "Đã hoàn thành phỏng vấn",
+      "INTERVIEW_CANCELLED": "Đã hủy phỏng vấn"
     }
   },
   "admin": {

@@ -18,6 +18,8 @@
     "account": "Account",
     "openChat": "Open chat",
     "openAccountMenu": "Open account menu",
+    "appliedCompanies": "Applied companies",
+    "savedCompanies": "Saved companies",
     "searchJobs": "Search jobs...",
     "mobileNavigation": "Mobile navigation",
     "primaryNavigation": "Primary navigation"
@@ -604,6 +606,74 @@
         "INTERVIEW_COMPLETED": "Interview completed",
         "INTERVIEW_CANCELLED": "Interview cancelled"
       }
+    }
+  },
+  "seekerCompanies": {
+    "common": {
+      "searchLabel": "Search companies",
+      "pageLabel": "Page {{page}} / {{total}}",
+      "previous": "Previous",
+      "next": "Next",
+      "viewCompany": "View company",
+      "showAppliedJobs": "Show applied jobs",
+      "hideAppliedJobs": "Hide applied jobs",
+      "statusFilter": "Application status",
+      "allStatuses": "All statuses",
+      "appliedDate": "Applied date",
+      "updatedDate": "Updated date",
+      "salary": "Salary",
+      "location": "Location",
+      "jobType": "Job type",
+      "category": "Category",
+      "viewJob": "View job",
+      "notSpecified": "Not specified"
+    },
+    "applied": {
+      "eyebrow": "Applied companies",
+      "title": "Companies you've applied to",
+      "description": "Track the companies where you've submitted applications, filter by current status, and inspect each applied role without leaving the page.",
+      "searchPlaceholder": "Search applied companies...",
+      "totalLabel": "Applied companies",
+      "emptyTitle": "No applied companies yet",
+      "emptyDescription": "Once you apply for jobs in the system, the companies will appear here.",
+      "loadError": "Unable to load applied companies",
+      "meta": {
+        "latestApplied": "Latest application",
+        "positionsApplied": "Applied positions",
+        "relatedRoles": "Related roles"
+      },
+      "jobs": {
+        "title": "Applied jobs",
+        "empty": "No applied jobs match the current status for this company."
+      }
+    },
+    "saved": {
+      "eyebrow": "Saved companies",
+      "title": "Companies you've saved",
+      "description": "Manage the companies you follow so you can come back to review their profile and active opportunities anytime.",
+      "searchPlaceholder": "Search saved companies...",
+      "totalLabel": "Saved companies",
+      "emptyTitle": "No saved companies yet",
+      "emptyDescription": "When you follow companies in the system, they will appear here.",
+      "loadError": "Unable to load saved companies",
+      "meta": {
+        "savedDate": "Saved date",
+        "companyStatus": "Company status",
+        "relatedRoles": "Related roles"
+      }
+    },
+    "statuses": {
+      "FOLLOWED": "Saved",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "APPLIED": "Applied",
+      "PENDING": "Pending",
+      "PASSED": "Passed",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "INTERVIEW_SCHEDULED": "Interview scheduled",
+      "INTERVIEW_COMPLETED": "Interview completed",
+      "INTERVIEW_CANCELLED": "Interview cancelled"
     }
   },
   "admin": {

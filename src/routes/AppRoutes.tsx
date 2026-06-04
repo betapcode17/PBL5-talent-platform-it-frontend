@@ -19,6 +19,8 @@ import CreateJobPage from '@/pages/employer/CreateJobPage'
 import CreateInterviewPage from '@/pages/employer/CreateInterviewPage'
 import ResourcesPage from '@/pages/ResourcesPage'
 import ProfilePage from '@/pages/seeker/ProfilePage'
+import AppliedCompaniesPage from '@/pages/seeker/AppliedCompaniesPage'
+import SavedCompaniesPage from '@/pages/seeker/SavedCompaniesPage'
 
 // Lazy load pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
@@ -78,6 +80,8 @@ export function AppRoutes() {
           >
             <Route index element={<Navigate to='profile' replace />} />
             <Route path='profile' element={<ProfilePage />} />
+            <Route path='applied-companies' element={<AppliedCompaniesPage />} />
+            <Route path='saved-companies' element={<SavedCompaniesPage />} />
           </Route>
 
           {/* Employer Routes */}

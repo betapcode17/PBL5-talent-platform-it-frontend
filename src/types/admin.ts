@@ -134,7 +134,7 @@ export interface AdminJobListItem {
   } | null
 }
 
-export interface AdminPaginatedResponse<T> {
+export interface AdminPaginatedResponse {
   total: number
   page: number
   limit: number

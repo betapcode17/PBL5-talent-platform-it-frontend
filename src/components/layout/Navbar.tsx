@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, ChevronDown, LogOut, Menu, MessageCircle, Search, User, X } from 'lucide-react'
+import { BriefcaseBusiness, ChevronDown, Heart, LogOut, Menu, MessageCircle, Search, User, X } from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
@@ -26,6 +26,19 @@ const navItems = [
   { labelKey: 'nav.categories', href: '/categories' },
   { labelKey: 'nav.resources', href: '/resources' }
 ]
+
+const seekerMenuItems = [
+  {
+    labelKey: 'nav.appliedCompanies',
+    href: '/seeker/applied-companies',
+    icon: BriefcaseBusiness
+  },
+  {
+    labelKey: 'nav.savedCompanies',
+    href: '/seeker/saved-companies',
+    icon: Heart
+  }
+] as const
 
 const baseFocusClassName =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2'
@@ -61,6 +74,7 @@ const Navbar = ({
   const isCompact = variant === 'compact'
   const dashboardPath = getDashboardPath(user?.role)
   const canShowPostJobButton = showPostJobButton && isAuthenticated && user?.role === 'EMPLOYEE'
+  const seekerOnlyMenuItems = user?.role === 'SEEKER' ? seekerMenuItems : []
   const initials = (user?.full_name || user?.email || 'U')
     .split(' ')
     .slice(0, 2)
@@ -210,9 +224,7 @@ const Navbar = ({
                     {isProfileOpen ? (
                       <div className='absolute right-0 mt-3 w-64 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.14)]'>
                         <div className='border-b border-slate-100 bg-slate-50 px-4 py-4'>
-                          <p className='truncate text-sm font-semibold text-slate-900'>
-                            {user?.full_name || 'Account'}
-                          </p>
+                          <p className='truncate text-sm font-semibold text-slate-900'>{user?.full_name || 'Account'}</p>
                           <p className='mt-1 truncate text-xs text-slate-500'>{user?.email}</p>
                         </div>
                         <div className='p-2'>
@@ -222,8 +234,25 @@ const Navbar = ({
                             className='flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50'
                           >
                             <User className='h-4 w-4 text-slate-500' />
-                            {user?.role === 'SEEKER' ? 'Hồ sơ & CV' : t('nav.dashboard')}
+                            {user?.role === 'SEEKER' ? 'Profile & CV' : t('nav.dashboard')}
                           </Link>
+
+                          {seekerOnlyMenuItems.map((item) => {
+                            const Icon = item.icon
+
+                            return (
+                              <Link
+                                key={item.href}
+                                to={item.href}
+                                onClick={() => setIsProfileOpen(false)}
+                                className='flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50'
+                              >
+                                <Icon className='h-4 w-4 text-slate-500' />
+                                {t(item.labelKey)}
+                              </Link>
+                            )
+                          })}
+
                           <button
                             type='button'
                             onClick={handleLogout}
@@ -264,7 +293,7 @@ const Navbar = ({
                       baseFocusClassName
                     )}
                   >
-                    Đăng ký Nhà tuyển dụng
+                    Dang ky Nha tuyen dung
                   </Link>
                 </>
               )
@@ -366,6 +395,23 @@ const Navbar = ({
                     >
                       {t('nav.goToDashboard')}
                     </Link>
+
+                    {seekerOnlyMenuItems.map((item) => {
+                      const Icon = item.icon
+
+                      return (
+                        <Link
+                          key={item.href}
+                          to={item.href}
+                          onClick={closeMenu}
+                          className='inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50'
+                        >
+                          <Icon className='h-4 w-4' />
+                          {t(item.labelKey)}
+                        </Link>
+                      )
+                    })}
+
                     <button
                       type='button'
                       onClick={handleLogout}
@@ -396,7 +442,7 @@ const Navbar = ({
                       onClick={closeMenu}
                       className='inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50'
                     >
-                      Đăng ký Nhà tuyển dụng
+                      Dang ky Nha tuyen dung
                     </Link>
                   </>
                 )

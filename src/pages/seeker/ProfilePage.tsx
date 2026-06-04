@@ -10,7 +10,6 @@ import {
   GraduationCap,
   Languages,
   Mail,
-  MapPin,
   Pencil,
   Phone,
   Sparkles,

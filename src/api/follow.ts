@@ -1,5 +1,5 @@
 import axiosInstance from './axiosInstance'
-import type { CheckFollowResponse, FollowCountResponse, FollowResponse } from '@/@types/follow'
+import type { CheckFollowResponse, FollowCountResponse, FollowResponse, FollowedCompanyItem } from '@/@types/follow'
 
 // Check if user follows a company
 export const checkFollowStatusApi = async (company_id: number): Promise<CheckFollowResponse> => {
@@ -39,6 +39,11 @@ export const getFollowCountApi = async (company_id: number): Promise<FollowCount
     console.error('Error getting follow count:', error)
     return 0
   }
+}
+
+export const getMyFollowedCompaniesApi = async (): Promise<FollowedCompanyItem[]> => {
+  const response = await axiosInstance.get<FollowedCompanyItem[]>('/follows/me')
+  return Array.isArray(response.data) ? response.data : []
 }
 
 // Follow a company

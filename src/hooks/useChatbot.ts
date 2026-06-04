@@ -17,13 +17,16 @@ export const useChatbot = () => {
     deletingConversationId,
     isWidgetOpen,
     isFullScreen,
+    chatMode,
     error,
     setWidgetOpen,
     toggleWidget,
     setFullScreen,
+    setChatMode,
     setActiveConversation,
     getConversations,
     sendMessage,
+    analyzeCv,
     createConversation,
     deleteConversation,
     renameConversation,
@@ -37,10 +40,10 @@ export const useChatbot = () => {
   }, [pathname, isWidgetOpen, getConversations])
 
   const handleSendMessage = useCallback(
-    async (message: string, files?: File[]) => {
+    async (message: string) => {
       const trimmed = message.trim()
       if (!trimmed || isSending) return
-      await sendMessage(trimmed, files)
+      await sendMessage(trimmed)
     },
     [isSending, sendMessage]
   )
@@ -50,6 +53,14 @@ export const useChatbot = () => {
       handleSendMessage(question)
     },
     [handleSendMessage]
+  )
+
+  const handleCvUpload = useCallback(
+    async (file: File) => {
+      if (isSending) return
+      await analyzeCv(file)
+    },
+    [analyzeCv, isSending]
   )
 
   return {
@@ -64,16 +75,19 @@ export const useChatbot = () => {
     deletingConversationId,
     isWidgetOpen,
     isFullScreen,
+    chatMode,
     error,
     setWidgetOpen,
     toggleWidget,
     setFullScreen,
+    setChatMode,
     setActiveConversation,
     createConversation,
     deleteConversation,
     renameConversation,
     clearError,
     handleSendMessage,
-    handleSuggestionClick
+    handleSuggestionClick,
+    handleCvUpload
   }
 }

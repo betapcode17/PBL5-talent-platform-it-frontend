@@ -11,6 +11,7 @@ const ChatbotFullPage = () => {
     conversations,
     activeConversationId,
     pendingConversationId,
+    chatMode,
     messages,
     isLoadingConversations,
     isLoadingMessages,
@@ -20,8 +21,10 @@ const ChatbotFullPage = () => {
     createConversation,
     deleteConversation,
     renameConversation,
+    setChatMode,
     handleSendMessage,
-    handleSuggestionClick
+    handleSuggestionClick,
+    handleCvUpload
   } = useChatbot()
 
   const hasMessages = messages.length > 0
@@ -44,17 +47,33 @@ const ChatbotFullPage = () => {
 
       {/* Main Chat Area */}
       <div className='flex flex-1 flex-col'>
-        <ChatHeader isFullScreen onToggleFullScreen={() => window.history.back()} onRefresh={createConversation} />
+        <ChatHeader
+          isFullScreen
+          onToggleFullScreen={() => window.history.back()}
+          onRefresh={createConversation}
+          chatMode={chatMode}
+          onModeChange={setChatMode}
+        />
 
         {hasMessages || isLoadingMessages ? (
           <ChatMessageList messages={messages} isSending={isSending} isLoading={isLoadingMessages} />
         ) : (
           <div className='flex-1 overflow-y-auto'>
-            <ChatSuggestions userName={user?.full_name?.split(' ')[0]} onSuggestionClick={handleSuggestionClick} />
+            <ChatSuggestions
+              userName={user?.full_name?.split(' ')[0]}
+              onSuggestionClick={handleSuggestionClick}
+              mode={chatMode}
+            />
           </div>
         )}
 
-        <ChatInput onSend={handleSendMessage} disabled={isSending} />
+        <ChatInput
+          mode={chatMode}
+          onSend={handleSendMessage}
+          onAnalyzeCv={handleCvUpload}
+          disabled={isSending}
+          placeholder={chatMode === 'jobs' ? 'Ask me anything about your IT career...' : 'Choose a CV PDF to analyze'}
+        />
       </div>
     </div>
   )

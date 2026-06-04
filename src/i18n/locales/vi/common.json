@@ -571,6 +571,12 @@
         "view": "Xem",
         "unknown": "Chưa rõ"
       },
+      "like": {
+        "like": "Like",
+        "liked": "Đã like",
+        "updating": "Đang lưu...",
+        "loading": "Đang tải ứng viên đã like..."
+      },
       "modal": {
         "closeDetails": "Đóng chi tiết ứng viên",
         "appliedFor": "Ứng tuyển vị trí: {{job}}",

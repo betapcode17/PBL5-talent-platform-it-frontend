@@ -7,10 +7,12 @@ import EmployerSectionCard from '@/components/employer/EmployerSectionCard'
 import EmployerCandidateList from '@/components/employer/EmployerCandidateList'
 import EmployerEmptyState from '@/components/employer/EmployerEmptyState'
 import { useEmployerCandidates } from '@/hooks/useEmployerData'
+import { useAuthStore } from '@/store/authStore'
 
 const CandidatesPage = () => {
   const { i18n, t } = useTranslation()
   const { data, isLoading, error } = useEmployerCandidates()
+  const companyId = useAuthStore((state) => state.user?.employee?.company.company_id)
   const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
 
   const handleExport = () => {
@@ -78,7 +80,7 @@ const CandidatesPage = () => {
           />
         ) : null}
         {error ? <EmployerEmptyState title={t('employer.candidates.page.failedTitle')} description={error} /> : null}
-        {data ? <EmployerCandidateList candidates={data.candidates} /> : null}
+        {data ? <EmployerCandidateList candidates={data.candidates} companyId={companyId} /> : null}
       </EmployerSectionCard>
     </div>
   )

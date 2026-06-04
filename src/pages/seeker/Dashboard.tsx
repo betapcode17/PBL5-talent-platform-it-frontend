@@ -1,11 +1,9 @@
+import { Outlet } from 'react-router-dom'
+
 const Dashboard = () => {
   return (
-    <div className='min-h-screen bg-background'>
-      {/* Main Content */}
-      <main className='container mx-auto px-4 py-8'>
-        <h2 className='text-2xl font-bold mb-4'>Dashboard</h2>
-        <p className='text-muted-foreground'>Chào mừng bạn đến với trang quản lý ứng viên!</p>
-      </main>
+    <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.12),_transparent_30%),linear-gradient(180deg,#f8fafc_0%,#eef4ff_100%)]'>
+      <Outlet />
     </div>
   )
 }

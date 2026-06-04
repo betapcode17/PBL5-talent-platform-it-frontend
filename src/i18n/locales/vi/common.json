@@ -18,6 +18,10 @@
     "account": "Tài khoản",
     "openChat": "Mở trò chuyện",
     "openAccountMenu": "Mở menu tài khoản",
+    "applicationTracker": "Đơn ứng tuyển của tôi",
+    "interviewSchedule": "Lịch phỏng vấn",
+    "appliedCompanies": "Danh sách công ty đã ứng tuyển",
+    "savedCompanies": "Danh sách công ty đã lưu",
     "searchJobs": "Tìm việc làm...",
     "mobileNavigation": "Điều hướng di động",
     "primaryNavigation": "Điều hướng chính"
@@ -604,6 +608,412 @@
         "INTERVIEW_COMPLETED": "Đã phỏng vấn xong",
         "INTERVIEW_CANCELLED": "Đã hủy phỏng vấn"
       }
+    }
+  },
+  "seekerCompanies": {
+    "common": {
+      "searchLabel": "Tìm công ty",
+      "pageLabel": "Trang {{page}} / {{total}}",
+      "previous": "Trước",
+      "next": "Sau",
+      "viewCompany": "Xem công ty",
+      "showAppliedJobs": "Xem job đã ứng tuyển",
+      "hideAppliedJobs": "Ẩn job đã ứng tuyển",
+      "statusFilter": "Trạng thái ứng tuyển",
+      "allStatuses": "Tất cả trạng thái",
+      "appliedDate": "Ngày ứng tuyển",
+      "updatedDate": "Ngày cập nhật",
+      "salary": "Mức lương",
+      "location": "Địa điểm",
+      "jobType": "Loại công việc",
+      "category": "Danh mục",
+      "viewJob": "Xem job",
+      "notSpecified": "Chưa xác định"
+    },
+    "applied": {
+      "eyebrow": "Công ty đã ứng tuyển",
+      "title": "Các công ty bạn đã ứng tuyển",
+      "description": "Theo dõi những công ty bạn đã nộp hồ sơ, lọc theo trạng thái hiện tại và xem ngay chi tiết từng job đã apply mà không cần rời trang.",
+      "searchPlaceholder": "Tìm công ty đã ứng tuyển...",
+      "totalLabel": "Công ty đã ứng tuyển",
+      "emptyTitle": "Chưa có công ty nào đã ứng tuyển",
+      "emptyDescription": "Khi bạn ứng tuyển vào các job trong hệ thống, công ty sẽ hiển thị tại đây.",
+      "loadError": "Không thể tải danh sách công ty đã ứng tuyển",
+      "meta": {
+        "latestApplied": "Lần ứng tuyển gần nhất",
+        "positionsApplied": "Số vị trí đã ứng tuyển",
+        "relatedRoles": "Số role liên quan"
+      },
+      "jobs": {
+        "title": "Danh sách job đã ứng tuyển",
+        "empty": "Không có job nào khớp với trạng thái hiện tại trong công ty này."
+      }
+    },
+    "saved": {
+      "eyebrow": "Công ty đã lưu",
+      "title": "Các công ty bạn đã lưu",
+      "description": "Quản lý danh sách công ty bạn đang theo dõi để quay lại xem hồ sơ và các cơ hội tuyển dụng bất cứ lúc nào.",
+      "searchPlaceholder": "Tìm công ty đã lưu...",
+      "totalLabel": "Công ty đã lưu",
+      "emptyTitle": "Chưa có công ty nào đã lưu",
+      "emptyDescription": "Khi bạn theo dõi công ty trong hệ thống, danh sách sẽ hiển thị tại đây.",
+      "loadError": "Không thể tải danh sách công ty đã lưu",
+      "meta": {
+        "savedDate": "Ngày lưu",
+        "companyStatus": "Trạng thái công ty",
+        "relatedRoles": "Số role liên quan"
+      }
+    },
+    "statuses": {
+      "FOLLOWED": "Đã lưu",
+      "ACTIVE": "Đang hoạt động",
+      "INACTIVE": "Tạm dừng",
+      "APPLIED": "Đã nộp",
+      "PENDING": "Đang chờ",
+      "PASSED": "Đã qua vòng lọc",
+      "ACCEPTED": "Đã duyệt",
+      "REJECTED": "Đã từ chối",
+      "INTERVIEW_SCHEDULED": "Đã lên lịch phỏng vấn",
+      "INTERVIEW_COMPLETED": "Đã hoàn thành phỏng vấn",
+      "INTERVIEW_CANCELLED": "Đã hủy phỏng vấn"
+    }
+  },
+  "seekerTracking": {
+    "common": {
+      "loadError": "Không thể tải dữ liệu theo dõi của seeker",
+      "pageLabel": "Trang {{page}} / {{total}}",
+      "previous": "Trước",
+      "next": "Sau",
+      "viewJob": "Xem job",
+      "viewInterviews": "Xem lịch phỏng vấn",
+      "viewApplications": "Xem đơn ứng tuyển",
+      "notSpecified": "Chưa xác định",
+      "exportCalendar": "Xuất .ics",
+      "exportCalendarShort": "Xuất lịch",
+      "copyMeetingLink": "Sao chép liên kết phỏng vấn",
+      "meetingLinkCopied": "Đã sao chép liên kết phỏng vấn vào bộ nhớ.",
+      "openGoogleCalendar": "Mở Google Calendar",
+      "openInterviewLink": "Mở link phỏng vấn",
+      "joinInterview": "Vào buổi phỏng vấn",
+      "calendarExported": "Đã tạo file lịch {{fileName}}.",
+      "toastSuccessTitle": "Thành công",
+      "closeToast": "Đóng"
+    },
+    "applicationStatus": {
+      "PENDING": "Đang chờ",
+      "ACCEPTED": "Đã qua vòng lọc",
+      "REJECTED": "Đã bị từ chối"
+    },
+    "interviewStatus": {
+      "SCHEDULED": "Đã lên lịch",
+      "COMPLETED": "Đã hoàn thành",
+      "CANCELLED": "Đã hủy"
+    },
+    "interviewType": {
+      "video": "Phỏng vấn video",
+      "phone": "Phỏng vấn điện thoại",
+      "onsite": "Phỏng vấn trực tiếp"
+    },
+    "applications": {
+      "eyebrow": "Theo dõi ứng tuyển",
+      "title": "Theo dõi các job bạn đã ứng tuyển",
+      "description": "Xem lại từng đơn đã nộp, theo dõi trạng thái hiện tại và nhận biết nhanh lịch phỏng vấn tiếp theo mà không cần chuyển nhiều màn hình.",
+      "metrics": {
+        "total": "Đơn ứng tuyển",
+        "pending": "Đang chờ",
+        "accepted": "Đã qua vòng lọc",
+        "interviews": "Có phỏng vấn"
+      },
+      "filters": {
+        "searchPlaceholder": "Tìm theo tên job, công ty, địa điểm...",
+        "status": "Trạng thái ứng tuyển",
+        "allStatuses": "Tất cả trạng thái"
+      },
+      "meta": {
+        "appliedDate": "Ngày ứng tuyển",
+        "updatedDate": "Ngày cập nhật",
+        "interviewCount": "Số buổi phỏng vấn"
+      },
+      "nextInterview": {
+        "title": "Lịch phỏng vấn tiếp theo",
+        "description": "Được lên lịch vào {{date}} với {{interviewer}}."
+      },
+      "actions": {
+        "showAllInterviews": "Xem toàn bộ lịch",
+        "hideAllInterviews": "Ẩn toàn bộ lịch",
+        "allInterviewsTitle": "Toàn bộ lịch phỏng vấn của application này"
+      },
+      "rejectionLabel": "Ghi chú từ nhà tuyển dụng:",
+      "empty": {
+        "title": "Chưa tìm thấy đơn ứng tuyển nào",
+        "description": "Các job bạn đã nộp hồ sơ sẽ xuất hiện tại đây khi bạn bắt đầu ứng tuyển trong hệ thống."
+      }
+    },
+    "interviews": {
+      "eyebrow": "Lịch phỏng vấn",
+      "title": "Quản lý lịch phỏng vấn tại một nơi",
+      "description": "Theo dõi các buổi sắp tới, các buổi đã hoàn thành và các lịch bị hủy gắn với những job bạn đã ứng tuyển.",
+      "metrics": {
+        "total": "Buổi phỏng vấn",
+        "upcoming": "Sắp tới",
+        "completed": "Đã hoàn thành",
+        "cancelled": "Đã hủy"
+      },
+      "filters": {
+        "searchPlaceholder": "Tìm theo job, công ty, người phỏng vấn...",
+        "status": "Trạng thái phỏng vấn",
+        "allStatuses": "Tất cả trạng thái"
+      },
+      "cards": {
+        "schedule": "Thời gian",
+        "duration": "Thời lượng",
+        "interviewer": "Người phỏng vấn",
+        "applicationStatus": "Trạng thái ứng tuyển",
+        "joinLink": "Link tham gia",
+        "feedback": "Phản hồi",
+        "reason": "Lý do:"
+      },
+      "durationValue": "{{count}} phút",
+      "empty": {
+        "title": "Chưa có lịch phỏng vấn nào",
+        "description": "Khi nhà tuyển dụng tạo lịch phỏng vấn cho bạn, thông tin sẽ hiển thị tại đây."
+      }
+    }
+  },
+  "seekerProfile": {
+    "common": {
+      "edit": "Chỉnh sửa",
+      "notUpdated": "Chưa cập nhật"
+    },
+    "hero": {
+      "defaultTitle": "Hồ sơ ứng viên",
+      "description": "Quản lý hành trình cá nhân, kỹ năng nổi bật và nhiều phiên bản CV trong một không gian gọn gàng.",
+      "badges": {
+        "openToInternship": "Sẵn sàng cho thực tập",
+        "activelyBuildingCv": "Đang hoàn thiện CV"
+      },
+      "metrics": {
+        "accountCode": "Mã tài khoản",
+        "email": "Email",
+        "phone": "Điện thoại",
+        "joined": "Tham gia"
+      }
+    },
+    "quickActions": {
+      "title": "Thao tác nhanh",
+      "editProfile": {
+        "title": "Chỉnh sửa hồ sơ",
+        "description": "Cập nhật thông tin cá nhân, học vấn và các dấu ấn kỹ năng."
+      },
+      "uploadCv": {
+        "title": "Tải CV mới",
+        "description": "Thêm phiên bản hồ sơ phù hợp với vị trí ứng tuyển."
+      },
+      "reviewProfile": {
+        "title": "Kiểm tra hồ sơ",
+        "description": "Rà soát nhanh các mục còn thiếu trước khi ứng tuyển."
+      }
+    },
+    "snapshot": {
+      "eyebrow": "Tóm tắt hành trình",
+      "title": "Theo dõi nhanh hành trình ứng tuyển",
+      "description": "Xem nhanh trạng thái ứng tuyển, số buổi phỏng vấn và lịch sắp tới ngay trong hồ sơ cá nhân.",
+      "viewApplications": "Xem đơn ứng tuyển",
+      "viewInterviews": "Xem lịch phỏng vấn",
+      "metrics": {
+        "applications": "Đơn ứng tuyển",
+        "pending": "Đang chờ",
+        "accepted": "Đã qua vòng lọc",
+        "interviews": "Buổi phỏng vấn"
+      }
+    },
+    "reminder": {
+      "eyebrow": "Nhắc lịch sắp tới",
+      "title": "Nhắc lịch sắp tới",
+      "scheduledWith": "{{date}} với {{interviewer}}",
+      "viewAllTitle": "Xem toàn bộ lịch",
+      "viewAllDescription": "Mở danh sách đầy đủ các buổi phỏng vấn liên quan đến các application của bạn.",
+      "exportTitle": "Xuất lịch .ics",
+      "exportDescription": "Lưu buổi phỏng vấn gần nhất vào Google Calendar, Outlook hoặc Apple Calendar.",
+      "empty": "Chưa có buổi phỏng vấn nào sắp tới. Khi nhà tuyển dụng lên lịch, phần nhắc lịch sẽ hiển thị ngay tại đây."
+    },
+    "tabs": {
+      "profile": "Hồ sơ",
+      "cv": "Quản lý CV"
+    },
+    "sections": {
+      "basicInfo": "Thông tin cơ bản",
+      "education": "Học vấn",
+      "certifications": "Chứng chỉ",
+      "awards": "Thành tích",
+      "skills": "Kỹ năng chuyên môn",
+      "projects": "Dự án nổi bật",
+      "experience": "Kinh nghiệm thực tập",
+      "about": "Giới thiệu & điểm mạnh",
+      "cvOverview": "Tổng quan CV",
+      "cvLibrary": "Thư viện CV",
+      "cvChecklist": "Checklist trước khi ứng tuyển"
+    },
+    "basicInfo": {
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "gender": "Giới tính",
+      "country": "Quốc gia",
+      "countryValue": "Việt Nam",
+      "personalLinks": "Liên kết cá nhân"
+    },
+    "links": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "portfolio": "Portfolio"
+    },
+    "education": {
+      "school": {
+        "label": "Trường",
+        "value": "Đại học Đà Nẵng - Đại học Bách khoa"
+      },
+      "major": {
+        "label": "Chuyên ngành",
+        "value": "Công nghệ thông tin"
+      },
+      "year": {
+        "label": "Năm học",
+        "value": "Năm 3"
+      },
+      "graduation": {
+        "label": "Tốt nghiệp dự kiến",
+        "value": "08/2027"
+      },
+      "gpa": {
+        "label": "GPA",
+        "value": "3.20 / 4.00"
+      }
+    },
+    "certifications": {
+      "achievedOn": "Đạt được vào {{date}}",
+      "jlpt": {
+        "name": "JLPT N3",
+        "date": "07/2025"
+      },
+      "toeic": {
+        "name": "TOEIC Bridge",
+        "date": "10/2025"
+      },
+      "aptis": {
+        "name": "Aptis Speaking B2",
+        "date": "12/2025"
+      }
+    },
+    "awards": {
+      "hackathon": {
+        "title": "Top 5 cuộc thi Hackathon nội bộ",
+        "date": "05/2025"
+      },
+      "semester": {
+        "title": "Sinh viên tiêu biểu học kỳ",
+        "date": "01/2025"
+      }
+    },
+    "skills": {
+      "programming": {
+        "category": "Ngôn ngữ lập trình"
+      },
+      "frameworks": {
+        "category": "Framework"
+      },
+      "databases": {
+        "category": "Database"
+      },
+      "tools": {
+        "category": "Công cụ"
+      }
+    },
+    "projects": {
+      "badge": "Dự án",
+      "recruitment": {
+        "title": "Nền tảng tuyển dụng nhân sự IT",
+        "description": "Xây dựng nền tảng tuyển dụng cho ứng viên IT với job browsing, profile công ty, chat và quản lý ứng tuyển.",
+        "status": "Đang phát triển"
+      },
+      "equipment": {
+        "title": "Quản lý thiết bị sinh viên",
+        "description": "Thiết kế giao diện và luồng quản lý thiết bị cho phòng lab trường học, tập trung vào trải nghiệm sử dụng và báo cáo thống kê.",
+        "status": "Hoàn thành"
+      }
+    },
+    "experience": {
+      "sun": {
+        "company": "Sun* Internal Project",
+        "role": "Frontend Developer Intern",
+        "period": "03/2026 - Hiện tại",
+        "summary": "Phát triển UI cho các module công ty, công việc, profile seeker; phối hợp API integration và tinh chỉnh trải nghiệm người dùng."
+      }
+    },
+    "about": {
+      "introductionTitle": "Giới thiệu",
+      "introductionDescription": "Mình là sinh viên IT định hướng Frontend và Full-stack, yêu thích xây dựng sản phẩm có trải nghiệm rõ ràng, hiện đại và hữu ích cho người dùng cuối.",
+      "strengthsTitle": "Điểm mạnh",
+      "strengths": {
+        "first": "Chủ động hoàn thiện UI và phối hợp API integration.",
+        "second": "Có tư duy sản phẩm, quan tâm đến trải nghiệm người dùng.",
+        "third": "Thoải mái với codebase TypeScript, React, Tailwind và Java backend."
+      }
+    },
+    "cvOverview": {
+      "eyebrow": "CV đang sử dụng",
+      "title": "CV Frontend Developer",
+      "description": "Đây là phiên bản CV đang được dùng mặc định khi ứng tuyển. Bạn có thể tải bản mới hoặc tạo nhiều phiên bản theo vị trí mong muốn.",
+      "actions": {
+        "upload": "Tải CV mới",
+        "create": "Tạo CV thủ công"
+      },
+      "metrics": {
+        "count": {
+          "label": "Số CV",
+          "value": "2 phiên bản"
+        },
+        "default": {
+          "label": "CV mặc định",
+          "value": "1 bản"
+        },
+        "recent": {
+          "label": "Lần cập nhật gần nhất",
+          "value": "2 ngày trước"
+        }
+      }
+    },
+    "cvLibrary": {
+      "actions": {
+        "view": "Xem CV",
+        "rename": "Đổi tên",
+        "setDefault": "Đặt mặc định"
+      },
+      "frontend": {
+        "title": "CV Frontend Developer",
+        "language": "Tiếng Anh",
+        "updatedAt": "Cập nhật 2 ngày trước",
+        "status": "Đang sử dụng"
+      },
+      "fullstack": {
+        "title": "CV Full-stack Intern",
+        "language": "Tiếng Việt",
+        "updatedAt": "Cập nhật 1 tuần trước",
+        "status": "Bản nháp"
+      }
+    },
+    "cvChecklist": {
+      "items": {
+        "titleMatch": "Tiêu đề CV bám sát vị trí ứng tuyển",
+        "skillsMatch": "Phần kỹ năng khớp JD và có mức độ ưu tiên",
+        "contact": "Thông tin liên hệ đầy đủ và chính xác",
+        "projects": "Project nổi bật có mô tả vai trò rõ ràng"
+      }
+    },
+    "sidebar": {
+      "userFallback": "Ứng viên",
+      "profileLabel": "Hồ sơ",
+      "cvLabel": "Thư viện CV"
     }
   },
   "admin": {

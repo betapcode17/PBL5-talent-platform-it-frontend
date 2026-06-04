@@ -1,4 +1,3 @@
-import React from 'react'
 import EmployerSignupCard from '@/components/EmployerSignupCard'
 
 export default function RegisterEmployerPage() {

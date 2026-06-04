@@ -11,10 +11,13 @@ const ChatWidget = () => {
     isLoadingMessages,
     isSending,
     isWidgetOpen,
+    chatMode,
     setWidgetOpen,
     createConversation,
+    setChatMode,
     handleSendMessage,
-    handleSuggestionClick
+    handleSuggestionClick,
+    handleCvUpload
   } = useChatbot()
 
   if (!isWidgetOpen) return null
@@ -23,17 +26,33 @@ const ChatWidget = () => {
 
   return (
     <div className='fixed bottom-10 right-6 z-50 flex h-[560px] w-[400px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl'>
-      <ChatHeader onClose={() => setWidgetOpen(false)} isFullScreen={false} onRefresh={createConversation} />
+      <ChatHeader
+        onClose={() => setWidgetOpen(false)}
+        isFullScreen={false}
+        onRefresh={createConversation}
+        chatMode={chatMode}
+        onModeChange={setChatMode}
+      />
 
       {hasMessages || isLoadingMessages ? (
         <ChatMessageList messages={messages} isSending={isSending} isLoading={isLoadingMessages} />
       ) : (
         <div className='flex-1 overflow-y-auto'>
-          <ChatSuggestions userName={user?.full_name?.split(' ')[0]} onSuggestionClick={handleSuggestionClick} />
+          <ChatSuggestions
+            userName={user?.full_name?.split(' ')[0]}
+            onSuggestionClick={handleSuggestionClick}
+            mode={chatMode}
+          />
         </div>
       )}
 
-      <ChatInput onSend={handleSendMessage} disabled={isSending} />
+      <ChatInput
+        mode={chatMode}
+        onSend={handleSendMessage}
+        onAnalyzeCv={handleCvUpload}
+        disabled={isSending}
+        placeholder={chatMode === 'jobs' ? 'Ask me anything about your IT career...' : 'Choose a CV PDF to analyze'}
+      />
     </div>
   )
 }

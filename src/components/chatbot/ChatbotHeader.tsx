@@ -1,14 +1,24 @@
 import { X, Maximize2, Minimize2, RotateCcw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import type { ChatMode } from '@/@types/chatbot'
 
 interface ChatHeaderProps {
   onClose?: () => void
   isFullScreen?: boolean
   onToggleFullScreen?: () => void
   onRefresh?: () => void
+  chatMode?: ChatMode
+  onModeChange?: (mode: ChatMode) => void
 }
 
-const ChatHeader = ({ onClose, isFullScreen, onToggleFullScreen, onRefresh }: ChatHeaderProps) => {
+const ChatHeader = ({
+  onClose,
+  isFullScreen,
+  onToggleFullScreen,
+  onRefresh,
+  chatMode = 'jobs',
+  onModeChange
+}: ChatHeaderProps) => {
   const navigate = useNavigate()
 
   const handleFullScreenToggle = () => {
@@ -46,6 +56,24 @@ const ChatHeader = ({ onClose, isFullScreen, onToggleFullScreen, onRefresh }: Ch
             <span className='h-2 w-2 rounded-full bg-green-500' />
             <span className='text-xs text-slate-500'>Online</span>
           </div>
+          {onModeChange && (
+            <div className='mt-2 inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs font-medium text-slate-600'>
+              <button
+                type='button'
+                onClick={() => onModeChange('jobs')}
+                className={`rounded-lg px-3 py-1.5 transition-all ${chatMode === 'jobs' ? 'bg-white text-purple-700 shadow-sm' : 'hover:text-slate-800'}`}
+              >
+                Hỏi đáp Job
+              </button>
+              <button
+                type='button'
+                onClick={() => onModeChange('cv')}
+                className={`rounded-lg px-3 py-1.5 transition-all ${chatMode === 'cv' ? 'bg-white text-purple-700 shadow-sm' : 'hover:text-slate-800'}`}
+              >
+                Phân tích CV
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div className='flex items-center gap-1'>

@@ -1,9 +1,13 @@
 import type { ReactNode } from 'react'
 import {
   Award,
+  BellRing,
   BriefcaseBusiness,
+  CalendarClock,
   CalendarDays,
+  CalendarPlus,
   Camera,
+  Copy,
   ExternalLink,
   FileBadge2,
   FileText,
@@ -17,121 +21,204 @@ import {
   UserRound
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+
+import { SeekerActionToast } from '@/components/seeker/SeekerActionToast'
+import { SeekerStatusBadge } from '@/components/seeker/SeekerStatusBadge'
+import { useSeekerApplicationsTracker, useSeekerInterviewsTracker } from '@/hooks/useSeekerCareer'
+import { buildGoogleCalendarUrl, downloadInterviewCalendarFile } from '@/lib/interviewCalendar'
 import { useAuthStore } from '@/store/authStore'
 
 type ProfileTab = 'profile' | 'cv'
-
-const profileSections = [
-  { id: 'basic-info', label: 'Thông tin cơ bản' },
-  { id: 'education', label: 'Học vấn' },
-  { id: 'certifications', label: 'Chứng chỉ' },
-  { id: 'awards', label: 'Thành tích' },
-  { id: 'skills', label: 'Kỹ năng' },
-  { id: 'projects', label: 'Dự án nổi bật' },
-  { id: 'experience', label: 'Kinh nghiệm' },
-  { id: 'about', label: 'Giới thiệu' }
-]
-
-const cvSections = [
-  { id: 'cv-overview', label: 'Tổng quan CV' },
-  { id: 'cv-library', label: 'Thư viện CV' },
-  { id: 'cv-checklist', label: 'Checklist' }
-]
-
-const educationItems = [
-  { label: 'Trường', value: 'Đại học Đà Nẵng - Đại học Bách khoa' },
-  { label: 'Chuyên ngành', value: 'Công nghệ thông tin' },
-  { label: 'Năm học', value: 'Năm 3' },
-  { label: 'Tốt nghiệp dự kiến', value: '08/2027' },
-  { label: 'GPA', value: '3.20 / 4.00' }
-]
-
-const certifications = [
-  { name: 'JLPT N3', date: '07/2025', accent: 'amber' },
-  { name: 'TOEIC Bridge', date: '10/2025', accent: 'sky' },
-  { name: 'Aptis Speaking B2', date: '12/2025', accent: 'emerald' }
-]
-
-const awards = [
-  { title: 'Top 5 cuộc thi Hackathon nội bộ', date: '05/2025' },
-  { title: 'Sinh viên tiêu biểu học kỳ', date: '01/2025' }
-]
-
-const skillGroups = [
-  {
-    category: 'Ngôn ngữ lập trình',
-    skills: ['Java', 'TypeScript', 'JavaScript', 'Python', 'C#']
-  },
-  {
-    category: 'Framework',
-    skills: ['Spring Boot', 'React', 'ASP.NET MVC']
-  },
-  {
-    category: 'Database',
-    skills: ['MySQL', 'SQL Server', 'PostgreSQL']
-  },
-  {
-    category: 'Công cụ',
-    skills: ['Git', 'Postman', 'Figma', 'Slack']
-  }
-]
-
-const projects = [
-  {
-    title: 'Talent Platform for IT Recruitment',
-    description: 'Xây dựng nền tảng tuyển dụng cho ứng viên IT với tính năng job browsing, profile công ty, chat và quản lý ứng tuyển.',
-    stack: ['React', 'TypeScript', 'Tailwind', 'Node.js'],
-    status: 'Đang phát triển'
-  },
-  {
-    title: 'Student Equipment Management',
-    description: 'Thiết kế giao diện và luồng quản lý thiết bị cho phòng lab trường học, tập trung vào trải nghiệm sử dụng và báo cáo thống kê.',
-    stack: ['Java', 'Spring', 'MySQL'],
-    status: 'Hoàn thành'
-  }
-]
-
-const experienceItems = [
-  {
-    company: 'Sun* Internal Project',
-    role: 'Frontend Developer Intern',
-    period: '03/2026 - Hiện tại',
-    summary: 'Phát triển UI cho các module công ty, công việc, profile seeker; phối hợp API integration và tinh chỉnh trải nghiệm người dùng.'
-  }
-]
-
-const cvCards = [
-  {
-    title: 'CV Frontend Developer',
-    format: 'PDF',
-    language: 'Tiếng Anh',
-    updatedAt: 'Cập nhật 2 ngày trước',
-    status: 'Đang sử dụng'
-  },
-  {
-    title: 'CV Full-stack Intern',
-    format: 'DOCX',
-    language: 'Tiếng Việt',
-    updatedAt: 'Cập nhật 1 tuần trước',
-    status: 'Bản nháp'
-  }
-]
+type Accent = 'amber' | 'sky' | 'emerald'
 
 const ProfilePage = () => {
+  const { t, i18n } = useTranslation()
   const user = useAuthStore((state) => state.user)
   const [activeTab, setActiveTab] = useState<ProfileTab>('profile')
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const { data: applications, isLoading: isLoadingApplications } = useSeekerApplicationsTracker()
+  const { data: interviews, isLoading: isLoadingInterviews } = useSeekerInterviewsTracker()
+  const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
+  const fallbackText = t('seekerProfile.common.notUpdated')
+
+  const profileSections = useMemo(
+    () => [
+      { id: 'basic-info', label: t('seekerProfile.sections.basicInfo') },
+      { id: 'education', label: t('seekerProfile.sections.education') },
+      { id: 'certifications', label: t('seekerProfile.sections.certifications') },
+      { id: 'awards', label: t('seekerProfile.sections.awards') },
+      { id: 'skills', label: t('seekerProfile.sections.skills') },
+      { id: 'projects', label: t('seekerProfile.sections.projects') },
+      { id: 'experience', label: t('seekerProfile.sections.experience') },
+      { id: 'about', label: t('seekerProfile.sections.about') }
+    ],
+    [t]
+  )
+
+  const cvSections = useMemo(
+    () => [
+      { id: 'cv-overview', label: t('seekerProfile.sections.cvOverview') },
+      { id: 'cv-library', label: t('seekerProfile.sections.cvLibrary') },
+      { id: 'cv-checklist', label: t('seekerProfile.sections.cvChecklist') }
+    ],
+    [t]
+  )
+
+  const educationItems = useMemo(
+    () => [
+      { label: t('seekerProfile.education.school.label'), value: t('seekerProfile.education.school.value') },
+      { label: t('seekerProfile.education.major.label'), value: t('seekerProfile.education.major.value') },
+      { label: t('seekerProfile.education.year.label'), value: t('seekerProfile.education.year.value') },
+      { label: t('seekerProfile.education.graduation.label'), value: t('seekerProfile.education.graduation.value') },
+      { label: t('seekerProfile.education.gpa.label'), value: t('seekerProfile.education.gpa.value') }
+    ],
+    [t]
+  )
+
+  const certifications = useMemo(
+    () => [
+      { name: t('seekerProfile.certifications.jlpt.name'), date: t('seekerProfile.certifications.jlpt.date'), accent: 'amber' as Accent },
+      { name: t('seekerProfile.certifications.toeic.name'), date: t('seekerProfile.certifications.toeic.date'), accent: 'sky' as Accent },
+      { name: t('seekerProfile.certifications.aptis.name'), date: t('seekerProfile.certifications.aptis.date'), accent: 'emerald' as Accent }
+    ],
+    [t]
+  )
+
+  const awards = useMemo(
+    () => [
+      { title: t('seekerProfile.awards.hackathon.title'), date: t('seekerProfile.awards.hackathon.date') },
+      { title: t('seekerProfile.awards.semester.title'), date: t('seekerProfile.awards.semester.date') }
+    ],
+    [t]
+  )
+
+  const skillGroups = useMemo(
+    () => [
+      {
+        category: t('seekerProfile.skills.programming.category'),
+        skills: ['Java', 'TypeScript', 'JavaScript', 'Python', 'C#']
+      },
+      {
+        category: t('seekerProfile.skills.frameworks.category'),
+        skills: ['Spring Boot', 'React', 'ASP.NET MVC']
+      },
+      {
+        category: t('seekerProfile.skills.databases.category'),
+        skills: ['MySQL', 'SQL Server', 'PostgreSQL']
+      },
+      {
+        category: t('seekerProfile.skills.tools.category'),
+        skills: ['Git', 'Postman', 'Figma', 'Slack']
+      }
+    ],
+    [t]
+  )
+
+  const projects = useMemo(
+    () => [
+      {
+        title: t('seekerProfile.projects.recruitment.title'),
+        description: t('seekerProfile.projects.recruitment.description'),
+        stack: ['React', 'TypeScript', 'Tailwind', 'Node.js'],
+        status: t('seekerProfile.projects.recruitment.status')
+      },
+      {
+        title: t('seekerProfile.projects.equipment.title'),
+        description: t('seekerProfile.projects.equipment.description'),
+        stack: ['Java', 'Spring', 'MySQL'],
+        status: t('seekerProfile.projects.equipment.status')
+      }
+    ],
+    [t]
+  )
+
+  const experienceItems = useMemo(
+    () => [
+      {
+        company: t('seekerProfile.experience.sun.company'),
+        role: t('seekerProfile.experience.sun.role'),
+        period: t('seekerProfile.experience.sun.period'),
+        summary: t('seekerProfile.experience.sun.summary')
+      }
+    ],
+    [t]
+  )
+
+  const cvCards = useMemo(
+    () => [
+      {
+        title: t('seekerProfile.cvLibrary.frontend.title'),
+        format: 'PDF',
+        language: t('seekerProfile.cvLibrary.frontend.language'),
+        updatedAt: t('seekerProfile.cvLibrary.frontend.updatedAt'),
+        status: t('seekerProfile.cvLibrary.frontend.status'),
+        isPrimary: true
+      },
+      {
+        title: t('seekerProfile.cvLibrary.fullstack.title'),
+        format: 'DOCX',
+        language: t('seekerProfile.cvLibrary.fullstack.language'),
+        updatedAt: t('seekerProfile.cvLibrary.fullstack.updatedAt'),
+        status: t('seekerProfile.cvLibrary.fullstack.status'),
+        isPrimary: false
+      }
+    ],
+    [t]
+  )
+
+  const checklistItems = useMemo(
+    () => [
+      t('seekerProfile.cvChecklist.items.titleMatch'),
+      t('seekerProfile.cvChecklist.items.skillsMatch'),
+      t('seekerProfile.cvChecklist.items.contact'),
+      t('seekerProfile.cvChecklist.items.projects')
+    ],
+    [t]
+  )
+
+  const strengths = useMemo(
+    () => [
+      t('seekerProfile.about.strengths.first'),
+      t('seekerProfile.about.strengths.second'),
+      t('seekerProfile.about.strengths.third')
+    ],
+    [t]
+  )
 
   const heroBadges = useMemo(() => {
-    const badges = ['Open to internship', 'Actively building CV']
+    const badges = [t('seekerProfile.hero.badges.openToInternship'), t('seekerProfile.hero.badges.activelyBuildingCv')]
 
     if (user?.gender) {
       badges.push(user.gender)
     }
 
     return badges
-  }, [user?.gender])
+  }, [t, user?.gender])
 
   const sectionNav = activeTab === 'profile' ? profileSections : cvSections
+  const seekerSnapshot = useMemo(() => {
+    const applicationItems = applications ?? []
+    const interviewItems = interviews?.interviews ?? []
+    const nextInterview =
+      interviewItems.find((item) => item.status === 'SCHEDULED' && new Date(item.schedule).getTime() >= Date.now()) ??
+      interviewItems.find((item) => item.status === 'SCHEDULED') ??
+      null
+
+    return {
+      totalApplications: applicationItems.length,
+      pendingApplications: applicationItems.filter((item) => item.status === 'PENDING').length,
+      acceptedApplications: applicationItems.filter((item) => item.status === 'ACCEPTED').length,
+      totalInterviews: interviewItems.length,
+      nextInterview
+    }
+  }, [applications, interviews?.interviews])
+
+  const handleCopyMeetingLink = async (meetingLink: string) => {
+    await navigator.clipboard.writeText(meetingLink)
+    setToastMessage(t('seekerTracking.common.meetingLinkCopied'))
+  }
 
   return (
     <div className='mx-auto max-w-7xl px-4 py-8'>
@@ -169,40 +256,179 @@ const ProfilePage = () => {
 
                 <div>
                   <h1 className='text-3xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-[3rem]'>
-                    {user?.full_name || 'Job seeker profile'}
+                    {user?.full_name || t('seekerProfile.hero.defaultTitle')}
                   </h1>
-                  <p className='mt-2 text-sm text-slate-500 sm:text-base'>
-                    Hồ sơ cá nhân và thư viện CV dành cho ứng viên. Bạn có thể quản lý thông tin nổi bật, kỹ năng và nhiều phiên bản CV tại đây.
-                  </p>
+                  <p className='mt-2 text-sm text-slate-500 sm:text-base'>{t('seekerProfile.hero.description')}</p>
                 </div>
               </div>
 
               <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4'>
-                <HeroMetric icon={<UserRound className='h-4 w-4' />} label='Mã tài khoản' value={`SEEKER-${user?.id ?? '0001'}`} />
-                <HeroMetric icon={<Mail className='h-4 w-4' />} label='Email' value={user?.email || 'Chưa cập nhật'} />
-                <HeroMetric icon={<Phone className='h-4 w-4' />} label='Điện thoại' value={user?.phone || 'Chưa cập nhật'} />
-                <HeroMetric icon={<CalendarDays className='h-4 w-4' />} label='Tham gia' value={formatDate(user?.registration_date)} />
+                <HeroMetric icon={<UserRound className='h-4 w-4' />} label={t('seekerProfile.hero.metrics.accountCode')} value={`SEEKER-${user?.id ?? '0001'}`} />
+                <HeroMetric icon={<Mail className='h-4 w-4' />} label={t('seekerProfile.hero.metrics.email')} value={user?.email || fallbackText} />
+                <HeroMetric icon={<Phone className='h-4 w-4' />} label={t('seekerProfile.hero.metrics.phone')} value={user?.phone || fallbackText} />
+                <HeroMetric icon={<CalendarDays className='h-4 w-4' />} label={t('seekerProfile.hero.metrics.joined')} value={formatDate(user?.registration_date, locale, fallbackText)} />
               </div>
             </div>
           </div>
 
           <div className='w-full max-w-sm rounded-[28px] border border-slate-200 bg-slate-50/80 p-5'>
-            <p className='text-xs font-semibold uppercase tracking-[0.22em] text-slate-400'>Quick Actions</p>
+            <p className='text-xs font-semibold uppercase tracking-[0.22em] text-slate-400'>{t('seekerProfile.quickActions.title')}</p>
             <div className='mt-4 grid gap-3'>
-              <ActionTile title='Chỉnh sửa hồ sơ' description='Cập nhật thông tin cá nhân, học vấn, kỹ năng.' icon={<Pencil className='h-4 w-4' />} />
-              <ActionTile title='Tải CV mới' description='Thêm phiên bản CV theo vị trí ứng tuyển.' icon={<FileText className='h-4 w-4' />} />
-              <ActionTile title='Kiểm tra hồ sơ' description='Rà soát nhanh các mục còn thiếu trước khi apply.' icon={<Sparkles className='h-4 w-4' />} />
+              <ActionTile title={t('seekerProfile.quickActions.editProfile.title')} description={t('seekerProfile.quickActions.editProfile.description')} icon={<Pencil className='h-4 w-4' />} />
+              <ActionTile title={t('seekerProfile.quickActions.uploadCv.title')} description={t('seekerProfile.quickActions.uploadCv.description')} icon={<FileText className='h-4 w-4' />} />
+              <ActionTile title={t('seekerProfile.quickActions.reviewProfile.title')} description={t('seekerProfile.quickActions.reviewProfile.description')} icon={<Sparkles className='h-4 w-4' />} />
             </div>
+          </div>
+        </div>
+
+        <div className='mt-8 grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]'>
+          <div className='rounded-[28px] border border-sky-100 bg-[linear-gradient(135deg,rgba(239,246,255,1),rgba(248,250,252,1))] p-5'>
+            <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
+              <div>
+                <p className='text-xs font-semibold uppercase tracking-[0.22em] text-sky-700'>{t('seekerProfile.snapshot.eyebrow')}</p>
+                <h2 className='mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950'>{t('seekerProfile.snapshot.title')}</h2>
+                <p className='mt-2 max-w-2xl text-sm leading-7 text-slate-600'>{t('seekerProfile.snapshot.description')}</p>
+              </div>
+
+              <div className='flex flex-wrap gap-3'>
+                <Link
+                  to='/seeker/applications'
+                  className='inline-flex h-11 items-center gap-2 rounded-2xl bg-sky-600 px-4 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.22)] transition hover:bg-sky-700'
+                >
+                  <BriefcaseBusiness className='h-4 w-4' />
+                  {t('seekerProfile.snapshot.viewApplications')}
+                </Link>
+                <Link
+                  to='/seeker/interviews'
+                  className='inline-flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700'
+                >
+                  <CalendarDays className='h-4 w-4' />
+                  {t('seekerProfile.snapshot.viewInterviews')}
+                </Link>
+              </div>
+            </div>
+
+            <div className='mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4'>
+              <HeroMetric icon={<BriefcaseBusiness className='h-4 w-4' />} label={t('seekerProfile.snapshot.metrics.applications')} value={isLoadingApplications ? '...' : String(seekerSnapshot.totalApplications)} />
+              <HeroMetric icon={<Sparkles className='h-4 w-4' />} label={t('seekerProfile.snapshot.metrics.pending')} value={isLoadingApplications ? '...' : String(seekerSnapshot.pendingApplications)} />
+              <HeroMetric icon={<Star className='h-4 w-4' />} label={t('seekerProfile.snapshot.metrics.accepted')} value={isLoadingApplications ? '...' : String(seekerSnapshot.acceptedApplications)} />
+              <HeroMetric icon={<CalendarDays className='h-4 w-4' />} label={t('seekerProfile.snapshot.metrics.interviews')} value={isLoadingInterviews ? '...' : String(seekerSnapshot.totalInterviews)} />
+            </div>
+          </div>
+
+          <div className='rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_18px_56px_rgba(15,23,42,0.06)]'>
+            <div className='flex items-center gap-3'>
+              <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-50 text-amber-600'>
+                <BellRing className='h-5 w-5' />
+              </div>
+              <div>
+                <p className='text-xs font-semibold uppercase tracking-[0.18em] text-slate-400'>{t('seekerProfile.reminder.eyebrow')}</p>
+                <h3 className='text-lg font-semibold text-slate-950'>{t('seekerProfile.reminder.title')}</h3>
+              </div>
+            </div>
+
+            {seekerSnapshot.nextInterview ? (
+              <div className='mt-4 space-y-4'>
+                <div className='rounded-[24px] border border-amber-200 bg-amber-50/80 p-4'>
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <SeekerStatusBadge
+                      kind='interview'
+                      value={seekerSnapshot.nextInterview.status}
+                      label={t(`seekerTracking.interviewStatus.${seekerSnapshot.nextInterview.status}`, {
+                        defaultValue: seekerSnapshot.nextInterview.status
+                      })}
+                    />
+                    <span className='rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500'>
+                      {t(`seekerTracking.interviewType.${seekerSnapshot.nextInterview.type}`, {
+                        defaultValue: seekerSnapshot.nextInterview.type
+                      })}
+                    </span>
+                  </div>
+                  <p className='mt-3 text-base font-semibold text-slate-950'>{seekerSnapshot.nextInterview.job.title}</p>
+                  <p className='mt-1 text-sm text-slate-600'>{seekerSnapshot.nextInterview.company.name}</p>
+                  <p className='mt-3 text-sm leading-6 text-slate-600'>
+                    {t('seekerProfile.reminder.scheduledWith', {
+                      date: formatDateTime(seekerSnapshot.nextInterview.schedule, locale, fallbackText),
+                      interviewer: seekerSnapshot.nextInterview.interviewer.fullName || t('seekerTracking.common.notSpecified')
+                    })}
+                  </p>
+                </div>
+
+                <div className='grid gap-3 sm:grid-cols-2'>
+                  <ActionLink
+                    to='/seeker/interviews'
+                    title={t('seekerProfile.reminder.viewAllTitle')}
+                    description={t('seekerProfile.reminder.viewAllDescription')}
+                    icon={<CalendarDays className='h-4 w-4' />}
+                  />
+                  <button
+                    type='button'
+                    onClick={() => {
+                      if (seekerSnapshot.nextInterview) {
+                        const fileName = downloadInterviewCalendarFile(seekerSnapshot.nextInterview)
+                        setToastMessage(t('seekerTracking.common.calendarExported', { fileName }))
+                      }
+                    }}
+                    className='flex items-start gap-3 rounded-[22px] border border-slate-200 bg-slate-50/70 p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/50'
+                  >
+                    <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600'>
+                      <CalendarPlus className='h-4 w-4' />
+                    </div>
+                    <div>
+                      <p className='text-sm font-semibold text-slate-900'>{t('seekerProfile.reminder.exportTitle')}</p>
+                      <p className='mt-1 text-sm leading-6 text-slate-500'>{t('seekerProfile.reminder.exportDescription')}</p>
+                    </div>
+                  </button>
+                </div>
+
+                <div className='flex flex-wrap gap-3'>
+                  <a
+                    href={buildGoogleCalendarUrl(seekerSnapshot.nextInterview)}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='inline-flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700'
+                  >
+                    <CalendarClock className='h-4 w-4' />
+                    {t('seekerTracking.common.openGoogleCalendar')}
+                  </a>
+                  {seekerSnapshot.nextInterview.link ? (
+                    <>
+                      <button
+                        type='button'
+                        onClick={() => void handleCopyMeetingLink(seekerSnapshot.nextInterview!.link!)}
+                        className='inline-flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700'
+                      >
+                        <Copy className='h-4 w-4' />
+                        {t('seekerTracking.common.copyMeetingLink')}
+                      </button>
+                      <a
+                        href={seekerSnapshot.nextInterview.link}
+                        target='_blank'
+                        rel='noreferrer'
+                        className='inline-flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700'
+                      >
+                        <ExternalLink className='h-4 w-4' />
+                        {t('seekerTracking.common.openInterviewLink')}
+                      </a>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <div className='mt-4 rounded-[24px] border border-dashed border-slate-300 bg-slate-50/70 p-4 text-sm leading-6 text-slate-500'>
+                {t('seekerProfile.reminder.empty')}
+              </div>
+            )}
           </div>
         </div>
 
         <div className='mt-8 border-b border-slate-200'>
           <div className='flex flex-wrap gap-2'>
             <TabButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')}>
-              Hồ sơ
+              {t('seekerProfile.tabs.profile')}
             </TabButton>
             <TabButton active={activeTab === 'cv'} onClick={() => setActiveTab('cv')}>
-              Quản lý CV
+              {t('seekerProfile.tabs.cv')}
             </TabButton>
           </div>
         </div>
@@ -212,28 +438,28 @@ const ProfilePage = () => {
         <div className='space-y-6'>
           {activeTab === 'profile' ? (
             <>
-              <SectionCard id='basic-info' title='Thông tin cơ bản' icon={<UserRound className='h-5 w-5' />}>
+              <SectionCard id='basic-info' title={t('seekerProfile.sections.basicInfo')} icon={<UserRound className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]'>
                   <dl className='space-y-3'>
-                    <ProfileRow label='Họ và tên' value={user?.full_name || 'Chưa cập nhật'} />
-                    <ProfileRow label='Email' value={user?.email || 'Chưa cập nhật'} />
-                    <ProfileRow label='Số điện thoại' value={user?.phone || 'Chưa cập nhật'} />
-                    <ProfileRow label='Giới tính' value={user?.gender || 'Chưa cập nhật'} />
-                    <ProfileRow label='Quốc gia' value='Việt Nam' />
+                    <ProfileRow label={t('seekerProfile.basicInfo.fullName')} value={user?.full_name || fallbackText} />
+                    <ProfileRow label={t('seekerProfile.basicInfo.email')} value={user?.email || fallbackText} />
+                    <ProfileRow label={t('seekerProfile.basicInfo.phone')} value={user?.phone || fallbackText} />
+                    <ProfileRow label={t('seekerProfile.basicInfo.gender')} value={user?.gender || fallbackText} />
+                    <ProfileRow label={t('seekerProfile.basicInfo.country')} value={t('seekerProfile.basicInfo.countryValue')} />
                   </dl>
 
                   <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
-                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>Liên kết cá nhân</h3>
+                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>{t('seekerProfile.basicInfo.personalLinks')}</h3>
                     <div className='mt-4 space-y-3'>
-                      <LinkItem label='GitHub' value='https://github.com/BachTran111' />
-                      <LinkItem label='LinkedIn' value='https://linkedin.com/in/tranxuanbach' />
-                      <LinkItem label='Portfolio' value='https://portfolio.example.dev' />
+                      <LinkItem label={t('seekerProfile.links.github')} value='https://github.com/BachTran111' />
+                      <LinkItem label={t('seekerProfile.links.linkedin')} value='https://linkedin.com/in/tranxuanbach' />
+                      <LinkItem label={t('seekerProfile.links.portfolio')} value='https://portfolio.example.dev' />
                     </div>
                   </div>
                 </div>
               </SectionCard>
 
-              <SectionCard id='education' title='Học vấn' icon={<GraduationCap className='h-5 w-5' />}>
+              <SectionCard id='education' title={t('seekerProfile.sections.education')} icon={<GraduationCap className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 md:grid-cols-2'>
                   {educationItems.map((item) => (
                     <InfoCard key={item.label} label={item.label} value={item.value} />
@@ -241,15 +467,15 @@ const ProfilePage = () => {
                 </div>
               </SectionCard>
 
-              <SectionCard id='certifications' title='Chứng chỉ' icon={<FileBadge2 className='h-5 w-5' />}>
+              <SectionCard id='certifications' title={t('seekerProfile.sections.certifications')} icon={<FileBadge2 className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
                   {certifications.map((item) => (
-                    <BadgeCard key={item.name} title={item.name} meta={`Đạt được ${item.date}`} accent={item.accent} />
+                    <BadgeCard key={item.name} title={item.name} meta={t('seekerProfile.certifications.achievedOn', { date: item.date })} accent={item.accent} />
                   ))}
                 </div>
               </SectionCard>
 
-              <SectionCard id='awards' title='Thành tích' icon={<Award className='h-5 w-5' />}>
+              <SectionCard id='awards' title={t('seekerProfile.sections.awards')} icon={<Award className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='space-y-3'>
                   {awards.map((item) => (
                     <TimelineRow key={item.title} title={item.title} meta={item.date} />
@@ -257,7 +483,7 @@ const ProfilePage = () => {
                 </div>
               </SectionCard>
 
-              <SectionCard id='skills' title='Kỹ năng chuyên môn' icon={<Languages className='h-5 w-5' />}>
+              <SectionCard id='skills' title={t('seekerProfile.sections.skills')} icon={<Languages className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='overflow-hidden rounded-[24px] border border-slate-200'>
                   {skillGroups.map((group, index) => (
                     <div
@@ -269,10 +495,7 @@ const ProfilePage = () => {
                       <div className='text-sm font-semibold text-slate-900'>{group.category}</div>
                       <div className='flex flex-wrap gap-2'>
                         {group.skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className='rounded-full border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-700'
-                          >
+                          <span key={skill} className='rounded-full border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-700'>
                             {skill}
                           </span>
                         ))}
@@ -282,7 +505,7 @@ const ProfilePage = () => {
                 </div>
               </SectionCard>
 
-              <SectionCard id='projects' title='Dự án nổi bật' icon={<Star className='h-5 w-5' />}>
+              <SectionCard id='projects' title={t('seekerProfile.sections.projects')} icon={<Star className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 lg:grid-cols-2'>
                   {projects.map((project) => (
                     <article key={project.title} className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
@@ -291,9 +514,7 @@ const ProfilePage = () => {
                           <h3 className='text-lg font-semibold text-slate-950'>{project.title}</h3>
                           <p className='mt-1 text-sm text-slate-500'>{project.status}</p>
                         </div>
-                        <span className='rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-500'>
-                          Project
-                        </span>
+                        <span className='rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-500'>{t('seekerProfile.projects.badge')}</span>
                       </div>
                       <p className='mt-4 text-sm leading-7 text-slate-600'>{project.description}</p>
                       <div className='mt-4 flex flex-wrap gap-2'>
@@ -308,7 +529,7 @@ const ProfilePage = () => {
                 </div>
               </SectionCard>
 
-              <SectionCard id='experience' title='Kinh nghiệm thực tập' icon={<BriefcaseBusiness className='h-5 w-5' />}>
+              <SectionCard id='experience' title={t('seekerProfile.sections.experience')} icon={<BriefcaseBusiness className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='space-y-4'>
                   {experienceItems.map((item) => (
                     <article key={item.company} className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
@@ -325,20 +546,18 @@ const ProfilePage = () => {
                 </div>
               </SectionCard>
 
-              <SectionCard id='about' title='Giới thiệu & điểm mạnh' icon={<Sparkles className='h-5 w-5' />}>
+              <SectionCard id='about' title={t('seekerProfile.sections.about')} icon={<Sparkles className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 lg:grid-cols-2'>
                   <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
-                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>Giới thiệu</h3>
-                    <p className='mt-4 text-sm leading-7 text-slate-600'>
-                      Mình là sinh viên IT định hướng Frontend và Full-stack, yêu thích xây dựng sản phẩm có trải nghiệm rõ ràng, hiện đại và hữu ích cho người dùng cuối.
-                    </p>
+                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>{t('seekerProfile.about.introductionTitle')}</h3>
+                    <p className='mt-4 text-sm leading-7 text-slate-600'>{t('seekerProfile.about.introductionDescription')}</p>
                   </div>
                   <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
-                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>Điểm mạnh</h3>
+                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>{t('seekerProfile.about.strengthsTitle')}</h3>
                     <ul className='mt-4 space-y-3 text-sm leading-7 text-slate-600'>
-                      <li>Chủ động hoàn thiện UI và phối hợp API integration.</li>
-                      <li>Có tư duy sản phẩm, quan tâm đến trải nghiệm người dùng.</li>
-                      <li>Thoải mái với codebase TypeScript, React, Tailwind và Java backend.</li>
+                      {strengths.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -346,33 +565,31 @@ const ProfilePage = () => {
             </>
           ) : (
             <>
-              <SectionCard id='cv-overview' title='Tổng quan CV' icon={<FileText className='h-5 w-5' />}>
+              <SectionCard id='cv-overview' title={t('seekerProfile.sections.cvOverview')} icon={<FileText className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]'>
                   <div className='rounded-[24px] border border-slate-200 bg-[linear-gradient(135deg,rgba(239,246,255,1),rgba(250,245,255,1))] p-6'>
-                    <p className='text-xs font-semibold uppercase tracking-[0.18em] text-sky-600'>Primary CV</p>
-                    <h3 className='mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950'>CV Frontend Developer</h3>
-                    <p className='mt-3 text-sm leading-7 text-slate-600'>
-                      Đây là phiên bản CV đang được dùng mặc định khi ứng tuyển. Bạn có thể tải bản mới hoặc tạo nhiều phiên bản theo vị trí mong muốn.
-                    </p>
+                    <p className='text-xs font-semibold uppercase tracking-[0.18em] text-sky-600'>{t('seekerProfile.cvOverview.eyebrow')}</p>
+                    <h3 className='mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950'>{t('seekerProfile.cvOverview.title')}</h3>
+                    <p className='mt-3 text-sm leading-7 text-slate-600'>{t('seekerProfile.cvOverview.description')}</p>
                     <div className='mt-5 flex flex-wrap gap-3'>
                       <button type='button' className='rounded-2xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)]'>
-                        Tải CV mới
+                        {t('seekerProfile.cvOverview.actions.upload')}
                       </button>
                       <button type='button' className='rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700'>
-                        Tạo CV thủ công
+                        {t('seekerProfile.cvOverview.actions.create')}
                       </button>
                     </div>
                   </div>
 
                   <div className='grid gap-3'>
-                    <MetricMini label='Số CV' value='2 phiên bản' />
-                    <MetricMini label='CV mặc định' value='1 bản' />
-                    <MetricMini label='Lần cập nhật gần nhất' value='2 ngày trước' />
+                    <MetricMini label={t('seekerProfile.cvOverview.metrics.count.label')} value={t('seekerProfile.cvOverview.metrics.count.value')} />
+                    <MetricMini label={t('seekerProfile.cvOverview.metrics.default.label')} value={t('seekerProfile.cvOverview.metrics.default.value')} />
+                    <MetricMini label={t('seekerProfile.cvOverview.metrics.recent.label')} value={t('seekerProfile.cvOverview.metrics.recent.value')} />
                   </div>
                 </div>
               </SectionCard>
 
-              <SectionCard id='cv-library' title='Thư viện CV' icon={<FileBadge2 className='h-5 w-5' />}>
+              <SectionCard id='cv-library' title={t('seekerProfile.sections.cvLibrary')} icon={<FileBadge2 className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 xl:grid-cols-2'>
                   {cvCards.map((cv) => (
                     <article key={cv.title} className='rounded-[24px] border border-slate-200 bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)]'>
@@ -381,20 +598,20 @@ const ProfilePage = () => {
                           <h3 className='text-lg font-semibold text-slate-950'>{cv.title}</h3>
                           <p className='mt-1 text-sm text-slate-500'>{cv.format} • {cv.language}</p>
                         </div>
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${cv.status === 'Đang sử dụng' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${cv.isPrimary ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
                           {cv.status}
                         </span>
                       </div>
                       <p className='mt-4 text-sm text-slate-500'>{cv.updatedAt}</p>
                       <div className='mt-5 flex flex-wrap gap-3'>
                         <button type='button' className='rounded-2xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white'>
-                          Xem CV
+                          {t('seekerProfile.cvLibrary.actions.view')}
                         </button>
                         <button type='button' className='rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700'>
-                          Đổi tên
+                          {t('seekerProfile.cvLibrary.actions.rename')}
                         </button>
                         <button type='button' className='rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700'>
-                          Đặt mặc định
+                          {t('seekerProfile.cvLibrary.actions.setDefault')}
                         </button>
                       </div>
                     </article>
@@ -402,14 +619,9 @@ const ProfilePage = () => {
                 </div>
               </SectionCard>
 
-              <SectionCard id='cv-checklist' title='Checklist trước khi apply' icon={<Sparkles className='h-5 w-5' />}>
+              <SectionCard id='cv-checklist' title={t('seekerProfile.sections.cvChecklist')} icon={<Sparkles className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 md:grid-cols-2'>
-                  {[
-                    'Tiêu đề CV bám sát vị trí ứng tuyển',
-                    'Phần kỹ năng khớp JD và có mức độ ưu tiên',
-                    'Thông tin liên hệ đầy đủ và chính xác',
-                    'Project nổi bật có mô tả vai trò rõ ràng'
-                  ].map((item) => (
+                  {checklistItems.map((item) => (
                     <div key={item} className='flex items-start gap-3 rounded-[22px] border border-slate-200 bg-slate-50/70 px-4 py-4'>
                       <span className='mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700'>
                         ✓
@@ -434,7 +646,7 @@ const ProfilePage = () => {
                 )}
               </div>
               <div className='min-w-0'>
-                <p className='truncate text-sm font-semibold text-slate-950'>{user?.full_name || 'Job seeker'}</p>
+                <p className='truncate text-sm font-semibold text-slate-950'>{user?.full_name || t('seekerProfile.sidebar.userFallback')}</p>
                 <p className='mt-1 truncate text-xs text-slate-500'>{user?.email}</p>
               </div>
             </div>
@@ -442,7 +654,7 @@ const ProfilePage = () => {
             <div className='mt-5 space-y-5'>
               <div>
                 <p className='text-xs font-semibold uppercase tracking-[0.22em] text-sky-600'>
-                  {activeTab === 'profile' ? 'Profile' : 'CV Library'}
+                  {activeTab === 'profile' ? t('seekerProfile.sidebar.profileLabel') : t('seekerProfile.sidebar.cvLabel')}
                 </p>
                 <nav className='mt-3 space-y-2'>
                   {sectionNav.map((section) => (
@@ -460,6 +672,15 @@ const ProfilePage = () => {
           </div>
         </aside>
       </div>
+
+      {toastMessage ? (
+        <SeekerActionToast
+          title={t('seekerTracking.common.toastSuccessTitle')}
+          message={toastMessage}
+          closeLabel={t('seekerTracking.common.closeToast')}
+          onClose={() => setToastMessage(null)}
+        />
+      ) : null}
     </div>
   )
 }
@@ -513,7 +734,29 @@ const ActionTile = ({ title, description, icon }: { title: string; description: 
   </button>
 )
 
-const SectionCard = ({ id, title, icon, children }: { id: string; title: string; icon: ReactNode; children: ReactNode }) => (
+const ActionLink = ({ to, title, description, icon }: { to: string; title: string; description: string; icon: ReactNode }) => (
+  <Link to={to} className='flex items-start gap-3 rounded-[22px] border border-slate-200 bg-slate-50/70 p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/50'>
+    <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600'>{icon}</div>
+    <div>
+      <p className='text-sm font-semibold text-slate-900'>{title}</p>
+      <p className='mt-1 text-sm leading-6 text-slate-500'>{description}</p>
+    </div>
+  </Link>
+)
+
+const SectionCard = ({
+  id,
+  title,
+  icon,
+  children,
+  editLabel
+}: {
+  id: string
+  title: string
+  icon: ReactNode
+  children: ReactNode
+  editLabel: string
+}) => (
   <section id={id} className='rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_56px_rgba(15,23,42,0.06)] sm:p-6'>
     <div className='mb-5 flex items-center justify-between gap-4'>
       <div className='flex items-center gap-3'>
@@ -522,7 +765,7 @@ const SectionCard = ({ id, title, icon, children }: { id: string; title: string;
       </div>
       <button type='button' className='inline-flex items-center gap-2 rounded-2xl bg-sky-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)]'>
         <Pencil className='h-4 w-4' />
-        Chỉnh sửa
+        {editLabel}
       </button>
     </div>
     {children}
@@ -553,13 +796,13 @@ const InfoCard = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
-const BadgeCard = ({ title, meta, accent }: { title: string; meta: string; accent: string }) => {
+const BadgeCard = ({ title, meta, accent }: { title: string; meta: string; accent: Accent }) => {
   const accentClassName =
     accent === 'amber'
-      ? 'bg-amber-50 text-amber-700 border-amber-200'
+      ? 'border-amber-200 bg-amber-50 text-amber-700'
       : accent === 'emerald'
-        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-        : 'bg-sky-50 text-sky-700 border-sky-200'
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+        : 'border-sky-200 bg-sky-50 text-sky-700'
 
   return (
     <div className={`rounded-[22px] border p-5 ${accentClassName}`}>
@@ -579,13 +822,28 @@ const TimelineRow = ({ title, meta }: { title: string; meta: string }) => (
   </div>
 )
 
-const formatDate = (date?: string) => {
-  if (!date) return 'Chưa cập nhật'
+const formatDate = (date: string | undefined, locale: string, fallback: string) => {
+  if (!date) return fallback
 
   const parsed = new Date(date)
   if (Number.isNaN(parsed.getTime())) return date
 
-  return parsed.toLocaleDateString('vi-VN')
+  return parsed.toLocaleDateString(locale)
+}
+
+const formatDateTime = (date: string | undefined, locale: string, fallback: string) => {
+  if (!date) return fallback
+
+  const parsed = new Date(date)
+  if (Number.isNaN(parsed.getTime())) return date
+
+  return parsed.toLocaleString(locale, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 export default ProfilePage

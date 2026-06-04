@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, ChevronDown, Heart, LogOut, Menu, MessageCircle, Search, User, X } from 'lucide-react'
+import { BriefcaseBusiness, CalendarDays, ChevronDown, ClipboardList, Heart, LogOut, Menu, MessageCircle, Search, User, X } from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
@@ -28,6 +28,16 @@ const navItems = [
 ]
 
 const seekerMenuItems = [
+  {
+    labelKey: 'nav.applicationTracker',
+    href: '/seeker/applications',
+    icon: ClipboardList
+  },
+  {
+    labelKey: 'nav.interviewSchedule',
+    href: '/seeker/interviews',
+    icon: CalendarDays
+  },
   {
     labelKey: 'nav.appliedCompanies',
     href: '/seeker/applied-companies',

@@ -18,6 +18,8 @@
     "account": "Account",
     "openChat": "Open chat",
     "openAccountMenu": "Open account menu",
+    "applicationTracker": "My applications",
+    "interviewSchedule": "Interview schedule",
     "appliedCompanies": "Applied companies",
     "savedCompanies": "Saved companies",
     "searchJobs": "Search jobs...",
@@ -674,6 +676,344 @@
       "INTERVIEW_SCHEDULED": "Interview scheduled",
       "INTERVIEW_COMPLETED": "Interview completed",
       "INTERVIEW_CANCELLED": "Interview cancelled"
+    }
+  },
+  "seekerTracking": {
+    "common": {
+      "loadError": "Unable to load seeker tracking data",
+      "pageLabel": "Page {{page}} / {{total}}",
+      "previous": "Previous",
+      "next": "Next",
+      "viewJob": "View job",
+      "viewInterviews": "View interviews",
+      "viewApplications": "View applications",
+      "notSpecified": "Not specified",
+      "exportCalendar": "Export .ics",
+      "exportCalendarShort": "Export",
+      "copyMeetingLink": "Copy meeting link",
+      "meetingLinkCopied": "Meeting link copied to clipboard.",
+      "openGoogleCalendar": "Open Google Calendar",
+      "openInterviewLink": "Open interview link",
+      "joinInterview": "Join interview",
+      "calendarExported": "Calendar file {{fileName}} has been created.",
+      "toastSuccessTitle": "Success",
+      "closeToast": "Close"
+    },
+    "applicationStatus": {
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected"
+    },
+    "interviewStatus": {
+      "SCHEDULED": "Scheduled",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "interviewType": {
+      "video": "Video interview",
+      "phone": "Phone call",
+      "onsite": "Onsite interview"
+    },
+    "applications": {
+      "eyebrow": "Application tracker",
+      "title": "Track the jobs you've applied for",
+      "description": "Review each submitted application, monitor its current status, and spot the next interview without jumping between pages.",
+      "metrics": {
+        "total": "Applications",
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "interviews": "With interviews"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by job title, company, location...",
+        "status": "Application status",
+        "allStatuses": "All statuses"
+      },
+      "meta": {
+        "appliedDate": "Applied date",
+        "updatedDate": "Updated date",
+        "interviewCount": "Interview count"
+      },
+      "nextInterview": {
+        "title": "Next interview",
+        "description": "Scheduled for {{date}} with {{interviewer}}."
+      },
+      "actions": {
+        "showAllInterviews": "Show all interviews",
+        "hideAllInterviews": "Hide all interviews",
+        "allInterviewsTitle": "All interviews for this application"
+      },
+      "rejectionLabel": "Recruiter note:",
+      "empty": {
+        "title": "No applications found",
+        "description": "Your submitted jobs will appear here once you start applying in the system."
+      }
+    },
+    "interviews": {
+      "eyebrow": "Interview schedule",
+      "title": "Keep your interview schedule in one place",
+      "description": "Track upcoming sessions, completed interviews, and cancellations linked to your job applications.",
+      "metrics": {
+        "total": "Interviews",
+        "upcoming": "Upcoming",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by job, company, interviewer...",
+        "status": "Interview status",
+        "allStatuses": "All statuses"
+      },
+      "cards": {
+        "schedule": "Schedule",
+        "duration": "Duration",
+        "interviewer": "Interviewer",
+        "applicationStatus": "Application status",
+        "joinLink": "Meeting link",
+        "feedback": "Feedback",
+        "reason": "Reason:"
+      },
+      "durationValue": "{{count}} minutes",
+      "empty": {
+        "title": "No interviews found",
+        "description": "Once a recruiter schedules an interview for you, it will appear here."
+      }
+    }
+  },
+  "seekerProfile": {
+    "common": {
+      "edit": "Edit",
+      "notUpdated": "Not updated"
+    },
+    "hero": {
+      "defaultTitle": "Job seeker profile",
+      "description": "Manage your personal story, standout skills, and multiple CV versions from one polished workspace.",
+      "badges": {
+        "openToInternship": "Open to internship",
+        "activelyBuildingCv": "Actively building CV"
+      },
+      "metrics": {
+        "accountCode": "Account code",
+        "email": "Email",
+        "phone": "Phone",
+        "joined": "Joined"
+      }
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "editProfile": {
+        "title": "Edit profile",
+        "description": "Refresh your personal details, education, and skill highlights."
+      },
+      "uploadCv": {
+        "title": "Upload a new CV",
+        "description": "Add a tailored resume version for a target role."
+      },
+      "reviewProfile": {
+        "title": "Review profile",
+        "description": "Run a quick check on missing pieces before you apply."
+      }
+    },
+    "snapshot": {
+      "eyebrow": "Career snapshot",
+      "title": "See your application journey at a glance",
+      "description": "Quickly review application progress, interview volume, and the next scheduled session right from your profile.",
+      "viewApplications": "View applications",
+      "viewInterviews": "View interviews",
+      "metrics": {
+        "applications": "Applications",
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "interviews": "Interviews"
+      }
+    },
+    "reminder": {
+      "eyebrow": "Upcoming reminder",
+      "title": "Next interview reminder",
+      "scheduledWith": "{{date}} with {{interviewer}}",
+      "viewAllTitle": "View full schedule",
+      "viewAllDescription": "Open the complete list of interviews linked to your applications.",
+      "exportTitle": "Export .ics",
+      "exportDescription": "Save the nearest interview to Google Calendar, Outlook, or Apple Calendar.",
+      "empty": "There is no upcoming interview yet. When a recruiter schedules one, the reminder will appear here."
+    },
+    "tabs": {
+      "profile": "Profile",
+      "cv": "CV management"
+    },
+    "sections": {
+      "basicInfo": "Basic information",
+      "education": "Education",
+      "certifications": "Certifications",
+      "awards": "Achievements",
+      "skills": "Professional skills",
+      "projects": "Featured projects",
+      "experience": "Internship experience",
+      "about": "About & strengths",
+      "cvOverview": "CV overview",
+      "cvLibrary": "CV library",
+      "cvChecklist": "Checklist before applying"
+    },
+    "basicInfo": {
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone number",
+      "gender": "Gender",
+      "country": "Country",
+      "countryValue": "Vietnam",
+      "personalLinks": "Personal links"
+    },
+    "links": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "portfolio": "Portfolio"
+    },
+    "education": {
+      "school": {
+        "label": "School",
+        "value": "The University of Danang - University of Science and Technology"
+      },
+      "major": {
+        "label": "Major",
+        "value": "Information Technology"
+      },
+      "year": {
+        "label": "Academic year",
+        "value": "Year 3"
+      },
+      "graduation": {
+        "label": "Expected graduation",
+        "value": "08/2027"
+      },
+      "gpa": {
+        "label": "GPA",
+        "value": "3.20 / 4.00"
+      }
+    },
+    "certifications": {
+      "achievedOn": "Achieved in {{date}}",
+      "jlpt": {
+        "name": "JLPT N3",
+        "date": "07/2025"
+      },
+      "toeic": {
+        "name": "TOEIC Bridge",
+        "date": "10/2025"
+      },
+      "aptis": {
+        "name": "Aptis Speaking B2",
+        "date": "12/2025"
+      }
+    },
+    "awards": {
+      "hackathon": {
+        "title": "Top 5 in the internal Hackathon competition",
+        "date": "05/2025"
+      },
+      "semester": {
+        "title": "Outstanding student of the semester",
+        "date": "01/2025"
+      }
+    },
+    "skills": {
+      "programming": {
+        "category": "Programming languages"
+      },
+      "frameworks": {
+        "category": "Frameworks"
+      },
+      "databases": {
+        "category": "Databases"
+      },
+      "tools": {
+        "category": "Tools"
+      }
+    },
+    "projects": {
+      "badge": "Project",
+      "recruitment": {
+        "title": "Talent Platform for IT Recruitment",
+        "description": "Built a recruitment platform for IT candidates with job browsing, company profiles, chat, and application tracking features.",
+        "status": "In progress"
+      },
+      "equipment": {
+        "title": "Student Equipment Management",
+        "description": "Designed the interface and workflow for a school lab equipment management system with a strong focus on usability and reporting.",
+        "status": "Completed"
+      }
+    },
+    "experience": {
+      "sun": {
+        "company": "Sun* Internal Project",
+        "role": "Frontend Developer Intern",
+        "period": "03/2026 - Present",
+        "summary": "Built UI for company, job, and seeker profile modules while coordinating API integration and polishing the end-user experience."
+      }
+    },
+    "about": {
+      "introductionTitle": "Introduction",
+      "introductionDescription": "I am an IT student focused on Frontend and Full-stack development, and I enjoy building products that feel clear, modern, and genuinely useful for end users.",
+      "strengthsTitle": "Strengths",
+      "strengths": {
+        "first": "Proactive about polishing UI and collaborating on API integration.",
+        "second": "Product-minded with real attention to end-user experience.",
+        "third": "Comfortable working in TypeScript, React, Tailwind, and Java backend codebases."
+      }
+    },
+    "cvOverview": {
+      "eyebrow": "Primary CV",
+      "title": "CV Frontend Developer",
+      "description": "This is the default CV version currently used for applications. You can upload a new one or create multiple tailored versions for different roles.",
+      "actions": {
+        "upload": "Upload a new CV",
+        "create": "Create manually"
+      },
+      "metrics": {
+        "count": {
+          "label": "CV count",
+          "value": "2 versions"
+        },
+        "default": {
+          "label": "Default CV",
+          "value": "1 version"
+        },
+        "recent": {
+          "label": "Most recent update",
+          "value": "2 days ago"
+        }
+      }
+    },
+    "cvLibrary": {
+      "actions": {
+        "view": "View CV",
+        "rename": "Rename",
+        "setDefault": "Set as default"
+      },
+      "frontend": {
+        "title": "CV Frontend Developer",
+        "language": "English",
+        "updatedAt": "Updated 2 days ago",
+        "status": "Currently in use"
+      },
+      "fullstack": {
+        "title": "CV Full-stack Intern",
+        "language": "Vietnamese",
+        "updatedAt": "Updated 1 week ago",
+        "status": "Draft"
+      }
+    },
+    "cvChecklist": {
+      "items": {
+        "titleMatch": "Your CV title closely matches the target role.",
+        "skillsMatch": "The skills section aligns with the JD and reflects clear priority.",
+        "contact": "Contact details are complete and accurate.",
+        "projects": "Featured projects clearly explain your role and impact."
+      }
+    },
+    "sidebar": {
+      "userFallback": "Job seeker",
+      "profileLabel": "Profile",
+      "cvLabel": "CV library"
     }
   },
   "admin": {

@@ -22,6 +22,9 @@ export type CvExperience = {
 export type CvSkill = {
   id: string
   name: string
+  category?: string | null
+  experienceMonths?: number | null
+  isStrong?: boolean
 }
 
 export type CvPersonality = {
@@ -80,7 +83,12 @@ export type CvExperiencePayload = {
   endDate?: string | null
   description?: string | null
 }
-export type CvSkillPayload = Pick<CvSkill, 'name'>
+export type CvSkillPayload = {
+  name: string
+  category?: string | null
+  experienceMonths?: number | null
+  isStrong?: boolean
+}
 export type CvPersonalityPayload = {
   type: string | null
   description?: string | null
@@ -131,7 +139,7 @@ export const updateCvExperienceApi = async (id: string, data: Partial<CvExperien
 
 export const deleteCvExperienceApi = async (id: string) => (await axiosInstance.delete(`/cv/experience/${id}`)).data
 
-export const createCvSkillsApi = async (skills: string[]) => (await axiosInstance.post('/cv/skills', { skills })).data
+export const createCvSkillsApi = async (skills: CvSkillPayload[]) => (await axiosInstance.post('/cv/skills', { skills })).data
 
 export const updateCvSkillApi = async (id: string, data: CvSkillPayload) =>
   (await axiosInstance.put(`/cv/skills/${id}`, data)).data

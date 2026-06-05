@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Award,
   BellRing,
@@ -11,19 +12,52 @@ import {
   ExternalLink,
   FileBadge2,
   FileText,
+  FileUp,
   GraduationCap,
   Languages,
   Mail,
   Pencil,
   Phone,
+  Plus,
+  Save,
   Sparkles,
   Star,
+  Trash2,
+  X,
   UserRound
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
+import {
+  createCvCertificateApi,
+  createCvEducationApi,
+  createCvExperienceApi,
+  createCvPersonalityApi,
+  createCvProjectApi,
+  createCvSkillsApi,
+  deleteCvCertificateApi,
+  deleteCvEducationApi,
+  deleteCvExperienceApi,
+  deleteCvPersonalityApi,
+  deleteCvProjectApi,
+  deleteCvSkillApi,
+  getCvDetailApi,
+  updateCvCertificateApi,
+  updateCvEducationApi,
+  updateCvExperienceApi,
+  updateCvPersonalityApi,
+  updateCvProjectApi,
+  updateCvSkillApi,
+  uploadCvFileApi,
+  type CvCertificate,
+  type CvEducation,
+  type CvExperience,
+  type CvPersonality,
+  type CvProject,
+  type CvSkill
+} from '@/api/cv'
 import { SeekerActionToast } from '@/components/seeker/SeekerActionToast'
 import { SeekerStatusBadge } from '@/components/seeker/SeekerStatusBadge'
 import { useSeekerApplicationsTracker, useSeekerInterviewsTracker } from '@/hooks/useSeekerCareer'
@@ -32,16 +66,176 @@ import { useAuthStore } from '@/store/authStore'
 
 type ProfileTab = 'profile' | 'cv'
 type Accent = 'amber' | 'sky' | 'emerald'
+type CvSectionName = 'education' | 'experience' | 'skill' | 'personality' | 'certificate' | 'project'
+
+const emptyEducationForm = {
+  school: '',
+  degree: '',
+  major: '',
+  startDate: '',
+  endDate: '',
+  description: ''
+}
+
+const emptyExperienceForm = {
+  company: '',
+  position: '',
+  startDate: '',
+  endDate: '',
+  description: ''
+}
+
+const emptyPersonalityForm = {
+  type: '',
+  description: ''
+}
+
+const emptyCertificateForm = {
+  title: '',
+  issuer: '',
+  issuedDate: '',
+  fileUrl: ''
+}
+
+const emptyProjectForm = {
+  name: '',
+  description: '',
+  link: '',
+  role: '',
+  startDate: '',
+  endDate: ''
+}
 
 const ProfilePage = () => {
   const { t, i18n } = useTranslation()
   const user = useAuthStore((state) => state.user)
   const [activeTab, setActiveTab] = useState<ProfileTab>('profile')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [cvFile, setCvFile] = useState<File | null>(null)
+  const [editing, setEditing] = useState<{ section: CvSectionName; id: string } | null>(null)
+  const [educationForm, setEducationForm] = useState(emptyEducationForm)
+  const [experienceForm, setExperienceForm] = useState(emptyExperienceForm)
+  const [skillForm, setSkillForm] = useState('')
+  const [personalityForm, setPersonalityForm] = useState(emptyPersonalityForm)
+  const [certificateForm, setCertificateForm] = useState(emptyCertificateForm)
+  const [projectForm, setProjectForm] = useState(emptyProjectForm)
+  const queryClient = useQueryClient()
   const { data: applications, isLoading: isLoadingApplications } = useSeekerApplicationsTracker()
   const { data: interviews, isLoading: isLoadingInterviews } = useSeekerInterviewsTracker()
   const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
   const fallbackText = t('seekerProfile.common.notUpdated')
+  const cvQueryKey = ['seeker', 'cv', user?.id]
+  const { data: cvDetail, isLoading: isLoadingCv } = useQuery({
+    queryKey: cvQueryKey,
+    queryFn: () => getCvDetailApi(user!.id),
+    enabled: Boolean(user?.id)
+  })
+
+  const refreshCv = async (message: string) => {
+    await queryClient.invalidateQueries({ queryKey: cvQueryKey })
+    setToastMessage(message)
+  }
+
+  const uploadCvMutation = useMutation({
+    mutationFn: uploadCvFileApi,
+    onSuccess: () => {
+      setCvFile(null)
+      void refreshCv('Đã tải CV lên thành công.')
+    }
+  })
+
+  const educationMutation = useMutation({
+    mutationFn: async () =>
+      editing?.section === 'education'
+        ? updateCvEducationApi(editing.id, normalizeOptionalFields(educationForm))
+        : createCvEducationApi(normalizeOptionalFields(educationForm)),
+    onSuccess: () => {
+      setEditing(null)
+      setEducationForm(emptyEducationForm)
+      void refreshCv('Đã lưu học vấn.')
+    }
+  })
+
+  const experienceMutation = useMutation({
+    mutationFn: async () =>
+      editing?.section === 'experience'
+        ? updateCvExperienceApi(editing.id, normalizeOptionalFields(experienceForm))
+        : createCvExperienceApi(normalizeOptionalFields(experienceForm)),
+    onSuccess: () => {
+      setEditing(null)
+      setExperienceForm(emptyExperienceForm)
+      void refreshCv('Đã lưu kinh nghiệm.')
+    }
+  })
+
+  const skillMutation = useMutation({
+    mutationFn: async () => {
+      if (editing?.section === 'skill') {
+        return updateCvSkillApi(editing.id, { name: skillForm.trim() })
+      }
+
+      return createCvSkillsApi(
+        skillForm
+          .split(',')
+          .map((skill) => skill.trim())
+          .filter(Boolean)
+      )
+    },
+    onSuccess: () => {
+      setEditing(null)
+      setSkillForm('')
+      void refreshCv('Đã lưu kỹ năng.')
+    }
+  })
+
+  const personalityMutation = useMutation({
+    mutationFn: async () =>
+      editing?.section === 'personality'
+        ? updateCvPersonalityApi(editing.id, normalizeOptionalFields(personalityForm))
+        : createCvPersonalityApi(normalizeOptionalFields(personalityForm)),
+    onSuccess: () => {
+      setEditing(null)
+      setPersonalityForm(emptyPersonalityForm)
+      void refreshCv('Đã lưu tính cách.')
+    }
+  })
+
+  const certificateMutation = useMutation({
+    mutationFn: async () =>
+      editing?.section === 'certificate'
+        ? updateCvCertificateApi(editing.id, normalizeOptionalFields(certificateForm))
+        : createCvCertificateApi(normalizeOptionalFields(certificateForm)),
+    onSuccess: () => {
+      setEditing(null)
+      setCertificateForm(emptyCertificateForm)
+      void refreshCv('Đã lưu chứng chỉ.')
+    }
+  })
+
+  const projectMutation = useMutation({
+    mutationFn: async () =>
+      editing?.section === 'project'
+        ? updateCvProjectApi(editing.id, normalizeOptionalFields(projectForm))
+        : createCvProjectApi(normalizeOptionalFields(projectForm)),
+    onSuccess: () => {
+      setEditing(null)
+      setProjectForm(emptyProjectForm)
+      void refreshCv('Đã lưu dự án.')
+    }
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: ({ section, id }: { section: CvSectionName; id: string }) => {
+      if (section === 'education') return deleteCvEducationApi(id)
+      if (section === 'experience') return deleteCvExperienceApi(id)
+      if (section === 'skill') return deleteCvSkillApi(id)
+      if (section === 'personality') return deleteCvPersonalityApi(id)
+      if (section === 'certificate') return deleteCvCertificateApi(id)
+
+      return deleteCvProjectApi(id)
+    },
+    onSuccess: () => void refreshCv('Đã xóa mục CV.')
+  })
 
   const profileSections = useMemo(
     () => [
@@ -60,8 +254,11 @@ const ProfilePage = () => {
   const cvSections = useMemo(
     () => [
       { id: 'cv-overview', label: t('seekerProfile.sections.cvOverview') },
-      { id: 'cv-library', label: t('seekerProfile.sections.cvLibrary') },
-      { id: 'cv-checklist', label: t('seekerProfile.sections.cvChecklist') }
+      { id: 'cv-education', label: 'Học vấn' },
+      { id: 'cv-experience', label: 'Kinh nghiệm' },
+      { id: 'cv-skills', label: 'Kỹ năng' },
+      { id: 'cv-certificates', label: 'Chứng chỉ' },
+      { id: 'cv-projects', label: 'Dự án' }
     ],
     [t]
   )
@@ -146,37 +343,15 @@ const ProfilePage = () => {
     [t]
   )
 
-  const cvCards = useMemo(
-    () => [
-      {
-        title: t('seekerProfile.cvLibrary.frontend.title'),
-        format: 'PDF',
-        language: t('seekerProfile.cvLibrary.frontend.language'),
-        updatedAt: t('seekerProfile.cvLibrary.frontend.updatedAt'),
-        status: t('seekerProfile.cvLibrary.frontend.status'),
-        isPrimary: true
-      },
-      {
-        title: t('seekerProfile.cvLibrary.fullstack.title'),
-        format: 'DOCX',
-        language: t('seekerProfile.cvLibrary.fullstack.language'),
-        updatedAt: t('seekerProfile.cvLibrary.fullstack.updatedAt'),
-        status: t('seekerProfile.cvLibrary.fullstack.status'),
-        isPrimary: false
-      }
-    ],
-    [t]
-  )
-
-  const checklistItems = useMemo(
-    () => [
-      t('seekerProfile.cvChecklist.items.titleMatch'),
-      t('seekerProfile.cvChecklist.items.skillsMatch'),
-      t('seekerProfile.cvChecklist.items.contact'),
-      t('seekerProfile.cvChecklist.items.projects')
-    ],
-    [t]
-  )
+  const cvCards: Array<{
+    title: string
+    format: string
+    language: string
+    updatedAt: string
+    status: string
+    isPrimary: boolean
+  }> = []
+  const checklistItems: string[] = []
 
   const strengths = useMemo(
     () => [
@@ -218,6 +393,83 @@ const ProfilePage = () => {
   const handleCopyMeetingLink = async (meetingLink: string) => {
     await navigator.clipboard.writeText(meetingLink)
     setToastMessage(t('seekerTracking.common.meetingLinkCopied'))
+  }
+
+  const handleUploadCv = () => {
+    if (!cvFile) {
+      setToastMessage('Vui lòng chọn file PDF/DOC/DOCX trước khi tải lên.')
+      return
+    }
+
+    uploadCvMutation.mutate(cvFile)
+  }
+
+  const startEditEducation = (item: CvEducation) => {
+    setEditing({ section: 'education', id: item.id })
+    setEducationForm({
+      school: item.school,
+      degree: item.degree,
+      major: item.major ?? '',
+      startDate: formatInputDate(item.startDate),
+      endDate: formatInputDate(item.endDate),
+      description: item.description ?? ''
+    })
+  }
+
+  const startEditExperience = (item: CvExperience) => {
+    setEditing({ section: 'experience', id: item.id })
+    setExperienceForm({
+      company: item.company,
+      position: item.position,
+      startDate: formatInputDate(item.startDate),
+      endDate: formatInputDate(item.endDate),
+      description: item.description ?? ''
+    })
+  }
+
+  const startEditSkill = (item: CvSkill) => {
+    setEditing({ section: 'skill', id: item.id })
+    setSkillForm(item.name)
+  }
+
+  const startEditPersonality = (item: CvPersonality) => {
+    setEditing({ section: 'personality', id: item.id })
+    setPersonalityForm({
+      type: item.type,
+      description: item.description ?? ''
+    })
+  }
+
+  const startEditCertificate = (item: CvCertificate) => {
+    setEditing({ section: 'certificate', id: item.id })
+    setCertificateForm({
+      title: item.title,
+      issuer: item.issuer,
+      issuedDate: formatInputDate(item.issuedDate),
+      fileUrl: item.fileUrl ?? ''
+    })
+  }
+
+  const startEditProject = (item: CvProject) => {
+    setEditing({ section: 'project', id: item.id })
+    setProjectForm({
+      name: item.name,
+      description: item.description ?? '',
+      link: item.link ?? '',
+      role: item.role ?? '',
+      startDate: formatInputDate(item.startDate),
+      endDate: formatInputDate(item.endDate)
+    })
+  }
+
+  const clearEdit = () => {
+    setEditing(null)
+    setEducationForm(emptyEducationForm)
+    setExperienceForm(emptyExperienceForm)
+    setSkillForm('')
+    setPersonalityForm(emptyPersonalityForm)
+    setCertificateForm(emptyCertificateForm)
+    setProjectForm(emptyProjectForm)
   }
 
   return (
@@ -568,27 +820,126 @@ const ProfilePage = () => {
               <SectionCard id='cv-overview' title={t('seekerProfile.sections.cvOverview')} icon={<FileText className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]'>
                   <div className='rounded-[24px] border border-slate-200 bg-[linear-gradient(135deg,rgba(239,246,255,1),rgba(250,245,255,1))] p-6'>
-                    <p className='text-xs font-semibold uppercase tracking-[0.18em] text-sky-600'>{t('seekerProfile.cvOverview.eyebrow')}</p>
-                    <h3 className='mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950'>{t('seekerProfile.cvOverview.title')}</h3>
-                    <p className='mt-3 text-sm leading-7 text-slate-600'>{t('seekerProfile.cvOverview.description')}</p>
-                    <div className='mt-5 flex flex-wrap gap-3'>
-                      <button type='button' className='rounded-2xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)]'>
-                        {t('seekerProfile.cvOverview.actions.upload')}
-                      </button>
-                      <button type='button' className='rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700'>
-                        {t('seekerProfile.cvOverview.actions.create')}
+                    <p className='text-xs font-semibold uppercase tracking-[0.18em] text-sky-600'>CV Backend</p>
+                    <h3 className='mt-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950'>Quản lý CV ứng viên</h3>
+                    <p className='mt-3 text-sm leading-7 text-slate-600'>
+                      Dữ liệu đang lấy trực tiếp từ backend CV theo schema Prisma: file CV, học vấn, kinh nghiệm, kỹ năng,
+                      tính cách, chứng chỉ và dự án.
+                    </p>
+                    <div className='mt-5 flex flex-col gap-3 sm:flex-row'>
+                      <input
+                        type='file'
+                        accept='.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                        onChange={(event) => setCvFile(event.target.files?.[0] ?? null)}
+                        className='min-h-12 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700'
+                      />
+                      <button
+                        type='button'
+                        onClick={handleUploadCv}
+                        disabled={uploadCvMutation.isPending}
+                        className='inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)] disabled:cursor-not-allowed disabled:opacity-60'
+                      >
+                        <FileUp className='h-4 w-4' />
+                        {uploadCvMutation.isPending ? 'Đang tải...' : 'Tải CV'}
                       </button>
                     </div>
+                    {cvDetail?.cvUrl ? (
+                      <a href={cvDetail.cvUrl} target='_blank' rel='noreferrer' className='mt-4 inline-flex items-center gap-2 text-sm font-semibold text-sky-700'>
+                        Xem file CV hiện tại
+                        <ExternalLink className='h-4 w-4' />
+                      </a>
+                    ) : null}
                   </div>
 
                   <div className='grid gap-3'>
-                    <MetricMini label={t('seekerProfile.cvOverview.metrics.count.label')} value={t('seekerProfile.cvOverview.metrics.count.value')} />
-                    <MetricMini label={t('seekerProfile.cvOverview.metrics.default.label')} value={t('seekerProfile.cvOverview.metrics.default.value')} />
-                    <MetricMini label={t('seekerProfile.cvOverview.metrics.recent.label')} value={t('seekerProfile.cvOverview.metrics.recent.value')} />
+                    <MetricMini label='Học vấn' value={isLoadingCv ? '...' : String(cvDetail?.educations.length ?? 0)} />
+                    <MetricMini label='Kinh nghiệm' value={isLoadingCv ? '...' : String(cvDetail?.experiences.length ?? 0)} />
+                    <MetricMini label='Kỹ năng' value={isLoadingCv ? '...' : String(cvDetail?.skills.length ?? 0)} />
                   </div>
                 </div>
               </SectionCard>
 
+              <SectionCard id='cv-education' title='Học vấn' icon={<GraduationCap className='h-5 w-5' />} editLabel={editing?.section === 'education' ? 'Đang sửa' : 'CRUD'}>
+                <CvFormGrid>
+                  <TextField label='Trường' value={educationForm.school} onChange={(value) => setEducationForm((form) => ({ ...form, school: value }))} />
+                  <TextField label='Bằng cấp' value={educationForm.degree} onChange={(value) => setEducationForm((form) => ({ ...form, degree: value }))} />
+                  <TextField label='Chuyên ngành' value={educationForm.major} onChange={(value) => setEducationForm((form) => ({ ...form, major: value }))} />
+                  <TextField type='date' label='Bắt đầu' value={educationForm.startDate} onChange={(value) => setEducationForm((form) => ({ ...form, startDate: value }))} />
+                  <TextField type='date' label='Kết thúc' value={educationForm.endDate} onChange={(value) => setEducationForm((form) => ({ ...form, endDate: value }))} />
+                  <TextField label='Mô tả' value={educationForm.description} onChange={(value) => setEducationForm((form) => ({ ...form, description: value }))} />
+                </CvFormGrid>
+                <CvFormActions isEditing={editing?.section === 'education'} isPending={educationMutation.isPending} onCancel={clearEdit} onSave={() => educationMutation.mutate()} />
+                <CvList items={cvDetail?.educations ?? []} emptyText='Chưa có học vấn.' renderItem={(item) => <CvListRow key={item.id} title={`${item.degree} - ${item.school}`} meta={`${formatDate(item.startDate, locale, fallbackText)} - ${formatDate(item.endDate ?? undefined, locale, 'Hiện tại')}`} description={item.description} onEdit={() => startEditEducation(item)} onDelete={() => deleteMutation.mutate({ section: 'education', id: item.id })} />} />
+              </SectionCard>
+
+              <SectionCard id='cv-experience' title='Kinh nghiệm' icon={<BriefcaseBusiness className='h-5 w-5' />} editLabel={editing?.section === 'experience' ? 'Đang sửa' : 'CRUD'}>
+                <CvFormGrid>
+                  <TextField label='Công ty' value={experienceForm.company} onChange={(value) => setExperienceForm((form) => ({ ...form, company: value }))} />
+                  <TextField label='Vị trí' value={experienceForm.position} onChange={(value) => setExperienceForm((form) => ({ ...form, position: value }))} />
+                  <TextField type='date' label='Bắt đầu' value={experienceForm.startDate} onChange={(value) => setExperienceForm((form) => ({ ...form, startDate: value }))} />
+                  <TextField type='date' label='Kết thúc' value={experienceForm.endDate} onChange={(value) => setExperienceForm((form) => ({ ...form, endDate: value }))} />
+                  <TextField label='Mô tả' value={experienceForm.description} onChange={(value) => setExperienceForm((form) => ({ ...form, description: value }))} />
+                </CvFormGrid>
+                <CvFormActions isEditing={editing?.section === 'experience'} isPending={experienceMutation.isPending} onCancel={clearEdit} onSave={() => experienceMutation.mutate()} />
+                <CvList items={cvDetail?.experiences ?? []} emptyText='Chưa có kinh nghiệm.' renderItem={(item) => <CvListRow key={item.id} title={`${item.position} - ${item.company}`} meta={`${formatDate(item.startDate, locale, fallbackText)} - ${formatDate(item.endDate ?? undefined, locale, 'Hiện tại')}`} description={item.description} onEdit={() => startEditExperience(item)} onDelete={() => deleteMutation.mutate({ section: 'experience', id: item.id })} />} />
+              </SectionCard>
+
+              <SectionCard id='cv-skills' title='Kỹ năng và tính cách' icon={<Languages className='h-5 w-5' />} editLabel='CRUD'>
+                <div className='grid gap-6 lg:grid-cols-2'>
+                  <div>
+                    <TextField label='Kỹ năng' value={skillForm} placeholder='React, NestJS, PostgreSQL' onChange={setSkillForm} />
+                    <CvFormActions isEditing={editing?.section === 'skill'} isPending={skillMutation.isPending} onCancel={clearEdit} onSave={() => skillMutation.mutate()} />
+                    <div className='mt-4 flex flex-wrap gap-2'>
+                      {(cvDetail?.skills ?? []).map((skill) => (
+                        <span key={skill.id} className='inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-medium text-sky-700'>
+                          {skill.name}
+                          <button type='button' onClick={() => startEditSkill(skill)} className='text-sky-900'>
+                            <Pencil className='h-3.5 w-3.5' />
+                          </button>
+                          <button type='button' onClick={() => deleteMutation.mutate({ section: 'skill', id: skill.id })} className='text-rose-600'>
+                            <Trash2 className='h-3.5 w-3.5' />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <CvFormGrid>
+                      <TextField label='Loại' value={personalityForm.type} onChange={(value) => setPersonalityForm((form) => ({ ...form, type: value }))} />
+                      <TextField label='Mô tả' value={personalityForm.description} onChange={(value) => setPersonalityForm((form) => ({ ...form, description: value }))} />
+                    </CvFormGrid>
+                    <CvFormActions isEditing={editing?.section === 'personality'} isPending={personalityMutation.isPending} onCancel={clearEdit} onSave={() => personalityMutation.mutate()} />
+                    <CvList items={cvDetail?.personalities ?? []} emptyText='Chưa có tính cách.' renderItem={(item) => <CvListRow key={item.id} title={item.type} description={item.description} onEdit={() => startEditPersonality(item)} onDelete={() => deleteMutation.mutate({ section: 'personality', id: item.id })} />} />
+                  </div>
+                </div>
+              </SectionCard>
+
+              <SectionCard id='cv-certificates' title='Chứng chỉ' icon={<FileBadge2 className='h-5 w-5' />} editLabel={editing?.section === 'certificate' ? 'Đang sửa' : 'CRUD'}>
+                <CvFormGrid>
+                  <TextField label='Tên chứng chỉ' value={certificateForm.title} onChange={(value) => setCertificateForm((form) => ({ ...form, title: value }))} />
+                  <TextField label='Đơn vị cấp' value={certificateForm.issuer} onChange={(value) => setCertificateForm((form) => ({ ...form, issuer: value }))} />
+                  <TextField type='date' label='Ngày cấp' value={certificateForm.issuedDate} onChange={(value) => setCertificateForm((form) => ({ ...form, issuedDate: value }))} />
+                  <TextField label='URL file' value={certificateForm.fileUrl} onChange={(value) => setCertificateForm((form) => ({ ...form, fileUrl: value }))} />
+                </CvFormGrid>
+                <CvFormActions isEditing={editing?.section === 'certificate'} isPending={certificateMutation.isPending} onCancel={clearEdit} onSave={() => certificateMutation.mutate()} />
+                <CvList items={cvDetail?.certificates ?? []} emptyText='Chưa có chứng chỉ.' renderItem={(item) => <CvListRow key={item.id} title={item.title} meta={`${item.issuer}${item.issuedDate ? ` - ${formatDate(item.issuedDate, locale, fallbackText)}` : ''}`} description={item.fileUrl} onEdit={() => startEditCertificate(item)} onDelete={() => deleteMutation.mutate({ section: 'certificate', id: item.id })} />} />
+              </SectionCard>
+
+              <SectionCard id='cv-projects' title='Dự án' icon={<Star className='h-5 w-5' />} editLabel={editing?.section === 'project' ? 'Đang sửa' : 'CRUD'}>
+                <CvFormGrid>
+                  <TextField label='Tên dự án' value={projectForm.name} onChange={(value) => setProjectForm((form) => ({ ...form, name: value }))} />
+                  <TextField label='Vai trò' value={projectForm.role} onChange={(value) => setProjectForm((form) => ({ ...form, role: value }))} />
+                  <TextField label='Link' value={projectForm.link} onChange={(value) => setProjectForm((form) => ({ ...form, link: value }))} />
+                  <TextField type='date' label='Bắt đầu' value={projectForm.startDate} onChange={(value) => setProjectForm((form) => ({ ...form, startDate: value }))} />
+                  <TextField type='date' label='Kết thúc' value={projectForm.endDate} onChange={(value) => setProjectForm((form) => ({ ...form, endDate: value }))} />
+                  <TextField label='Mô tả' value={projectForm.description} onChange={(value) => setProjectForm((form) => ({ ...form, description: value }))} />
+                </CvFormGrid>
+                <CvFormActions isEditing={editing?.section === 'project'} isPending={projectMutation.isPending} onCancel={clearEdit} onSave={() => projectMutation.mutate()} />
+                <CvList items={cvDetail?.projects ?? []} emptyText='Chưa có dự án.' renderItem={(item) => <CvListRow key={item.id} title={item.name} meta={item.role ?? undefined} description={item.description} onEdit={() => startEditProject(item)} onDelete={() => deleteMutation.mutate({ section: 'project', id: item.id })} />} />
+              </SectionCard>
+
+              {false ? (
+                <>
               <SectionCard id='cv-library' title={t('seekerProfile.sections.cvLibrary')} icon={<FileBadge2 className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
                 <div className='grid gap-4 xl:grid-cols-2'>
                   {cvCards.map((cv) => (
@@ -631,6 +982,8 @@ const ProfilePage = () => {
                   ))}
                 </div>
               </SectionCard>
+                </>
+              ) : null}
             </>
           )}
         </div>
@@ -772,6 +1125,119 @@ const SectionCard = ({
   </section>
 )
 
+const CvFormGrid = ({ children }: { children: ReactNode }) => (
+  <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-3'>{children}</div>
+)
+
+const TextField = ({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  placeholder
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  type?: string
+  placeholder?: string
+}) => (
+  <label className='block'>
+    <span className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>{label}</span>
+    <input
+      type={type}
+      value={value}
+      placeholder={placeholder}
+      onChange={(event) => onChange(event.target.value)}
+      className='mt-2 h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
+    />
+  </label>
+)
+
+const CvFormActions = ({
+  isEditing,
+  isPending,
+  onCancel,
+  onSave
+}: {
+  isEditing: boolean
+  isPending: boolean
+  onCancel: () => void
+  onSave: () => void
+}) => (
+  <div className='mt-4 flex flex-wrap gap-3'>
+    <button
+      type='button'
+      onClick={onSave}
+      disabled={isPending}
+      className='inline-flex h-11 items-center gap-2 rounded-2xl bg-sky-500 px-4 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)] disabled:cursor-not-allowed disabled:opacity-60'
+    >
+      {isEditing ? <Save className='h-4 w-4' /> : <Plus className='h-4 w-4' />}
+      {isPending ? 'Đang lưu...' : isEditing ? 'Cập nhật' : 'Thêm mới'}
+    </button>
+    {isEditing ? (
+      <button
+        type='button'
+        onClick={onCancel}
+        className='inline-flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700'
+      >
+        <X className='h-4 w-4' />
+        Hủy
+      </button>
+    ) : null}
+  </div>
+)
+
+const CvList = <T,>({
+  items,
+  emptyText,
+  renderItem
+}: {
+  items: T[]
+  emptyText: string
+  renderItem: (item: T) => ReactNode
+}) => (
+  <div className='mt-5 space-y-3'>
+    {items.length > 0 ? (
+      items.map(renderItem)
+    ) : (
+      <div className='rounded-[22px] border border-dashed border-slate-300 bg-slate-50/70 px-4 py-5 text-sm text-slate-500'>{emptyText}</div>
+    )}
+  </div>
+)
+
+const CvListRow = ({
+  title,
+  meta,
+  description,
+  onEdit,
+  onDelete
+}: {
+  title: string
+  meta?: string
+  description?: string | null
+  onEdit: () => void
+  onDelete: () => void
+}) => (
+  <article className='rounded-[22px] border border-slate-200 bg-slate-50/70 p-4'>
+    <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+      <div className='min-w-0'>
+        <h3 className='text-sm font-semibold text-slate-950'>{title}</h3>
+        {meta ? <p className='mt-1 text-sm text-slate-500'>{meta}</p> : null}
+        {description ? <p className='mt-2 text-sm leading-6 text-slate-600'>{description}</p> : null}
+      </div>
+      <div className='flex shrink-0 gap-2'>
+        <button type='button' onClick={onEdit} className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-sky-700'>
+          <Pencil className='h-4 w-4' />
+        </button>
+        <button type='button' onClick={onDelete} className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200 bg-white text-rose-600'>
+          <Trash2 className='h-4 w-4' />
+        </button>
+      </div>
+    </div>
+  </article>
+)
+
 const ProfileRow = ({ label, value }: { label: string; value: string }) => (
   <div className='flex flex-col gap-1 rounded-[20px] border border-slate-200 bg-slate-50/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4'>
     <dt className='text-sm font-semibold text-slate-900'>{label}</dt>
@@ -830,6 +1296,20 @@ const formatDate = (date: string | undefined, locale: string, fallback: string) 
 
   return parsed.toLocaleDateString(locale)
 }
+
+const formatInputDate = (date?: string | null) => {
+  if (!date) return ''
+
+  const parsed = new Date(date)
+  if (Number.isNaN(parsed.getTime())) return ''
+
+  return parsed.toISOString().slice(0, 10)
+}
+
+const normalizeOptionalFields = <T extends Record<string, string>>(data: T) =>
+  Object.fromEntries(Object.entries(data).map(([key, value]) => [key, value.trim() === '' ? null : value.trim()])) as {
+    [K in keyof T]: string | null
+  }
 
 const formatDateTime = (date: string | undefined, locale: string, fallback: string) => {
   if (!date) return fallback

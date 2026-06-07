@@ -34,23 +34,29 @@ import {
   createCvCertificateApi,
   createCvEducationApi,
   createCvExperienceApi,
+  createCvPersonalityApi,
   createCvProjectApi,
   createCvSkillsApi,
   deleteCvCertificateApi,
   deleteCvEducationApi,
   deleteCvExperienceApi,
+  deleteCvPersonalityApi,
   deleteCvProjectApi,
   deleteCvSkillApi,
   getCvDetailApi,
   updateCvCertificateApi,
   updateCvEducationApi,
   updateCvExperienceApi,
+  updateCvPersonalityApi,
   updateCvProjectApi,
   updateCvSkillApi,
   uploadCvFileApi,
   type CvCertificate,
+  type CvCertificatePayload,
   type CvEducation,
   type CvExperience,
+  type CvPersonality,
+  type CvPersonalityPayload,
   type CvProject,
   type CvSkill
 } from '@/api/cv'
@@ -60,7 +66,9 @@ import { useSeekerApplicationsTracker, useSeekerInterviewsTracker } from '@/hook
 import { buildGoogleCalendarUrl, downloadInterviewCalendarFile } from '@/lib/interviewCalendar'
 import { useAuthStore } from '@/store/authStore'
 
-type CvSectionName = 'education' | 'experience' | 'skill' | 'certificate' | 'project'
+type CvSectionName = 'education' | 'experience' | 'skill' | 'certificate' | 'project' | 'personality'
+type CertificateCategory = 'english' | 'other'
+type EnglishCertificateType = 'TOEIC' | 'IELTS' | 'VSTEP'
 type SkillDraft = {
   id?: string
   name: string
@@ -124,11 +132,23 @@ const emptyExperienceForm = {
 }
 
 const emptyCertificateForm = {
-  title: '',
-  issuer: '',
+  category: 'english' as CertificateCategory,
+  englishType: 'TOEIC' as EnglishCertificateType,
+  score: '',
+  customTitle: '',
   issuedDate: '',
-  fileUrl: ''
 }
+
+const englishCertificateOptions: Array<{ value: EnglishCertificateType; label: string }> = [
+  { value: 'TOEIC', label: 'TOEIC' },
+  { value: 'IELTS', label: 'IELTS' },
+  { value: 'VSTEP', label: 'VSTEP' }
+]
+
+const certificateCategoryOptions: Array<{ value: CertificateCategory; label: string }> = [
+  { value: 'english', label: 'Tiếng Anh' },
+  { value: 'other', label: 'Chứng chỉ khác' }
+]
 
 const emptyProjectForm = {
   name: '',
@@ -137,6 +157,11 @@ const emptyProjectForm = {
   role: '',
   startDate: '',
   endDate: ''
+}
+
+const emptyPersonalityForm = {
+  type: '',
+  description: ''
 }
 
 const ProfilePage = () => {
@@ -152,6 +177,7 @@ const ProfilePage = () => {
   const [skillDrafts, setSkillDrafts] = useState<SkillDraft[]>(() => ensureCategoryDrafts([]))
   const [certificateForm, setCertificateForm] = useState(emptyCertificateForm)
   const [projectForm, setProjectForm] = useState(emptyProjectForm)
+  const [personalityForm, setPersonalityForm] = useState(emptyPersonalityForm)
   const queryClient = useQueryClient()
   const { data: applications, isLoading: isLoadingApplications } = useSeekerApplicationsTracker()
   const { data: interviews, isLoading: isLoadingInterviews } = useSeekerInterviewsTracker()
@@ -245,10 +271,20 @@ const ProfilePage = () => {
   })
 
   const certificateMutation = useMutation({
-    mutationFn: async () =>
-      editing?.section === 'certificate'
-        ? updateCvCertificateApi(editing.id, normalizeOptionalFields(certificateForm))
-        : createCvCertificateApi(normalizeOptionalFields(certificateForm)),
+    mutationFn: async () => {
+      const validationMessage = validateCertificateForm(certificateForm)
+
+      if (validationMessage) {
+        setToastMessage(validationMessage)
+        throw new Error(validationMessage)
+      }
+
+      const payload = buildCertificatePayload(certificateForm)
+
+      return editing?.section === 'certificate'
+        ? updateCvCertificateApi(editing.id, payload)
+        : createCvCertificateApi(payload)
+    },
     onSuccess: () => {
       setEditing(null)
       setCertificateForm(emptyCertificateForm)
@@ -268,12 +304,28 @@ const ProfilePage = () => {
     }
   })
 
+  const personalityMutation = useMutation({
+    mutationFn: async () => {
+      const payload = normalizeOptionalFields(personalityForm) as CvPersonalityPayload
+
+      return editing?.section === 'personality'
+        ? updateCvPersonalityApi(editing.id, payload)
+        : createCvPersonalityApi(payload)
+    },
+    onSuccess: () => {
+      setEditing(null)
+      setPersonalityForm(emptyPersonalityForm)
+      void refreshCv('Đã lưu CvPersonality.')
+    }
+  })
+
   const deleteMutation = useMutation({
     mutationFn: ({ section, id }: { section: CvSectionName; id: string }) => {
       if (section === 'education') return deleteCvEducationApi(id)
       if (section === 'experience') return deleteCvExperienceApi(id)
       if (section === 'skill') return deleteCvSkillApi(id)
       if (section === 'certificate') return deleteCvCertificateApi(id)
+      if (section === 'personality') return deleteCvPersonalityApi(id)
 
       return deleteCvProjectApi(id)
     },
@@ -298,15 +350,6 @@ const ProfilePage = () => {
     () => [
       { title: t('seekerProfile.awards.hackathon.title'), date: t('seekerProfile.awards.hackathon.date') },
       { title: t('seekerProfile.awards.semester.title'), date: t('seekerProfile.awards.semester.date') }
-    ],
-    [t]
-  )
-
-  const strengths = useMemo(
-    () => [
-      t('seekerProfile.about.strengths.first'),
-      t('seekerProfile.about.strengths.second'),
-      t('seekerProfile.about.strengths.third')
     ],
     [t]
   )
@@ -353,6 +396,15 @@ const ProfilePage = () => {
     uploadCvMutation.mutate(cvFile)
   }
 
+  const handleExportCvPdf = () => {
+    const exportUrl = '/seeker/profile/export?print=1'
+    const exportWindow = window.open(exportUrl, '_blank', 'noopener,noreferrer')
+
+    if (!exportWindow) {
+      window.location.assign(exportUrl)
+    }
+  }
+
   const toggleSectionEditor = (sectionId: string) => {
     setExpandedSection((currentSection) => {
       const nextSection = currentSection === sectionId ? null : sectionId
@@ -390,12 +442,7 @@ const ProfilePage = () => {
 
   const startEditCertificate = (item: CvCertificate) => {
     setEditing({ section: 'certificate', id: item.id })
-    setCertificateForm({
-      title: item.title,
-      issuer: item.issuer,
-      issuedDate: formatInputDate(item.issuedDate),
-      fileUrl: item.fileUrl ?? ''
-    })
+    setCertificateForm(toCertificateForm(item))
   }
 
   const startEditProject = (item: CvProject) => {
@@ -410,6 +457,14 @@ const ProfilePage = () => {
     })
   }
 
+  const startEditPersonality = (item: CvPersonality) => {
+    setEditing({ section: 'personality', id: item.id })
+    setPersonalityForm({
+      type: item.type,
+      description: item.description ?? ''
+    })
+  }
+
   const clearEdit = () => {
     setEditing(null)
     setEducationForm(emptyEducationForm)
@@ -417,6 +472,7 @@ const ProfilePage = () => {
     setSkillDrafts(ensureCategoryDrafts(cvDetail?.skills.map(toSkillDraft) ?? []))
     setCertificateForm(emptyCertificateForm)
     setProjectForm(emptyProjectForm)
+    setPersonalityForm(emptyPersonalityForm)
   }
 
   return (
@@ -476,6 +532,19 @@ const ProfilePage = () => {
               <ActionTile title={t('seekerProfile.quickActions.editProfile.title')} description={t('seekerProfile.quickActions.editProfile.description')} icon={<Pencil className='h-4 w-4' />} />
               <ActionTile title={t('seekerProfile.quickActions.uploadCv.title')} description={t('seekerProfile.quickActions.uploadCv.description')} icon={<FileText className='h-4 w-4' />} />
               <ActionTile title={t('seekerProfile.quickActions.reviewProfile.title')} description={t('seekerProfile.quickActions.reviewProfile.description')} icon={<Sparkles className='h-4 w-4' />} />
+              <button
+                type='button'
+                onClick={handleExportCvPdf}
+                className='flex items-start gap-3 rounded-[22px] border border-slate-200 bg-slate-50/70 p-4 text-left transition hover:border-sky-200 hover:bg-sky-50/50'
+              >
+                <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-600'>
+                  <FileBadge2 className='h-4 w-4' />
+                </div>
+                <div>
+                  <p className='text-sm font-semibold text-slate-900'>Xuất PDF CV</p>
+                  <p className='mt-1 text-sm leading-6 text-slate-500'>Trích xuất toàn bộ thông tin seeker và các mục CV sang bản in để lưu dưới dạng PDF.</p>
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -698,8 +767,10 @@ const ProfilePage = () => {
                       <TextField label='Chuyên ngành' value={educationForm.major} onChange={(value) => setEducationForm((form) => ({ ...form, major: value }))} />
                       <TextField type='date' label='Bắt đầu' value={educationForm.startDate} onChange={(value) => setEducationForm((form) => ({ ...form, startDate: value }))} />
                       <TextField type='date' label='Kết thúc' value={educationForm.endDate} onChange={(value) => setEducationForm((form) => ({ ...form, endDate: value }))} />
-                      <TextField label='Mô tả' value={educationForm.description} onChange={(value) => setEducationForm((form) => ({ ...form, description: value }))} />
                     </CvFormGrid>
+                    <div className='mt-4'>
+                      <TextAreaField label='Mô tả' value={educationForm.description} onChange={(value) => setEducationForm((form) => ({ ...form, description: value }))} />
+                    </div>
                     <CvFormActions isEditing={editing?.section === 'education'} isPending={educationMutation.isPending} onCancel={clearEdit} onSave={() => educationMutation.mutate()} />
                   </div>
                 ) : null}
@@ -712,15 +783,73 @@ const ProfilePage = () => {
                 editLabel={expandedSection === 'certifications' ? 'Đóng' : t('seekerProfile.common.edit')}
                 onEdit={() => toggleSectionEditor('certifications')}
               >
-                <CvList items={cvDetail?.certificates ?? []} emptyText='Chưa có chứng chỉ.' renderItem={(item) => <CvListRow key={item.id} canEdit={expandedSection === 'certifications'} title={item.title} meta={`${item.issuer}${item.issuedDate ? ` - ${formatDate(item.issuedDate, locale, fallbackText)}` : ''}`} description={item.fileUrl} onEdit={() => startEditCertificate(item)} onDelete={() => deleteMutation.mutate({ section: 'certificate', id: item.id })} />} />
+                <CvList
+                  items={cvDetail?.certificates ?? []}
+                  emptyText='Chưa có chứng chỉ.'
+                  renderItem={(item) => (
+                    <CvListRow
+                      key={item.id}
+                      canEdit={expandedSection === 'certifications'}
+                      title={getCertificateDisplayLabel(item)}
+                      meta={[
+                        isEnglishCertificate(item) ? 'Tiếng Anh' : 'Chứng chỉ khác',
+                        item.issuedDate ? formatDate(item.issuedDate, locale, fallbackText) : undefined
+                      ]
+                        .filter(Boolean)
+                        .join(' - ')}
+                      onEdit={() => startEditCertificate(item)}
+                      onDelete={() => deleteMutation.mutate({ section: 'certificate', id: item.id })}
+                    />
+                  )}
+                />
                 {expandedSection === 'certifications' ? (
                   <div className='mt-5 rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
-                    <CvFormGrid>
-                      <TextField label='Tên chứng chỉ' value={certificateForm.title} onChange={(value) => setCertificateForm((form) => ({ ...form, title: value }))} />
-                      <TextField label='Đơn vị cấp' value={certificateForm.issuer} onChange={(value) => setCertificateForm((form) => ({ ...form, issuer: value }))} />
-                      <TextField type='date' label='Ngày cấp' value={certificateForm.issuedDate} onChange={(value) => setCertificateForm((form) => ({ ...form, issuedDate: value }))} />
-                      <TextField label='URL file' value={certificateForm.fileUrl} onChange={(value) => setCertificateForm((form) => ({ ...form, fileUrl: value }))} />
-                    </CvFormGrid>
+                    <div className='space-y-4'>
+                      <div className='rounded-[22px] border border-sky-100 bg-white p-4'>
+                        <p className='text-sm font-semibold text-slate-950'>Nhập chứng chỉ theo nhóm</p>
+                        <p className='mt-1 text-sm text-slate-500'>Mục tiếng Anh dùng dropdown TOEIC, IELTS, VSTEP. Các chứng chỉ khác có thể tự thêm tên như form mẫu.</p>
+                      </div>
+                      <CvFormGrid>
+                        <SelectField
+                          label='Nhóm chứng chỉ'
+                          value={certificateForm.category}
+                          onChange={(value) => setCertificateForm((form) => ({ ...form, category: value as CertificateCategory }))}
+                          options={certificateCategoryOptions}
+                        />
+                        {certificateForm.category === 'english' ? (
+                          <>
+                            <SelectField
+                              label='Chứng chỉ tiếng Anh'
+                              value={certificateForm.englishType}
+                              onChange={(value) => setCertificateForm((form) => ({ ...form, englishType: value as EnglishCertificateType }))}
+                              options={englishCertificateOptions}
+                            />
+                            <TextField
+                              label='Điểm / band'
+                              value={certificateForm.score}
+                              placeholder='VD: 850 hoặc 6.5'
+                              inputMode='decimal'
+                              pattern={
+                                certificateForm.englishType === 'IELTS'
+                                  ? '^(0|0\\.5|[1-8](\\.0|\\.5)?|9(\\.0)?)$'
+                                  : certificateForm.englishType === 'TOEIC'
+                                    ? '^(0|[1-9]\\d{0,2})$'
+                                    : '^(0|[1-9]\\d*)(\\.\\d+)?$'
+                              }
+                              onChange={(value) => setCertificateForm((form) => ({ ...form, score: value }))}
+                            />
+                          </>
+                        ) : (
+                          <TextField
+                            label='Tên chứng chỉ'
+                            value={certificateForm.customTitle}
+                            placeholder='VD: AWS Cloud Practitioner'
+                            onChange={(value) => setCertificateForm((form) => ({ ...form, customTitle: value }))}
+                          />
+                        )}
+                        <TextField type='date' label='Ngày cấp' value={certificateForm.issuedDate} onChange={(value) => setCertificateForm((form) => ({ ...form, issuedDate: value }))} />
+                      </CvFormGrid>
+                    </div>
                     <CvFormActions isEditing={editing?.section === 'certificate'} isPending={certificateMutation.isPending} onCancel={clearEdit} onSave={() => certificateMutation.mutate()} />
                   </div>
                 ) : null}
@@ -795,8 +924,10 @@ const ProfilePage = () => {
                       <TextField label='Link' value={projectForm.link} onChange={(value) => setProjectForm((form) => ({ ...form, link: value }))} />
                       <TextField type='date' label='Bắt đầu' value={projectForm.startDate} onChange={(value) => setProjectForm((form) => ({ ...form, startDate: value }))} />
                       <TextField type='date' label='Kết thúc' value={projectForm.endDate} onChange={(value) => setProjectForm((form) => ({ ...form, endDate: value }))} />
-                      <TextField label='Mô tả' value={projectForm.description} onChange={(value) => setProjectForm((form) => ({ ...form, description: value }))} />
                     </CvFormGrid>
+                    <div className='mt-4'>
+                      <TextAreaField label='Mô tả' value={projectForm.description} onChange={(value) => setProjectForm((form) => ({ ...form, description: value }))} />
+                    </div>
                     <CvFormActions isEditing={editing?.section === 'project'} isPending={projectMutation.isPending} onCancel={clearEdit} onSave={() => projectMutation.mutate()} />
                   </div>
                 ) : null}
@@ -817,28 +948,56 @@ const ProfilePage = () => {
                       <TextField label='Vị trí' value={experienceForm.position} onChange={(value) => setExperienceForm((form) => ({ ...form, position: value }))} />
                       <TextField type='date' label='Bắt đầu' value={experienceForm.startDate} onChange={(value) => setExperienceForm((form) => ({ ...form, startDate: value }))} />
                       <TextField type='date' label='Kết thúc' value={experienceForm.endDate} onChange={(value) => setExperienceForm((form) => ({ ...form, endDate: value }))} />
-                      <TextField label='Mô tả' value={experienceForm.description} onChange={(value) => setExperienceForm((form) => ({ ...form, description: value }))} />
                     </CvFormGrid>
+                    <div className='mt-4'>
+                      <TextAreaField label='Mô tả' value={experienceForm.description} onChange={(value) => setExperienceForm((form) => ({ ...form, description: value }))} />
+                    </div>
                     <CvFormActions isEditing={editing?.section === 'experience'} isPending={experienceMutation.isPending} onCancel={clearEdit} onSave={() => experienceMutation.mutate()} />
                   </div>
                 ) : null}
               </SectionCard>
 
-              <SectionCard id='about' title={t('seekerProfile.sections.about')} icon={<Sparkles className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
-                <div className='grid gap-4 lg:grid-cols-2'>
-                  <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
-                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>{t('seekerProfile.about.introductionTitle')}</h3>
-                    <p className='mt-4 text-sm leading-7 text-slate-600'>{t('seekerProfile.about.introductionDescription')}</p>
+              <SectionCard
+                id='about'
+                title={t('seekerProfile.sections.about')}
+                icon={<Sparkles className='h-5 w-5' />}
+                editLabel={expandedSection === 'about' ? 'Đóng' : t('seekerProfile.common.edit')}
+                onEdit={() => toggleSectionEditor('about')}
+              >
+                <CvList
+                  items={cvDetail?.personalities ?? []}
+                  emptyText='Chưa có CvPersonality.'
+                  renderItem={(item) => (
+                    <CvListRow
+                      key={item.id}
+                      canEdit={expandedSection === 'about'}
+                      title={item.type}
+                      description={item.description}
+                      onEdit={() => startEditPersonality(item)}
+                      onDelete={() => deleteMutation.mutate({ section: 'personality', id: item.id })}
+                    />
+                  )}
+                />
+                {expandedSection === 'about' ? (
+                  <div className='mt-5 rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
+                    <CvFormGrid>
+                      <TextField label='Type' value={personalityForm.type} onChange={(value) => setPersonalityForm((form) => ({ ...form, type: value }))} />
+                    </CvFormGrid>
+                    <div className='mt-4'>
+                      <TextAreaField
+                        label='Description'
+                        value={personalityForm.description}
+                        onChange={(value) => setPersonalityForm((form) => ({ ...form, description: value }))}
+                      />
+                    </div>
+                    <CvFormActions
+                      isEditing={editing?.section === 'personality'}
+                      isPending={personalityMutation.isPending}
+                      onCancel={clearEdit}
+                      onSave={() => personalityMutation.mutate()}
+                    />
                   </div>
-                  <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
-                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>{t('seekerProfile.about.strengthsTitle')}</h3>
-                    <ul className='mt-4 space-y-3 text-sm leading-7 text-slate-600'>
-                      {strengths.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                ) : null}
               </SectionCard>
             </>
           ) : null}
@@ -969,13 +1128,21 @@ const TextField = ({
   value,
   onChange,
   type = 'text',
-  placeholder
+  placeholder,
+  min,
+  step,
+  pattern,
+  inputMode
 }: {
   label: string
   value: string
   onChange: (value: string) => void
   type?: string
   placeholder?: string
+  min?: number
+  step?: number | string
+  pattern?: string
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']
 }) => (
   <label className='block'>
     <span className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>{label}</span>
@@ -983,8 +1150,64 @@ const TextField = ({
       type={type}
       value={value}
       placeholder={placeholder}
+      min={min}
+      step={step}
+      pattern={pattern}
+      inputMode={inputMode}
       onChange={(event) => onChange(event.target.value)}
       className='mt-2 h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
+    />
+  </label>
+)
+
+const SelectField = ({
+  label,
+  value,
+  onChange,
+  options
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  options: Array<{ value: string; label: string }>
+}) => (
+  <label className='block'>
+    <span className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>{label}</span>
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className='mt-2 h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  </label>
+)
+
+const TextAreaField = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  rows = 6
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  rows?: number
+}) => (
+  <label className='block'>
+    <span className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>{label}</span>
+    <textarea
+      value={value}
+      rows={rows}
+      placeholder={placeholder}
+      onChange={(event) => onChange(event.target.value)}
+      className='mt-2 min-h-[180px] w-full resize-y rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base leading-7 text-slate-800 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
     />
   </label>
 )
@@ -1235,6 +1458,115 @@ const TimelineRow = ({ title, meta }: { title: string; meta: string }) => (
     </div>
   </div>
 )
+
+const parseEnglishCertificate = (title: string) => {
+  const match = title.trim().match(/^(TOEIC|IELTS|VSTEP)(?:\s*[-:]?\s*(.*))?$/i)
+
+  if (!match) return null
+
+  return {
+    type: match[1].toUpperCase() as EnglishCertificateType,
+    score: match[2]?.trim() ?? ''
+  }
+}
+
+const validateCertificateForm = (form: typeof emptyCertificateForm) => {
+  if (!form.issuedDate.trim()) {
+    return 'Vui lòng chọn ngày cấp chứng chỉ.'
+  }
+
+  if (form.category === 'english') {
+    const score = form.score.trim()
+
+    if (!score) {
+      return 'Vui lòng nhập điểm hoặc band cho chứng chỉ tiếng Anh.'
+    }
+
+    if (form.englishType === 'TOEIC') {
+      if (!/^(0|[1-9]\d{0,2})$/.test(score)) {
+        return 'Điểm TOEIC phải là số nguyên không âm.'
+      }
+
+      if (Number(score) > 990) {
+        return 'Điểm TOEIC không được vượt quá 990.'
+      }
+    }
+
+    if (form.englishType === 'IELTS' && !/^(0|0\.5|[1-8](\.0|\.5)?|9(\.0)?)$/.test(score)) {
+      return 'Band IELTS phải nằm trong khoảng 0 đến 9 và cách nhau 0.5.'
+    }
+
+    if (form.englishType === 'VSTEP') {
+      if (!/^(0|[1-9]\d*)(\.\d+)?$/.test(score)) {
+        return 'Điểm VSTEP phải là số không âm.'
+      }
+
+      if (Number(score) > 10) {
+        return 'Điểm VSTEP không được vượt quá 10.'
+      }
+    }
+
+    return null
+  }
+
+  const customTitle = form.customTitle.trim()
+
+  if (!customTitle) {
+    return 'Vui lòng nhập tên chứng chỉ.'
+  }
+
+  if (!/^(?=.*[\p{L}\p{N}])[ \p{L}\p{N}().,+\-/#&]+$/u.test(customTitle)) {
+    return 'Tên chứng chỉ chứa ký tự không hợp lệ.'
+  }
+
+  return null
+}
+
+const isEnglishCertificate = (certificate: CvCertificate) => Boolean(parseEnglishCertificate(certificate.title))
+
+const getCertificateDisplayLabel = (certificate: CvCertificate) => {
+  const parsed = parseEnglishCertificate(certificate.title)
+
+  if (!parsed) return certificate.title
+
+  return [parsed.type, parsed.score].filter(Boolean).join(' ')
+}
+
+const toCertificateForm = (certificate: CvCertificate) => {
+  const parsed = parseEnglishCertificate(certificate.title)
+
+  if (parsed) {
+    return {
+      category: 'english' as CertificateCategory,
+      englishType: parsed.type,
+      score: parsed.score,
+      customTitle: '',
+      issuedDate: formatInputDate(certificate.issuedDate)
+    }
+  }
+
+  return {
+    category: 'other' as CertificateCategory,
+    englishType: 'TOEIC' as EnglishCertificateType,
+    score: '',
+    customTitle: certificate.title,
+    issuedDate: formatInputDate(certificate.issuedDate)
+  }
+}
+
+const buildCertificatePayload = (form: typeof emptyCertificateForm): CvCertificatePayload => {
+  const title =
+    form.category === 'english'
+      ? [form.englishType.trim(), form.score.trim()].filter(Boolean).join(' ')
+      : form.customTitle.trim()
+
+  return {
+    title: title || null,
+    issuer: form.category === 'english' ? 'English Certificate' : 'Other Certificate',
+    issuedDate: form.issuedDate.trim() || null,
+    fileUrl: null
+  }
+}
 
 const formatDate = (date: string | undefined, locale: string, fallback: string) => {
   if (!date) return fallback

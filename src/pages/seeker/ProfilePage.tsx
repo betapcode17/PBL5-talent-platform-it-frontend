@@ -48,7 +48,6 @@ import {
   updateCvPersonalityApi,
   updateCvProjectApi,
   updateCvSkillApi,
-  uploadCvFileApi,
   type CvCertificate,
   type CvCertificatePayload,
   type CvEducation,
@@ -63,6 +62,8 @@ import { SeekerStatusBadge } from '@/components/seeker/SeekerStatusBadge'
 import { useSeekerApplicationsTracker, useSeekerInterviewsTracker } from '@/hooks/useSeekerCareer'
 import { buildGoogleCalendarUrl, downloadInterviewCalendarFile } from '@/lib/interviewCalendar'
 import { useAuthStore } from '@/store/authStore'
+import { updateMeApi } from '@/api/user'
+import { getMeApi } from '@/api/auth'
 
 type CvSectionName = 'education' | 'experience' | 'skill' | 'certificate' | 'project' | 'personality'
 type CertificateCategory = 'english' | 'other'
@@ -280,14 +281,26 @@ const emptyPersonalityForm = {
   description: ''
 }
 
+const emptyBasicInfoForm = {
+  full_name: '',
+  email: '',
+  phone: '',
+  gender: ''
+}
+
 const ProfilePage = () => {
   const { t, i18n } = useTranslation()
   const user = useAuthStore((state) => state.user)
+  const setAuth = useAuthStore((state) => state.setAuth)
+  const accessToken = useAuthStore((state) => state.accessToken)
+  const refreshToken = useAuthStore((state) => state.refreshToken)
   const [activeTab] = useState<'profile' | 'cv'>('profile')
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [cvFile, setCvFile] = useState<File | null>(null)
+  void cvFile
   const [editing, setEditing] = useState<{ section: CvSectionName; id: string } | null>(null)
+  const [basicInfoForm, setBasicInfoForm] = useState(emptyBasicInfoForm)
   const [educationForm, setEducationForm] = useState(emptyEducationForm)
   const [experienceForm, setExperienceForm] = useState(emptyExperienceForm)
   const [skillDrafts, setSkillDrafts] = useState<SkillDraft[]>(() => ensureCategoryDrafts([]))
@@ -311,13 +324,40 @@ const ProfilePage = () => {
     setToastMessage(message)
   }
 
-  const uploadCvMutation = useMutation({
-    mutationFn: uploadCvFileApi,
+  const basicInfoMutation = useMutation({
+    mutationFn: async () => {
+      const validationMessage = validateBasicInfoForm(basicInfoForm)
+
+      if (validationMessage) {
+        setToastMessage(validationMessage)
+        throw new Error(validationMessage)
+      }
+
+      return updateMeApi({
+        phone: basicInfoForm.phone.trim()
+      })
+    },
     onSuccess: () => {
-      setCvFile(null)
+      void (async () => {
+        const refreshedUser = await getMeApi()
+
+        if (accessToken) {
+          setAuth(refreshedUser, accessToken, refreshToken ?? undefined)
+        }
+
+        setBasicInfoForm({
+          full_name: refreshedUser.full_name ?? '',
+          email: refreshedUser.email ?? '',
+          phone: refreshedUser.phone ?? '',
+          gender: refreshedUser.gender ?? ''
+        })
+        setExpandedSection(null)
+        setToastMessage('Đã cập nhật thông tin cơ bản.')
+      })()
       void refreshCv('Đã tải CV lên thành công.')
     }
   })
+  const uploadCvMutation = basicInfoMutation
 
   const educationMutation = useMutation({
     mutationFn: async () => {
@@ -554,12 +594,12 @@ const ProfilePage = () => {
   }
 
   const handleUploadCv = () => {
-    if (!cvFile) {
+    if (true) {
       setToastMessage('Vui lòng chọn file PDF/DOC/DOCX trước khi tải lên.')
       return
     }
 
-    uploadCvMutation.mutate(cvFile)
+    return
   }
 
   const handleExportCvPdf = () => {
@@ -574,6 +614,15 @@ const ProfilePage = () => {
   const toggleSectionEditor = (sectionId: string) => {
     setExpandedSection((currentSection) => {
       const nextSection = currentSection === sectionId ? null : sectionId
+
+      if (nextSection === 'basic-info') {
+        setBasicInfoForm({
+          full_name: user?.full_name ?? '',
+          email: user?.email ?? '',
+          phone: user?.phone ?? '',
+          gender: user?.gender ?? ''
+        })
+      }
 
       if (nextSection === 'skills') {
         setSkillDrafts(ensureCategoryDrafts(cvDetail?.skills.map(toSkillDraft) ?? []))
@@ -868,28 +917,52 @@ const ProfilePage = () => {
                 editLabel={expandedSection === 'basic-info' ? 'Đóng' : t('seekerProfile.common.edit')}
                 onEdit={() => toggleSectionEditor('basic-info')}
               >
-                <div className='grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]'>
-                  <dl className='space-y-3'>
-                    <ProfileRow label={t('seekerProfile.basicInfo.fullName')} value={user?.full_name || fallbackText} />
-                    <ProfileRow label={t('seekerProfile.basicInfo.email')} value={user?.email || fallbackText} />
-                    <ProfileRow label={t('seekerProfile.basicInfo.phone')} value={user?.phone || fallbackText} />
-                    <ProfileRow label={t('seekerProfile.basicInfo.gender')} value={user?.gender || fallbackText} />
-                    <ProfileRow label={t('seekerProfile.basicInfo.country')} value={t('seekerProfile.basicInfo.countryValue')} />
-                  </dl>
-
-                  <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
-                    <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>{t('seekerProfile.basicInfo.personalLinks')}</h3>
-                    <div className='mt-4 space-y-3'>
-                      <LinkItem label={t('seekerProfile.links.github')} value='https://github.com/BachTran111' />
-                      <LinkItem label={t('seekerProfile.links.linkedin')} value='https://linkedin.com/in/tranxuanbach' />
-                      <LinkItem label={t('seekerProfile.links.portfolio')} value='https://portfolio.example.dev' />
-                    </div>
-                  </div>
-                </div>
+                <dl className='space-y-3'>
+                  <ProfileRow label={t('seekerProfile.basicInfo.fullName')} value={user?.full_name || fallbackText} />
+                  <ProfileRow label={t('seekerProfile.basicInfo.email')} value={user?.email || fallbackText} />
+                  <ProfileRow label={t('seekerProfile.basicInfo.phone')} value={user?.phone || fallbackText} />
+                  <ProfileRow label={t('seekerProfile.basicInfo.gender')} value={user?.gender || fallbackText} />
+                </dl>
                 {expandedSection === 'basic-info' ? (
                   <div className='mt-5 rounded-[24px] border border-sky-100 bg-sky-50/50 p-5'>
+                    <div className='grid gap-4 md:grid-cols-2'>
+                      <ProfileRow label='Họ và tên' value={basicInfoForm.full_name || fallbackText} />
+                      <ProfileRow label='Email' value={basicInfoForm.email || fallbackText} />
+                      <TextField label='Số điện thoại' value={basicInfoForm.phone} onChange={(value) => setBasicInfoForm((form) => ({ ...form, phone: value }))} />
+                      <ProfileRow label='Giới tính' value={basicInfoForm.gender || fallbackText} />
+                    </div>
+                    <div className='hidden'>
+                    <CvFormGrid>
+                      <TextField label='Họ và tên' value={basicInfoForm.full_name} onChange={(value) => setBasicInfoForm((form) => ({ ...form, full_name: value }))} />
+                      <TextField label='Email' value={basicInfoForm.email} onChange={(value) => setBasicInfoForm((form) => ({ ...form, email: value }))} />
+                      <TextField label='Số điện thoại' value={basicInfoForm.phone} onChange={(value) => setBasicInfoForm((form) => ({ ...form, phone: value }))} />
+                      <SelectField
+                        label='Giới tính'
+                        value={basicInfoForm.gender}
+                        onChange={(value) => setBasicInfoForm((form) => ({ ...form, gender: value }))}
+                        options={[
+                          { value: '', label: 'Chọn giới tính' },
+                          { value: 'Male', label: 'Male' },
+                          { value: 'Female', label: 'Female' },
+                          { value: 'Other', label: 'Other' }
+                        ]}
+                      />
+                    </CvFormGrid>
+                    </div>
+                    <div className='mt-4'>
+                      <button
+                        type='button'
+                        onClick={() => basicInfoMutation.mutate()}
+                        disabled={basicInfoMutation.isPending}
+                        className='inline-flex h-11 items-center gap-2 rounded-2xl bg-sky-500 px-4 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)] disabled:cursor-not-allowed disabled:opacity-60'
+                      >
+                        <Save className='h-4 w-4' />
+                        {basicInfoMutation.isPending ? 'Đang lưu...' : 'Lưu thông tin'}
+                      </button>
+                    </div>
+                    <div className='hidden'>
                     <p className='text-sm font-semibold text-slate-950'>File CV đính kèm</p>
-                    <div className='mt-3 flex flex-col gap-3 sm:flex-row'>
+                    <div className='hidden mt-3 flex-col gap-3 sm:flex-row'>
                       <input
                         type='file'
                         accept='.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
@@ -907,11 +980,12 @@ const ProfilePage = () => {
                       </button>
                     </div>
                     {cvDetail?.cvUrl ? (
-                      <a href={cvDetail.cvUrl} target='_blank' rel='noreferrer' className='mt-4 inline-flex items-center gap-2 text-sm font-semibold text-sky-700'>
+                      <a href={cvDetail.cvUrl} target='_blank' rel='noreferrer' className='hidden mt-4 items-center gap-2 text-sm font-semibold text-sky-700'>
                         Xem file CV hiện tại
                         <ExternalLink className='h-4 w-4' />
                       </a>
                     ) : null}
+                    </div>
                   </div>
                 ) : null}
               </SectionCard>
@@ -1692,6 +1766,15 @@ const LinkItem = ({ label, value }: { label: string; value: string }) => (
     </a>
   </div>
 )
+void LinkItem
+
+const validateBasicInfoForm = (form: typeof emptyBasicInfoForm) => {
+  if (form.phone.trim() && !/^[0-9+\s()-]{8,20}$/.test(form.phone.trim())) {
+    return 'Số điện thoại không đúng định dạng.'
+  }
+
+  return null
+}
 
 const isValidDateRange = (startDate: string, endDate: string) => {
   if (!startDate.trim() || !endDate.trim()) return true

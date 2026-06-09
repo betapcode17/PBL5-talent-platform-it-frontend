@@ -1,5 +1,6 @@
 import type { BrowseJob } from '@/types/browse-jobs'
 import type { CompanyJobSummary, JobDetailApiResponse } from '@/types/job-detail'
+import { formatSalaryDisplay } from '@/utils/salary'
 
 const LIST_SEPARATOR = /[\n\r|;]+/
 
@@ -156,7 +157,7 @@ export const formatSalary = (job: JobDetailApiResponse | null, browseJob?: Brows
   }
 
   if (job?.salary?.trim()) {
-    return job.salary
+    return formatSalaryDisplay(job.salary) ?? job.salary
   }
 
   const min = job?.salaryRange?.min
@@ -166,21 +167,15 @@ export const formatSalary = (job: JobDetailApiResponse | null, browseJob?: Brows
     return 'Salary negotiable'
   }
 
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-  })
-
   if (typeof min === 'number' && typeof max === 'number') {
-    return `${formatter.format(min)} - ${formatter.format(max)}`
+    return formatSalaryDisplay(`${min}-${max}`) ?? `${min.toLocaleString()} - ${max.toLocaleString()} VND`
   }
 
   if (typeof min === 'number') {
-    return `From ${formatter.format(min)}`
+    return formatSalaryDisplay(String(min)) ?? `From ${min.toLocaleString()} VND`
   }
 
-  return `Up to ${formatter.format(max as number)}`
+  return formatSalaryDisplay(String(max)) ?? `Up to ${(max as number).toLocaleString()} VND`
 }
 
 export const formatDate = (value?: string | null): string | null => {

@@ -4,6 +4,9 @@ import type {
   AdminChartPoint,
   AdminCompanyListItem,
   AdminDistributionItem,
+  AdminEmployerRegistrationRequestListItem,
+  AdminEmployerRegistrationRoleCount,
+  AdminEmployerRegistrationStatusCounts,
   AdminIndustryItem,
   AdminJobListItem,
   AdminRecentUser,
@@ -47,6 +50,16 @@ type AdminJobsResponse = {
   sortOrder?: 'asc' | 'desc'
 }
 
+type AdminEmployerRegistrationRequestsResponse = {
+  requests: AdminEmployerRegistrationRequestListItem[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+  statusCounts: AdminEmployerRegistrationStatusCounts
+  roleCounts: AdminEmployerRegistrationRoleCount[]
+}
+
 type AdminUsersQuery = {
   page?: number
   limit?: number
@@ -78,6 +91,14 @@ type AdminJobsQuery = {
   active?: boolean
   sortBy?: 'createdDate' | 'deadline' | 'salary' | 'numberOfHires' | 'updatedDate'
   sortOrder?: 'asc' | 'desc'
+}
+
+type AdminEmployerRegistrationRequestsQuery = {
+  page?: number
+  limit?: number
+  search?: string
+  status?: 'PENDING' | 'APPROVED' | 'REJECTED'
+  role?: string
 }
 
 export type AdminDashboardData = {
@@ -268,5 +289,29 @@ export const toggleAdminCompanyStatusApi = async (companyId: number, shouldActiv
 export const toggleAdminJobStatusApi = async (jobId: number, shouldActivate: boolean) => {
   const action = shouldActivate ? 'activate' : 'deactivate'
   const response = await axiosInstance.patch(`/admin/jobs/${jobId}/${action}`)
+  return response.data
+}
+
+export const getAdminEmployerRegistrationRequestsApi = async (
+  params: AdminEmployerRegistrationRequestsQuery = {}
+) => {
+  const response = await axiosInstance.get<AdminEmployerRegistrationRequestsResponse>(
+    '/admin/employer-registration-requests',
+    { params }
+  )
+  return response.data
+}
+
+export const approveAdminEmployerRegistrationRequestApi = async (requestId: number, note?: string) => {
+  const response = await axiosInstance.patch(`/admin/employer-registration-requests/${requestId}/approve`, {
+    note
+  })
+  return response.data
+}
+
+export const rejectAdminEmployerRegistrationRequestApi = async (requestId: number, note?: string) => {
+  const response = await axiosInstance.patch(`/admin/employer-registration-requests/${requestId}/reject`, {
+    note
+  })
   return response.data
 }

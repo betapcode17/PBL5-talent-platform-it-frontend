@@ -14,6 +14,7 @@ export const useChatbot = () => {
     isLoadingConversations,
     isLoadingMessages,
     isSending,
+    streamStatus,
     deletingConversationId,
     isWidgetOpen,
     isFullScreen,
@@ -27,6 +28,7 @@ export const useChatbot = () => {
     getConversations,
     sendMessage,
     analyzeCv,
+    analyzeCvAgainstJd,
     createConversation,
     deleteConversation,
     renameConversation,
@@ -56,11 +58,20 @@ export const useChatbot = () => {
   )
 
   const handleCvUpload = useCallback(
-    async (file: File) => {
+    async (file: File, jdText?: string) => {
       if (isSending) return
-      await analyzeCv(file)
+      await analyzeCv(file, jdText)
     },
     [analyzeCv, isSending]
+  )
+
+  const handleCvJdMatch = useCallback(
+    async (jdText: string) => {
+      const trimmed = jdText.trim()
+      if (!trimmed || isSending) return
+      await analyzeCvAgainstJd(trimmed)
+    },
+    [analyzeCvAgainstJd, isSending]
   )
 
   return {
@@ -72,6 +83,7 @@ export const useChatbot = () => {
     isLoadingConversations,
     isLoadingMessages,
     isSending,
+    streamStatus,
     deletingConversationId,
     isWidgetOpen,
     isFullScreen,
@@ -88,6 +100,7 @@ export const useChatbot = () => {
     clearError,
     handleSendMessage,
     handleSuggestionClick,
-    handleCvUpload
+    handleCvUpload,
+    handleCvJdMatch
   }
 }

@@ -36,6 +36,7 @@ const SeekerDashboard = lazy(() => import('@/pages/seeker/Dashboard'))
 const EmployerDashboard = lazy(() => import('@/pages/employer/Dashboard'))
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'))
 const AdminUsersPage = lazy(() => import('@/pages/admin/UsersPage'))
+const AdminEmployerRegistrationRequestsPage = lazy(() => import('@/pages/admin/EmployerRegistrationRequestsPage'))
 const AdminCompaniesPage = lazy(() => import('@/pages/admin/CompaniesPage'))
 const AdminJobsPage = lazy(() => import('@/pages/admin/JobsPage'))
 
@@ -129,6 +130,14 @@ export function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <AdminUsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/admin/employer-requests'
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminEmployerRegistrationRequestsPage />
             </ProtectedRoute>
           }
         />

@@ -11,18 +11,21 @@ import {
   deleteConversationApi,
   createConversationApi,
   renameConversationApi,
-  analyzeCvApi
+  analyzeCvApi,
+  matchCvWithJdApi
 } from '@/api/chatbot'
-import type { ChatMode, CVFileAnalysisResponse } from '@/@types/chatbot'
+import type { ChatMode, CVFileAnalysisResponse, CVJDMatchResponse } from '@/@types/chatbot'
 
 interface ChatState {
   conversations: Conversation[]
   activeConversationId: string | number | null
+  activeConversationIdsByMode: Record<ChatMode, string | number | null>
   pendingConversationId: string | number | null
   messages: ChatMessage[]
   isLoadingConversations: boolean
   isLoadingMessages: boolean
   isSending: boolean
+  streamStatus: string | null
   deletingConversationId: string | null
   isWidgetOpen: boolean
   isFullScreen: boolean
@@ -31,7 +34,7 @@ interface ChatState {
   setWidgetOpen: (open: boolean) => void
   toggleWidget: () => void
   setFullScreen: (full: boolean) => void
-  setChatMode: (mode: ChatMode) => void
+  setChatMode: (mode: ChatMode) => Promise<void>
   setActiveConversation: (id: string | number | null) => Promise<void>
   getConversations: () => Promise<void>
   getMessages: (conversationId: string | number) => Promise<void>
@@ -40,7 +43,8 @@ interface ChatState {
   deleteConversation: (id: string | number) => Promise<void>
   renameConversation: (id: string, newTitle: string) => Promise<void>
   clearError: () => void
-  analyzeCv: (file: File) => Promise<void>
+  analyzeCv: (file: File, jdText?: string) => Promise<void>
+  analyzeCvAgainstJd: (jdText: string) => Promise<void>
 }
 
 const normalizeConversations = (conversations: Conversation[]) =>
@@ -52,6 +56,9 @@ const upsertConversation = (conversations: Conversation[], nextConversation: Con
   const filtered = conversations.filter((conversation) => String(conversation.id) !== String(nextConversation.id))
   return normalizeConversations([nextConversation, ...filtered])
 }
+
+const getConversationMode = (conversation?: Conversation | null): ChatMode =>
+  conversation?.conversationType === 'cv_analysis' ? 'cv' : 'jobs'
 
 const buildConversationPreview = (
   conversations: Conversation[],
@@ -130,14 +137,48 @@ const formatCvAnalysisMessage = (result: CVFileAnalysisResponse) => {
     .join('\n')
 }
 
+const formatCvJdMatchMessage = (result: CVJDMatchResponse) =>
+  [
+    `## Danh gia do phu hop CV voi JD: ${result.job_title}`,
+    `**Tong diem phu hop:** ${result.overall_score}/100 (${result.match_level})`,
+    `**Tom tat:** ${result.summary}`,
+    '',
+    '### Diem hop',
+    ...(result.matched_keywords.length ? result.matched_keywords.map((item) => `- ${item}`) : ['- Chua co thong tin ro rang']),
+    '',
+    '### Diem thieu',
+    ...(result.missing_keywords.length ? result.missing_keywords.map((item) => `- ${item}`) : ['- Chua co thong tin ro rang']),
+    '',
+    '### Diem manh',
+    ...(result.strengths.length ? result.strengths.map((item) => `- ${item}`) : ['- Chua co thong tin ro rang']),
+    '',
+    '### Diem yeu',
+    ...(result.weaknesses.length ? result.weaknesses.map((item) => `- ${item}`) : ['- Chua co thong tin ro rang']),
+    '',
+    '### Can cai thien',
+    ...(result.recommendations.length ? result.recommendations.map((item) => `- ${item}`) : ['- Chua co thong tin ro rang'])
+  ].join('\n')
+
+const getLatestCvIdFromMessages = (messages: ChatMessage[]) => {
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const message = messages[index]
+    if (message.cvAnalysis?.cv_id) {
+      return message.cvAnalysis.cv_id
+    }
+  }
+  return null
+}
+
 export const useChatbotStore = create<ChatState>()((set, get) => ({
   conversations: [],
   activeConversationId: null,
+  activeConversationIdsByMode: { jobs: null, cv: null },
   pendingConversationId: null,
   messages: [],
   isLoadingConversations: false,
   isLoadingMessages: false,
   isSending: false,
+  streamStatus: null,
   deletingConversationId: null,
   isWidgetOpen: false,
   isFullScreen: false,
@@ -147,10 +188,27 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
   setWidgetOpen: (open) => set({ isWidgetOpen: open }),
   toggleWidget: () => set((s) => ({ isWidgetOpen: !s.isWidgetOpen })),
   setFullScreen: (full) => set({ isFullScreen: full }),
-  setChatMode: (mode) => set({ chatMode: mode }),
+  setChatMode: async (mode) => {
+    const { activeConversationId, activeConversationIdsByMode, conversations } = get()
+    if (activeConversationId) {
+      set({ chatMode: mode, error: null })
+      return
+    }
+    const nextConversationId = activeConversationIdsByMode[mode]
+    const targetConversation = conversations.find((item) => String(item.id) === String(nextConversationId))
+
+    set({ chatMode: mode, error: null })
+
+    if (nextConversationId && targetConversation && getConversationMode(targetConversation) === mode) {
+      await get().setActiveConversation(nextConversationId)
+      return
+    }
+
+    set({ activeConversationId: null, pendingConversationId: null, messages: [] })
+  },
 
   setActiveConversation: async (id) => {
-    const { activeConversationId, pendingConversationId } = get()
+    const { activeConversationId, pendingConversationId, conversations, activeConversationIdsByMode } = get()
 
     if (id === null) {
       set({ activeConversationId: null, pendingConversationId: null, messages: [], error: null })
@@ -165,7 +223,17 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
 
     try {
       const messages = await getMessagesApi(id)
-      set({ activeConversationId: id, pendingConversationId: null, messages })
+      const selectedConversation = conversations.find((conversation) => String(conversation.id) === String(id))
+      const mode = getConversationMode(selectedConversation)
+      set({
+        activeConversationId: id,
+        pendingConversationId: null,
+        messages,
+        activeConversationIdsByMode: {
+          ...activeConversationIdsByMode,
+          [mode]: id
+        }
+      })
     } catch {
       set({ error: 'Failed to load messages', pendingConversationId: null })
     } finally {
@@ -177,8 +245,14 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
     set({ isLoadingConversations: true, error: null })
     try {
       const conversations = await getConversationsApi()
+      const normalized = normalizeConversations(Array.isArray(conversations) ? conversations : [conversations])
+      const latestConversation = normalized[0]
       set({
-        conversations: normalizeConversations(Array.isArray(conversations) ? conversations : [conversations])
+        conversations: normalized,
+        activeConversationIdsByMode: {
+          jobs: latestConversation?.id ?? get().activeConversationIdsByMode.jobs,
+          cv: latestConversation?.id ?? get().activeConversationIdsByMode.cv
+        }
       })
     } catch {
       set({ error: 'Failed to load chat history' })
@@ -200,8 +274,9 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
   },
 
   sendMessage: async (message: string, conversationId?: string | number) => {
-    const { activeConversationId, messages, conversations } = get()
-    const targetConvId = conversationId ?? activeConversationId
+    const { messages, conversations, activeConversationId, activeConversationIdsByMode, chatMode } = get()
+    const conversationType = chatMode === 'cv' ? 'cv_analysis' : 'job_chat'
+    const targetConvId = conversationId ?? activeConversationId ?? activeConversationIdsByMode[chatMode]
 
     const tempId = -Date.now()
     const tempUserMsg: ChatMessage = {
@@ -209,10 +284,11 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       role: 'user',
       content: message,
       createdAt: new Date(),
-      conversationId: (targetConvId ?? '') as string | number
+      conversationId: (targetConvId ?? '') as string | number,
+      conversationType,
+      messageType: chatMode === 'cv' ? 'cv_followup_query' : 'job_query'
     }
-
-    set({ messages: [...messages, tempUserMsg], isSending: true, error: null })
+    set({ messages: [...messages, tempUserMsg], isSending: true, streamStatus: null, error: null })
 
     try {
       const res = await sendMessageApi({
@@ -223,34 +299,56 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       const resolvedConversationId = res.conversationId
       const assistantContent = typeof res.message?.content === 'string' ? res.message.content : ''
 
-      set({ activeConversationId: resolvedConversationId })
+      set((s) => ({
+        activeConversationId: resolvedConversationId,
+        activeConversationIdsByMode: {
+          ...s.activeConversationIdsByMode,
+          jobs: resolvedConversationId,
+          cv: resolvedConversationId
+        }
+      }))
       set((s) => ({
         conversations: buildConversationPreview(
           s.conversations.length ? s.conversations : conversations,
           resolvedConversationId,
           message,
           assistantContent
+        ).map((conversation) =>
+          String(conversation.id) === String(resolvedConversationId)
+            ? { ...conversation, conversationType: 'job_chat' }
+            : conversation
         ),
         messages: [
           ...s.messages.filter((m) => m.id !== tempId),
           { ...tempUserMsg, conversationId: resolvedConversationId },
-          res.message
+          {
+            ...res.message,
+            conversationType: res.message.conversationType ?? 'job_chat',
+            messageType:
+              res.message.messageType ?? (chatMode === 'cv' ? 'cv_followup_answer' : 'job_answer')
+          }
         ]
       }))
       void get().getConversations()
     } catch {
       set({ error: 'Failed to send message. Please try again.' })
     } finally {
-      set({ isSending: false })
+      set({ isSending: false, streamStatus: null })
     }
   },
 
   createConversation: async () => {
     try {
-      const conversation = await createConversationApi()
+      const { chatMode } = get()
+      const conversationType = chatMode === 'cv' ? 'cv_analysis' : 'job_chat'
+      const conversation = await createConversationApi(conversationType)
       set((s) => ({
         activeConversationId: conversation.id,
         pendingConversationId: null,
+        activeConversationIdsByMode: {
+          jobs: conversation.id,
+          cv: conversation.id
+        },
         messages: [],
         conversations: upsertConversation(s.conversations, conversation)
       }))
@@ -266,6 +364,10 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       set((s) => ({
         conversations: s.conversations.filter((c) => c.id !== id),
         deletingConversationId: null,
+        activeConversationIdsByMode: {
+          jobs: String(s.activeConversationIdsByMode.jobs) === String(id) ? null : s.activeConversationIdsByMode.jobs,
+          cv: String(s.activeConversationIdsByMode.cv) === String(id) ? null : s.activeConversationIdsByMode.cv
+        },
         ...(s.activeConversationId === id || s.pendingConversationId === id
           ? { activeConversationId: null, pendingConversationId: null, messages: [] }
           : {})
@@ -291,41 +393,218 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
     }
   },
 
-  analyzeCv: async (file) => {
-    const { messages } = get()
-    const tempId = `cv-upload-${Date.now()}`
+  analyzeCv: async (file, jdText) => {
+    const { conversations, activeConversationId, activeConversationIdsByMode } = get()
+    let targetConversationId = activeConversationId ?? activeConversationIdsByMode.cv
+
+    try {
+      if (!targetConversationId) {
+        const conversation = await createConversationApi('job_chat')
+        targetConversationId = conversation.id
+        set((s) => ({
+          conversations: upsertConversation(s.conversations, conversation),
+          activeConversationId: conversation.id,
+          chatMode: 'cv',
+          activeConversationIdsByMode: {
+            jobs: conversation.id,
+            cv: conversation.id
+          },
+          messages: []
+        }))
+      }
+
+      const tempId = `cv-upload-${Date.now()}`
+      const normalizedJd = jdText?.trim() || ''
+      const tempUserMsg: ChatMessage = {
+        id: tempId,
+        role: 'user',
+        content: normalizedJd
+          ? `Da tai len CV: ${file.name} va yeu cau danh gia do phu hop voi mo ta cong viec`
+          : `Da tai len CV: ${file.name}`,
+        attachments: [
+          {
+            name: file.name,
+            size: file.size,
+            type: file.type
+          }
+        ],
+        conversationId: targetConversationId,
+        conversationType: 'job_chat',
+        messageType: 'cv_upload',
+        createdAt: new Date()
+      }
+
+      set((state) => ({ messages: [...state.messages, tempUserMsg], isSending: true, error: null }))
+
+      if (normalizedJd) {
+        const result = await matchCvWithJdApi({
+          file,
+          jdText: normalizedJd,
+          conversationId: targetConversationId
+        })
+        const resolvedConversationId = result.conversation_id ?? targetConversationId
+        const assistantMessage: ChatMessage = {
+          id: result.conversation_message_id || `cv-jd-match-${Date.now()}`,
+          role: 'assistant',
+          content: formatCvJdMatchMessage(result),
+          conversationId: resolvedConversationId,
+          conversationType: 'job_chat',
+          messageType: 'cv_jd_match',
+          detectedIntent: 'cv_jd_match',
+          cvJdMatch: result,
+          createdAt: new Date()
+        }
+
+        set((state) => ({
+          activeConversationId: resolvedConversationId,
+          chatMode: 'cv',
+          activeConversationIdsByMode: {
+            jobs: resolvedConversationId,
+            cv: resolvedConversationId
+          },
+          conversations: buildConversationPreview(
+            state.conversations.length ? state.conversations : conversations,
+            resolvedConversationId,
+            `Danh gia CV voi JD: ${file.name}`,
+            `${result.job_title} - ${result.overall_score}%`
+          ).map((conversation) =>
+            String(conversation.id) === String(resolvedConversationId)
+              ? {
+                  ...conversation,
+                  conversationType: 'job_chat',
+                  title:
+                    conversation.title && conversation.title !== 'Cuoc tro chuyen moi'
+                      ? conversation.title
+                      : `CV match JD - ${file.name.slice(0, 32)}`
+                }
+              : conversation
+          ),
+          messages: state.messages.filter((message) => message.id !== tempId).concat(assistantMessage)
+        }))
+      } else {
+        const result = await analyzeCvApi(file, 5, targetConversationId)
+        const resolvedConversationId = result.conversation_id ?? targetConversationId
+        const assistantMessage: ChatMessage = {
+          id: result.conversation_message_id || `cv-analysis-${result.cv_id}-${Date.now()}`,
+          role: 'assistant',
+          content: formatCvAnalysisMessage(result),
+          conversationId: resolvedConversationId,
+          conversationType: 'job_chat',
+          messageType: 'cv_analysis',
+          detectedIntent: 'cv_analysis',
+          cvAnalysis: result,
+          createdAt: new Date()
+        }
+
+        set((state) => ({
+          activeConversationId: resolvedConversationId,
+          chatMode: 'cv',
+          activeConversationIdsByMode: {
+            jobs: resolvedConversationId,
+            cv: resolvedConversationId
+          },
+          conversations: buildConversationPreview(
+            state.conversations.length ? state.conversations : conversations,
+            resolvedConversationId,
+            `Phan tich CV: ${file.name}`,
+            `Da phan tich CV ${file.name}`
+          ).map((conversation) =>
+            String(conversation.id) === String(resolvedConversationId)
+              ? {
+                  ...conversation,
+                  conversationType: 'job_chat',
+                  title:
+                    conversation.title && conversation.title !== 'Cuoc tro chuyen moi'
+                      ? conversation.title
+                      : `Phan tich CV - ${file.name.slice(0, 32)}`
+                }
+              : conversation
+          ),
+          messages: state.messages.filter((message) => message.id !== tempId).concat(assistantMessage)
+        }))
+      }
+      void get().getConversations()
+    } catch {
+      set({ error: 'Failed to analyze CV. Please try again.' })
+    } finally {
+      set({ isSending: false })
+    }
+  },
+
+  analyzeCvAgainstJd: async (jdText) => {
+    const { messages, conversations, activeConversationId, activeConversationIdsByMode } = get()
+    const targetConversationId = activeConversationId ?? activeConversationIdsByMode.cv
+    const cvId = getLatestCvIdFromMessages(messages)
+    const normalizedJd = jdText.trim()
+
+    if (!normalizedJd) {
+      set({ error: 'Job description is required.' })
+      return
+    }
+
+    if (!cvId) {
+      set({ error: 'Hay phan tich CV truoc khi doi chieu voi mo ta cong viec.' })
+      return
+    }
+
+    const tempId = `cv-jd-${Date.now()}`
     const tempUserMsg: ChatMessage = {
       id: tempId,
       role: 'user',
-      content: `Da tai len CV: ${file.name}`,
-      attachments: [
-        {
-          name: file.name,
-          size: file.size,
-          type: file.type
-        }
-      ],
-      conversationId: '',
+      content: `Danh gia CV voi mo ta cong viec: ${normalizedJd.slice(0, 240)}`,
+      conversationId: (targetConversationId ?? '') as string | number,
+      conversationType: 'job_chat',
+      messageType: 'cv_jd_match_query',
       createdAt: new Date()
     }
 
-    set({ messages: [...messages, tempUserMsg], isSending: true, error: null })
+    set((state) => ({
+      messages: [...state.messages, tempUserMsg],
+      isSending: true,
+      error: null,
+      chatMode: 'cv'
+    }))
 
     try {
-      const result = await analyzeCvApi(file)
+      const result = await matchCvWithJdApi({
+        cvId,
+        jdText: normalizedJd,
+        conversationId: targetConversationId ?? undefined
+      })
+      const resolvedConversationId = result.conversation_id ?? targetConversationId ?? ''
       const assistantMessage: ChatMessage = {
-        id: `cv-analysis-${result.cv_id}-${Date.now()}`,
+        id: result.conversation_message_id || `cv-jd-match-${Date.now()}`,
         role: 'assistant',
-        content: formatCvAnalysisMessage(result),
-        conversationId: '',
+        content: formatCvJdMatchMessage(result),
+        conversationId: resolvedConversationId,
+        conversationType: 'job_chat',
+        messageType: 'cv_jd_match',
+        detectedIntent: 'cv_jd_match',
+        cvJdMatch: result,
         createdAt: new Date()
       }
 
       set((state) => ({
+        activeConversationId: resolvedConversationId,
+        activeConversationIdsByMode: {
+          jobs: resolvedConversationId,
+          cv: resolvedConversationId
+        },
+        conversations: buildConversationPreview(
+          state.conversations.length ? state.conversations : conversations,
+          resolvedConversationId,
+          'Danh gia CV voi job description',
+          `${result.job_title} - ${result.overall_score}%`
+        ).map((conversation) =>
+          String(conversation.id) === String(resolvedConversationId)
+            ? { ...conversation, conversationType: 'job_chat' }
+            : conversation
+        ),
         messages: state.messages.filter((message) => message.id !== tempId).concat(assistantMessage)
       }))
+      void get().getConversations()
     } catch {
-      set({ error: 'Failed to analyze CV. Please try again.' })
+      set({ error: 'Failed to evaluate CV against job description. Please try again.' })
     } finally {
       set({ isSending: false })
     }

@@ -1,5 +1,15 @@
 import axiosInstance from '@/api/axiosInstance'
 
+export type MyCvResponse = {
+  id: number
+  userId: number
+  cvUrl?: string | null
+}
+
+export type UploadCvFileResponse = {
+  cvUrl: string
+}
+
 export type CvEducation = {
   id: string
   school: string
@@ -76,6 +86,7 @@ export type CvEducationPayload = {
   endDate?: string | null
   description?: string | null
 }
+
 export type CvExperiencePayload = {
   company: string | null
   position: string | null
@@ -83,22 +94,26 @@ export type CvExperiencePayload = {
   endDate?: string | null
   description?: string | null
 }
+
 export type CvSkillPayload = {
   name: string
   category?: string | null
   experienceMonths?: number | null
   isStrong?: boolean
 }
+
 export type CvPersonalityPayload = {
   type: string | null
   description?: string | null
 }
+
 export type CvCertificatePayload = {
   title: string | null
   issuer: string | null
   issuedDate?: string | null
   fileUrl?: string | null
 }
+
 export type CvProjectPayload = {
   name: string | null
   description?: string | null
@@ -108,9 +123,13 @@ export type CvProjectPayload = {
   endDate?: string | null
 }
 
+export const getMyCvApi = async (userId: number) => {
+  const response = await axiosInstance.get<MyCvResponse>(`/cv/${userId}`)
+  return response.data
+}
+
 export const getCvDetailApi = async (userId: number) => {
   const response = await axiosInstance.get<CvDetail>(`/cv/${userId}`)
-
   return response.data
 }
 
@@ -118,8 +137,7 @@ export const uploadCvFileApi = async (file: File) => {
   const formData = new FormData()
   formData.append('file', file)
 
-  const response = await axiosInstance.put<{ cvUrl: string }>('/cv/file', formData)
-
+  const response = await axiosInstance.put<UploadCvFileResponse>('/cv/file', formData)
   return response.data
 }
 
@@ -139,7 +157,8 @@ export const updateCvExperienceApi = async (id: string, data: Partial<CvExperien
 
 export const deleteCvExperienceApi = async (id: string) => (await axiosInstance.delete(`/cv/experience/${id}`)).data
 
-export const createCvSkillsApi = async (skills: CvSkillPayload[]) => (await axiosInstance.post('/cv/skills', { skills })).data
+export const createCvSkillsApi = async (skills: CvSkillPayload[]) =>
+  (await axiosInstance.post('/cv/skills', { skills })).data
 
 export const updateCvSkillApi = async (id: string, data: CvSkillPayload) =>
   (await axiosInstance.put(`/cv/skills/${id}`, data)).data
@@ -162,7 +181,8 @@ export const updateCvCertificateApi = async (id: string, data: Partial<CvCertifi
 
 export const deleteCvCertificateApi = async (id: string) => (await axiosInstance.delete(`/cv/certificates/${id}`)).data
 
-export const createCvProjectApi = async (data: CvProjectPayload) => (await axiosInstance.post('/cv/projects', data)).data
+export const createCvProjectApi = async (data: CvProjectPayload) =>
+  (await axiosInstance.post('/cv/projects', data)).data
 
 export const updateCvProjectApi = async (id: string, data: Partial<CvProjectPayload>) =>
   (await axiosInstance.put(`/cv/projects/${id}`, data)).data

@@ -3,6 +3,7 @@ import axiosInstance from '@/api/axiosInstance'
 export type CreateApplicationRequest = {
   jobId: number
   coverLetter?: string
+  cvUrl?: string
 }
 
 export type CreateApplicationResponse = {

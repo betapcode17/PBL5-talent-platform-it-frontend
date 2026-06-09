@@ -144,7 +144,30 @@
     "hiringCompany": "CÃ´ng ty tuyá»ƒn dá»¥ng",
     "sections": "CÃ¡c pháº§n chi tiáº¿t viá»‡c lÃ m",
     "tryAgain": "Thá»­ láº¡i",
-    "backToJobs": "Quay láº¡i viá»‡c lÃ m"
+    "backToJobs": "Quay láº¡i viá»‡c lÃ m",
+    "applyWithCv": {
+      "closeModal": "Đóng hộp thoại",
+      "eyebrow": "Ứng tuyển với CV",
+      "title": "Chọn CV gửi cho nhà tuyển dụng",
+      "description": "Ứng viên cần chọn CV hiện tại hoặc tải lên CV mới trước khi ứng tuyển để nhà tuyển dụng có thể xem hồ sơ.",
+      "selectedCv": "CV đang được chọn",
+      "noSelectedCv": "Chưa có CV nào được chọn.",
+      "viewCv": "Xem CV",
+      "currentDefaultCv": "CV mặc định hiện tại",
+      "loadingCv": "Đang tải thông tin CV...",
+      "keepOrReplace": "Bạn có thể giữ CV này hoặc tải lên một CV mới để thay thế.",
+      "noDefaultCv": "Tài khoản seeker này chưa có CV mặc định. Bạn cần tải lên CV mới trước khi ứng tuyển.",
+      "createOrUpdate": "Tạo mới / cập nhật CV",
+      "uploadDescription": "Tải lên CV mới ngay tại đây để dùng CV vừa chọn cho lần ứng tuyển này.",
+      "uploading": "Đang tải lên CV...",
+      "uploadNew": "Tải lên CV mới",
+      "noCvYet": "Nếu chưa có CV?",
+      "noCvHint": "Bạn có thể tải CV ngay trong popup này hoặc vào trang hồ sơ seeker để bổ sung thêm thông tin chi tiết.",
+      "openSeekerProfile": "Mở trang hồ sơ seeker",
+      "cancel": "Hủy",
+      "submitting": "Đang nộp đơn...",
+      "confirm": "Xác nhận ứng tuyển"
+    }
   },
   "employerSignup": {
     "badge": "Quy trÃ¬nh gia nháº­p nhÃ  tuyá»ƒn dá»¥ng",
@@ -1046,4 +1069,3 @@
     "collapse": "Thu gá»n"
   }
 }
-

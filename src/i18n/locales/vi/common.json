@@ -1,867 +1,867 @@
 ﻿{
   "language": {
-    "switchTo": "Äá»•i ngÃ´n ngá»¯",
-    "current": "Tiáº¿ng Viá»‡t",
+    "switchTo": "Đổi ngôn ngữ",
+    "current": "Tiếng Việt",
     "short": "VI"
   },
   "nav": {
-    "jobs": "Viá»‡c lÃ m",
-    "companies": "CÃ´ng ty",
-    "categories": "Danh má»¥c",
-    "resources": "TÃ i nguyÃªn",
-    "postJob": "ÄÄƒng tuyá»ƒn",
-    "signIn": "ÄÄƒng nháº­p",
-    "signUp": "ÄÄƒng kÃ½",
-    "dashboard": "Báº£ng Ä‘iá»u khiá»ƒn",
-    "goToDashboard": "VÃ o báº£ng Ä‘iá»u khiá»ƒn",
-    "logout": "ÄÄƒng xuáº¥t",
-    "account": "TÃ i khoáº£n",
-    "openChat": "Má»Ÿ trÃ² chuyá»‡n",
-    "openAccountMenu": "Má»Ÿ menu tÃ i khoáº£n",
-    "applicationTracker": "ÄÆ¡n á»©ng tuyá»ƒn cá»§a tÃ´i",
-    "interviewSchedule": "Lá»‹ch phá»ng váº¥n",
-    "appliedCompanies": "Danh sÃ¡ch cÃ´ng ty Ä‘Ã£ á»©ng tuyá»ƒn",
-    "savedCompanies": "Danh sÃ¡ch cÃ´ng ty Ä‘Ã£ lÆ°u",
-    "searchJobs": "TÃ¬m viá»‡c lÃ m...",
-    "mobileNavigation": "Äiá»u hÆ°á»›ng di Ä‘á»™ng",
-    "primaryNavigation": "Äiá»u hÆ°á»›ng chÃ­nh"
+    "jobs": "Việc làm",
+    "companies": "Công ty",
+    "categories": "Danh mục",
+    "resources": "Tài nguyên",
+    "postJob": "Đăng tuyển",
+    "signIn": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "dashboard": "Bảng điều khiển",
+    "goToDashboard": "Vào bảng điều khiển",
+    "logout": "Đăng xuất",
+    "account": "Tài khoản",
+    "openChat": "Mở trò chuyện",
+    "openAccountMenu": "Mở menu tài khoản",
+    "applicationTracker": "Đơn ứng tuyển của tôi",
+    "interviewSchedule": "Lịch phỏng vấn",
+    "appliedCompanies": "Danh sách công ty đã ứng tuyển",
+    "savedCompanies": "Danh sách công ty đã lưu",
+    "searchJobs": "Tìm việc làm...",
+    "mobileNavigation": "Điều hướng di động",
+    "primaryNavigation": "Điều hướng chính"
   },
   "browseJobs": {
     "search": {
-      "placeholder": "TÃ¬m theo tÃªn viá»‡c lÃ m, ká»¹ nÄƒng hoáº·c cÃ´ng ty...",
-      "location": "HÃ  Ná»™i, TP.HCM...",
-      "allLocations": "Táº¥t cáº£ Ä‘á»‹a Ä‘iá»ƒm",
-      "notifications": "ThÃ´ng bÃ¡o",
-      "saved": "ÄÃ£ lÆ°u"
+      "placeholder": "Tìm theo tên việc làm, kỹ năng hoặc công ty...",
+      "location": "Hà Nội, TP.HCM...",
+      "allLocations": "Tất cả địa điểm",
+      "notifications": "Thông báo",
+      "saved": "Đã lưu"
     },
     "filters": {
-      "open": "Bá»™ lá»c",
-      "close": "ÄÃ³ng bá»™ lá»c",
-      "title": "Bá»™ lá»c",
-      "description": "Tinh chá»‰nh káº¿t quáº£ viá»‡c lÃ m",
-      "programmingLanguages": "NgÃ´n ngá»¯ láº­p trÃ¬nh",
-      "chooseLanguage": "Chá»n ngÃ´n ngá»¯",
-      "noMatches": "KhÃ´ng cÃ³ káº¿t quáº£ phÃ¹ há»£p",
-      "experienceLevel": "Cáº¥p Ä‘á»™ kinh nghiá»‡m",
-      "workType": "HÃ¬nh thá»©c lÃ m viá»‡c",
-      "jobType": "Loáº¡i viá»‡c lÃ m",
-      "chooseJobType": "Chá»n loáº¡i viá»‡c lÃ m",
-      "postedWithin": "Thá»i gian Ä‘Äƒng",
-      "chooseTime": "Chá»n thá»i gian",
-      "salaryRange": "Khoáº£ng lÆ°Æ¡ng (hÃ ng thÃ¡ng)",
-      "from": "Tá»«",
-      "to": "Äáº¿n",
-      "salaryHelp": "Nháº­p khoáº£ng lÆ°Æ¡ng mong muá»‘n Ä‘á»ƒ thu háº¹p cÃ¡c viá»‡c lÃ m phÃ¹ há»£p.",
-      "reset": "Äáº·t láº¡i",
-      "apply": "Ãp dá»¥ng bá»™ lá»c"
+      "open": "Bộ lọc",
+      "close": "Đóng bộ lọc",
+      "title": "Bộ lọc",
+      "description": "Tinh chỉnh kết quả việc làm",
+      "programmingLanguages": "Ngôn ngữ lập trình",
+      "chooseLanguage": "Chọn ngôn ngữ",
+      "noMatches": "Không có kết quả phù hợp",
+      "experienceLevel": "Cấp độ kinh nghiệm",
+      "workType": "Hình thức làm việc",
+      "jobType": "Loại việc làm",
+      "chooseJobType": "Chọn loại việc làm",
+      "postedWithin": "Thời gian đăng",
+      "chooseTime": "Chọn thời gian",
+      "salaryRange": "Khoảng lương (hàng tháng)",
+      "from": "Từ",
+      "to": "Đến",
+      "salaryHelp": "Nhập khoảng lương mong muốn để thu hẹp các việc làm phù hợp.",
+      "reset": "Đặt lại",
+      "apply": "Áp dụng bộ lọc"
     },
     "results": {
-      "title": "Viá»‡c lÃ m gá»£i Ã½",
-      "found": "TÃ¬m tháº¥y {{count}} viá»‡c lÃ m phÃ¹ há»£p vá»›i báº¡n",
-      "updating": "Äang cáº­p nháº­t...",
-      "latest": "Má»›i nháº¥t",
-      "bestMatch": "PhÃ¹ há»£p nháº¥t",
-      "savedJobs": "Viá»‡c Ä‘Ã£ lÆ°u",
-      "showing": "Äang hiá»ƒn thá»‹",
-      "showingRange": "{{from}}-{{to}} trÃªn {{count}}",
-      "showingJobs": "Äang hiá»ƒn thá»‹ {{from}}-{{to}} trÃªn {{count}} viá»‡c lÃ m",
-      "sortBy": "Sáº¯p xáº¿p",
-      "newestFirst": "Má»›i nháº¥t trÆ°á»›c",
-      "suggestedFilters": "Bá»™ lá»c gá»£i Ã½",
-      "clearAll": "XÃ³a táº¥t cáº£"
+      "title": "Việc làm gợi ý",
+      "found": "Tìm thấy {{count}} việc làm phù hợp với bạn",
+      "updating": "Đang cập nhật...",
+      "latest": "Mới nhất",
+      "bestMatch": "Phù hợp nhất",
+      "savedJobs": "Việc đã lưu",
+      "showing": "Đang hiển thị",
+      "showingRange": "{{from}}-{{to}} trên {{count}}",
+      "showingJobs": "Đang hiển thị {{from}}-{{to}} trên {{count}} việc làm",
+      "sortBy": "Sắp xếp",
+      "newestFirst": "Mới nhất trước",
+      "suggestedFilters": "Bộ lọc gợi ý",
+      "clearAll": "Xóa tất cả"
     },
     "jobCard": {
-      "developerHiring": "Tuyá»ƒn dá»¥ng láº­p trÃ¬nh viÃªn",
-      "extraSkills": "+{{count}} ká»¹ nÄƒng",
-      "saveJob": "LÆ°u viá»‡c lÃ m",
-      "viewDetails": "Xem chi tiáº¿t",
-      "apply": "á»¨ng tuyá»ƒn"
+      "developerHiring": "Tuyển dụng lập trình viên",
+      "extraSkills": "+{{count}} kỹ năng",
+      "saveJob": "Lưu việc làm",
+      "viewDetails": "Xem chi tiết",
+      "apply": "Ứng tuyển"
     },
     "empty": {
-      "title": "KhÃ´ng cÃ³ viá»‡c lÃ m phÃ¹ há»£p vá»›i bá»™ lá»c",
-      "description": "HÃ£y thá»­ bá» bá»›t bá»™ lá»c hoáº·c má»Ÿ rá»™ng tÃ¬m kiáº¿m Ä‘á»ƒ khÃ¡m phÃ¡ thÃªm cÆ¡ há»™i táº¡i Viá»‡t Nam.",
-      "reset": "Äáº·t láº¡i bá»™ lá»c"
+      "title": "Không có việc làm phù hợp với bộ lọc",
+      "description": "Hãy thử bỏ bớt bộ lọc hoặc mở rộng tìm kiếm để khám phá thêm cơ hội tại Việt Nam.",
+      "reset": "Đặt lại bộ lọc"
     },
     "alerts": {
-      "title": "ThÃ´ng bÃ¡o viá»‡c lÃ m",
-      "description": "Nháº­n thÃ´ng bÃ¡o khi cÃ³ viá»‡c lÃ m má»›i phÃ¹ há»£p vá»›i bá»™ lá»c hiá»‡n táº¡i.",
-      "enable": "Báº­t thÃ´ng bÃ¡o"
+      "title": "Thông báo việc làm",
+      "description": "Nhận thông báo khi có việc làm mới phù hợp với bộ lọc hiện tại.",
+      "enable": "Bật thông báo"
     },
     "topCompanies": {
-      "title": "CÃ´ng ty ná»•i báº­t",
-      "jobs": "{{count}} viá»‡c lÃ m",
-      "viewAll": "Xem táº¥t cáº£ cÃ´ng ty"
+      "title": "Công ty nổi bật",
+      "jobs": "{{count}} việc làm",
+      "viewAll": "Xem tất cả công ty"
     },
     "careerTips": {
-      "title": "Máº¹o nghá» nghiá»‡p",
-      "cvTips": "Máº¹o viáº¿t CV",
-      "interviewPrep": "Chuáº©n bá»‹ phá»ng váº¥n",
-      "salaryGuide": "HÆ°á»›ng dáº«n lÆ°Æ¡ng",
-      "explore": "KhÃ¡m phÃ¡ tÃ i nguyÃªn"
+      "title": "Mẹo nghề nghiệp",
+      "cvTips": "Mẹo viết CV",
+      "interviewPrep": "Chuẩn bị phỏng vấn",
+      "salaryGuide": "Hướng dẫn lương",
+      "explore": "Khám phá tài nguyên"
     },
     "pagination": {
-      "previous": "Trang trÆ°á»›c",
+      "previous": "Trang trước",
       "next": "Trang sau"
     },
     "values": {
       "junior": "Junior",
       "senior": "Senior",
       "leadArchitect": "Lead / Architect",
-      "remote": "Tá»« xa",
-      "hybrid": "Linh hoáº¡t",
-      "onSite": "Táº¡i vÄƒn phÃ²ng",
-      "fullTime": "ToÃ n thá»i gian",
-      "contract": "Há»£p Ä‘á»“ng",
-      "partTime": "BÃ¡n thá»i gian",
-      "allLevels": "Táº¥t cáº£ cáº¥p Ä‘á»™",
-      "locationFlexible": "Äá»‹a Ä‘iá»ƒm linh hoáº¡t",
-      "salaryNegotiable": "LÆ°Æ¡ng thá»a thuáº­n",
-      "recentlyPosted": "Má»›i Ä‘Äƒng gáº§n Ä‘Ã¢y",
-      "justNow": "Vá»«a xong",
-      "today": "HÃ´m nay",
-      "yesterday": "HÃ´m qua",
-      "hoursAgo": "{{count}} giá» trÆ°á»›c",
-      "daysAgo": "{{count}} ngÃ y trÆ°á»›c"
+      "remote": "Từ xa",
+      "hybrid": "Linh hoạt",
+      "onSite": "Tại văn phòng",
+      "fullTime": "Toàn thời gian",
+      "contract": "Hợp đồng",
+      "partTime": "Bán thời gian",
+      "allLevels": "Tất cả cấp độ",
+      "locationFlexible": "Địa điểm linh hoạt",
+      "salaryNegotiable": "Lương thỏa thuận",
+      "recentlyPosted": "Mới đăng gần đây",
+      "justNow": "Vừa xong",
+      "today": "Hôm nay",
+      "yesterday": "Hôm qua",
+      "hoursAgo": "{{count}} giờ trước",
+      "daysAgo": "{{count}} ngày trước"
     }
   },
   "jobDetail": {
-    "active": "Äang má»Ÿ",
-    "posted": "ÄÄƒng {{date}}",
-    "updated": "Cáº­p nháº­t {{date}}",
-    "applicants": "{{count}} á»©ng viÃªn",
-    "applyNow": "á»¨ng tuyá»ƒn ngay",
-    "applying": "Äang á»©ng tuyá»ƒn...",
-    "applied": "ÄÃ£ á»©ng tuyá»ƒn",
-    "bookmarked": "ÄÃ£ lÆ°u",
-    "saveJob": "LÆ°u viá»‡c lÃ m",
-    "saved": "ÄÃ£ lÆ°u",
-    "shareThisRole": "Chia sáº» vá»‹ trÃ­ nÃ y",
-    "shareLinkedIn": "Chia sáº» lÃªn LinkedIn",
-    "copyLink": "Sao chÃ©p link viá»‡c lÃ m",
-    "shareEmail": "Chia sáº» qua email",
-    "viewCompany": "Xem cÃ´ng ty",
-    "similarRoles": "Vá»‹ trÃ­ tÆ°Æ¡ng tá»±",
-    "hiringCompany": "CÃ´ng ty tuyá»ƒn dá»¥ng",
-    "sections": "CÃ¡c pháº§n chi tiáº¿t viá»‡c lÃ m",
-    "tryAgain": "Thá»­ láº¡i",
-    "backToJobs": "Quay láº¡i viá»‡c lÃ m"
+    "active": "Đang mở",
+    "posted": "Đăng {{date}}",
+    "updated": "Cập nhật {{date}}",
+    "applicants": "{{count}} ứng viên",
+    "applyNow": "Ứng tuyển ngay",
+    "applying": "Đang ứng tuyển...",
+    "applied": "Đã ứng tuyển",
+    "bookmarked": "Đã lưu",
+    "saveJob": "Lưu việc làm",
+    "saved": "Đã lưu",
+    "shareThisRole": "Chia sẻ vị trí này",
+    "shareLinkedIn": "Chia sẻ lên LinkedIn",
+    "copyLink": "Sao chép link việc làm",
+    "shareEmail": "Chia sẻ qua email",
+    "viewCompany": "Xem công ty",
+    "similarRoles": "Vị trí tương tự",
+    "hiringCompany": "Công ty tuyển dụng",
+    "sections": "Các phần chi tiết việc làm",
+    "tryAgain": "Thử lại",
+    "backToJobs": "Quay lại việc làm"
   },
   "employerSignup": {
-    "badge": "Quy trÃ¬nh gia nháº­p nhÃ  tuyá»ƒn dá»¥ng",
-    "badgeSecondary": "Luá»“ng tuyá»ƒn dá»¥ng cao cáº¥p",
-    "heroTitle": "XÃ¢y dá»±ng sá»± hiá»‡n diá»‡n tuyá»ƒn dá»¥ng vá»›i há»“ sÆ¡ nhÃ  tuyá»ƒn dá»¥ng chuyÃªn nghiá»‡p.",
-    "heroDescription": "ÄÄƒng kÃ½ tÃ i khoáº£n tuyá»ƒn dá»¥ng, táº¡o hoáº·c tham gia há»“ sÆ¡ cÃ´ng ty cá»§a báº¡n vÃ  báº¯t Ä‘áº§u Ä‘Äƒng tin vá»›i cÃ¹ng ngÃ´n ngá»¯ thiáº¿t káº¿ tÃ´ng tÃ­m cá»§a dá»± Ã¡n.",
+    "badge": "Quy trình gia nhập nhà tuyển dụng",
+    "badgeSecondary": "Luồng tuyển dụng cao cấp",
+    "heroTitle": "Xây dựng sự hiện diện tuyển dụng với hồ sơ nhà tuyển dụng chuyên nghiệp.",
+    "heroDescription": "Đăng ký tài khoản tuyển dụng, tạo hoặc tham gia hồ sơ công ty của bạn và bắt đầu đăng tin với cùng ngôn ngữ thiết kế tông tím của dự án.",
     "stats": {
-      "techCandidates": "á»©ng viÃªn cÃ´ng nghá»‡",
-      "accountSetup": "thiáº¿t láº­p tÃ i khoáº£n",
-      "companyProfile": "há»“ sÆ¡ cÃ´ng ty"
+      "techCandidates": "ứng viên công nghệ",
+      "accountSetup": "thiết lập tài khoản",
+      "companyProfile": "hồ sơ công ty"
     },
     "whatHappens": {
-      "title": "Äiá»u gÃ¬ xáº£y ra sau khi Ä‘Äƒng kÃ½?",
+      "title": "Điều gì xảy ra sau khi đăng ký?",
       "items": {
-        "accountCreated": "TÃ i khoáº£n nhÃ¢n viÃªn Ä‘Æ°á»£c táº¡o tá»± Ä‘á»™ng.",
-        "credentialsSent": "ThÃ´ng tin Ä‘Äƒng nháº­p Ä‘Æ°á»£c gá»­i tá»›i email Ä‘Ã£ Ä‘Äƒng kÃ½.",
-        "companyLinked": "Há»“ sÆ¡ cÃ´ng ty Ä‘Æ°á»£c liÃªn káº¿t hoáº·c táº¡o má»›i khi cáº§n."
+        "accountCreated": "Tài khoản nhân viên được tạo tự động.",
+        "credentialsSent": "Thông tin đăng nhập được gửi tới email đã đăng ký.",
+        "companyLinked": "Hồ sơ công ty được liên kết hoặc tạo mới khi cần."
       }
     },
     "page": {
-      "eyebrow": "ÄÄƒng kÃ½ nhÃ  tuyá»ƒn dá»¥ng",
-      "title": "Táº¡o khÃ´ng gian lÃ m viá»‡c cho nhÃ  tuyá»ƒn dá»¥ng",
-      "description": "HoÃ n thÃ nh biá»ƒu máº«u bÃªn dÆ°á»›i Ä‘á»ƒ táº¡o tÃ i khoáº£n nhÃ  tuyá»ƒn dá»¥ng phÃ¹ há»£p vá»›i nháº­n diá»‡n cÃ´ng ty vÃ  há»‡ thá»‘ng thiáº¿t káº¿ cá»§a dá»± Ã¡n."
+      "eyebrow": "Đăng ký nhà tuyển dụng",
+      "title": "Tạo không gian làm việc cho nhà tuyển dụng",
+      "description": "Hoàn thành biểu mẫu bên dưới để tạo tài khoản nhà tuyển dụng phù hợp với nhận diện công ty và hệ thống thiết kế của dự án."
     },
     "sections": {
       "representative": {
-        "title": "NgÆ°á»i Ä‘áº¡i diá»‡n",
-        "subtitle": "ThÃ´ng tin ngÆ°á»i phá»¥ trÃ¡ch tuyá»ƒn dá»¥ng"
+        "title": "Người đại diện",
+        "subtitle": "Thông tin người phụ trách tuyển dụng"
       },
       "company": {
-        "title": "CÃ´ng ty",
-        "subtitle": "ThÃ´ng tin cÃ´ng ty hiá»ƒn thá»‹ trong há»‡ thá»‘ng"
+        "title": "Công ty",
+        "subtitle": "Thông tin công ty hiển thị trong hệ thống"
       }
     },
     "labels": {
-      "fullName": "Há» vÃ  tÃªn",
+      "fullName": "Họ và tên",
       "email": "Email",
-      "phone": "Sá»‘ Ä‘iá»‡n thoáº¡i",
-      "role": "Vai trÃ²",
-      "joinedDate": "NgÃ y tham gia",
-      "companyName": "TÃªn cÃ´ng ty",
-      "companyAddress": "Äá»‹a chá»‰ cÃ´ng ty",
-      "companyWebsite": "Website cÃ´ng ty"
+      "phone": "Số điện thoại",
+      "role": "Vai trò",
+      "joinedDate": "Ngày tham gia",
+      "companyName": "Tên công ty",
+      "companyAddress": "Địa chỉ công ty",
+      "companyWebsite": "Website công ty"
     },
     "placeholders": {
       "fullName": "Nguyen Van A",
       "email": "recruiter@company.com",
       "phone": "+84 912 345 678",
       "companyName": "ACME Inc.",
-      "companyAddress": "123 LÃª Lá»£i, Quáº­n 1, TP.HCM",
+      "companyAddress": "123 Lê Lợi, Quận 1, TP.HCM",
       "companyWebsite": "https://company.com"
     },
     "roleOptions": {
-      "hr": "NhÃ¢n sá»±",
-      "admin": "Quáº£n trá»‹ viÃªn",
-      "recruiter": "NhÃ  tuyá»ƒn dá»¥ng",
-      "hiringManager": "TrÆ°á»Ÿng phÃ²ng tuyá»ƒn dá»¥ng"
+      "hr": "Nhân sự",
+      "admin": "Quản trị viên",
+      "recruiter": "Nhà tuyển dụng",
+      "hiringManager": "Trưởng phòng tuyển dụng"
     },
     "companyMatching": {
-      "title": "GhÃ©p cÃ´ng ty",
-      "description": "Náº¿u Ä‘Ã£ cÃ³ cÃ´ng ty trÃ¹ng tÃªn, nhÃ¢n viÃªn sáº½ Ä‘Æ°á»£c liÃªn káº¿t vá»›i cÃ´ng ty Ä‘Ã³. Náº¿u chÆ°a, há»“ sÆ¡ cÃ´ng ty má»›i sáº½ Ä‘Æ°á»£c táº¡o tá»± Ä‘á»™ng."
+      "title": "Ghép công ty",
+      "description": "Nếu đã có công ty trùng tên, nhân viên sẽ được liên kết với công ty đó. Nếu chưa, hồ sơ công ty mới sẽ được tạo tự động."
     },
     "activation": {
-      "title": "Sáºµn sÃ ng kÃ­ch hoáº¡t tÃ i khoáº£n nhÃ  tuyá»ƒn dá»¥ng?",
-      "description": "ChÃºng tÃ´i sáº½ táº¡o Ä‘Äƒng nháº­p nhÃ¢n viÃªn vÃ  liÃªn káº¿t ngay vá»›i há»“ sÆ¡ cÃ´ng ty cá»§a báº¡n."
+      "title": "Sẵn sàng kích hoạt tài khoản nhà tuyển dụng?",
+      "description": "Chúng tôi sẽ tạo đăng nhập nhân viên và liên kết ngay với hồ sơ công ty của bạn."
     },
     "actions": {
-      "reset": "Äáº·t láº¡i biá»ƒu máº«u",
-      "register": "ÄÄƒng kÃ½ nhÃ  tuyá»ƒn dá»¥ng",
-      "creating": "Äang táº¡o nhÃ  tuyá»ƒn dá»¥ng..."
+      "reset": "Đặt lại biểu mẫu",
+      "register": "Đăng ký nhà tuyển dụng",
+      "creating": "Đang tạo nhà tuyển dụng..."
     },
-    "success": "TÃ i khoáº£n nhÃ  tuyá»ƒn dá»¥ng cho {{companyName}} Ä‘Ã£ Ä‘Æ°á»£c táº¡o thÃ nh cÃ´ng. ThÃ´ng tin Ä‘Äƒng nháº­p Ä‘Ã£ Ä‘Æ°á»£c gá»­i Ä‘áº¿n email Ä‘Ã£ Ä‘Äƒng kÃ½.",
+    "success": "Tài khoản nhà tuyển dụng cho {{companyName}} đã được tạo thành công. Thông tin đăng nhập đã được gửi đến email đã đăng ký.",
     "errors": {
-      "fullNameRequired": "Vui lÃ²ng nháº­p há» vÃ  tÃªn",
-      "invalidEmail": "Vui lÃ²ng nháº­p email há»£p lá»‡",
-      "invalidPhone": "Sá»‘ Ä‘iá»‡n thoáº¡i khÃ´ng há»£p lá»‡",
-      "companyNameRequired": "Vui lÃ²ng nháº­p tÃªn cÃ´ng ty",
-      "companyAddressRequired": "Vui lÃ²ng nháº­p Ä‘á»‹a chá»‰ cÃ´ng ty",
-      "websiteProtocolRequired": "Vui lÃ²ng thÃªm https:// hoáº·c http://",
-      "unableToRegister": "KhÃ´ng thá»ƒ Ä‘Äƒng kÃ½ nhÃ  tuyá»ƒn dá»¥ng"
+      "fullNameRequired": "Vui lòng nhập họ và tên",
+      "invalidEmail": "Vui lòng nhập email hợp lệ",
+      "invalidPhone": "Số điện thoại không hợp lệ",
+      "companyNameRequired": "Vui lòng nhập tên công ty",
+      "companyAddressRequired": "Vui lòng nhập địa chỉ công ty",
+      "websiteProtocolRequired": "Vui lòng thêm https:// hoặc http://",
+      "unableToRegister": "Không thể đăng ký nhà tuyển dụng"
     }
   },
   "employer": {
-    "searchPlaceholder": "TÃ¬m á»©ng viÃªn, viá»‡c lÃ m hoáº·c thao tÃ¡c...",
-    "roleLabel": "Tuyá»ƒn dá»¥ng",
-    "toggleTheme": "Äá»•i giao diá»‡n",
-    "openNotifications": "Má»Ÿ thÃ´ng bÃ¡o",
+    "searchPlaceholder": "Tìm ứng viên, việc làm hoặc thao tác...",
+    "roleLabel": "Tuyển dụng",
+    "toggleTheme": "Đổi giao diện",
+    "openNotifications": "Mở thông báo",
     "notifications": {
-      "title": "ThÃ´ng bÃ¡o",
-      "description": "CÃ¡c thao tÃ¡c tuyá»ƒn dá»¥ng cÃ³ thá»ƒ cáº§n xá»­ lÃ½.",
+      "title": "Thông báo",
+      "description": "Các thao tác tuyển dụng có thể cần xử lý.",
       "reviewCandidates": {
-        "title": "Xem á»©ng viÃªn má»›i",
-        "description": "Má»Ÿ pipeline á»©ng viÃªn vÃ  xem cÃ¡c há»“ sÆ¡ á»©ng tuyá»ƒn gáº§n Ä‘Ã¢y.",
+        "title": "Xem ứng viên mới",
+        "description": "Mở pipeline ứng viên và xem các hồ sơ ứng tuyển gần đây.",
         "time": "Ngay"
       },
       "checkInterviews": {
-        "title": "Kiá»ƒm tra lá»‹ch phá»ng váº¥n",
-        "description": "Xem cÃ¡c lá»‹ch phá»ng váº¥n sáº¯p tá»›i vÃ  thay Ä‘á»•i lá»‹ch.",
-        "time": "HÃ´m nay"
+        "title": "Kiểm tra lịch phỏng vấn",
+        "description": "Xem các lịch phỏng vấn sắp tới và thay đổi lịch.",
+        "time": "Hôm nay"
       },
       "keepJobsUpdated": {
-        "title": "Cáº­p nháº­t tin tuyá»ƒn dá»¥ng",
-        "description": "Quáº£n lÃ½ tin Ä‘ang hoáº¡t Ä‘á»™ng vÃ  Ä‘Äƒng cÆ¡ há»™i má»›i.",
-        "time": "Äang má»Ÿ"
+        "title": "Cập nhật tin tuyển dụng",
+        "description": "Quản lý tin đang hoạt động và đăng cơ hội mới.",
+        "time": "Đang mở"
       }
     },
     "profile": {
-      "employeeFallback": "NhÃ  tuyá»ƒn dá»¥ng",
-      "viewProfile": "Xem há»“ sÆ¡",
-      "chat": "TrÃ² chuyá»‡n"
+      "employeeFallback": "Nhà tuyển dụng",
+      "viewProfile": "Xem hồ sơ",
+      "chat": "Trò chuyện"
     },
     "sidebar": {
-      "overview": "Tá»•ng quan",
-      "jobs": "Viá»‡c lÃ m",
-      "candidates": "á»¨ng viÃªn",
-      "interviews": "Phá»ng váº¥n",
-      "company": "ThÃ´ng tin cÃ´ng ty",
-      "workspace": "KhÃ´ng gian lÃ m viá»‡c",
-      "console": "Báº£ng tuyá»ƒn dá»¥ng",
-      "consoleDescription": "Há»— trá»£ váº­n hÃ nh tuyá»ƒn dá»¥ng vÃ  quy trÃ¬nh tuyá»ƒn háº±ng ngÃ y.",
-      "closeSidebar": "ÄÃ³ng thanh Ä‘iá»u hÆ°á»›ng",
+      "overview": "Tổng quan",
+      "jobs": "Việc làm",
+      "candidates": "Ứng viên",
+      "interviews": "Phỏng vấn",
+      "company": "Thông tin công ty",
+      "workspace": "Không gian làm việc",
+      "console": "Bảng tuyển dụng",
+      "consoleDescription": "Hỗ trợ vận hành tuyển dụng và quy trình tuyển hằng ngày.",
+      "closeSidebar": "Đóng thanh điều hướng",
       "companyCard": {
-        "eyebrow": "ThÃ´ng tin cÃ´ng ty",
-        "fallbackDescription": "ChÆ°a cÃ³ dá»¯ liá»‡u cÃ´ng ty bá»• sung.",
-        "manage": "Quáº£n lÃ½ há»“ sÆ¡"
+        "eyebrow": "Thông tin công ty",
+        "fallbackDescription": "Chưa có dữ liệu công ty bổ sung.",
+        "manage": "Quản lý hồ sơ"
       }
     },
     "header": {
-      "openNavigation": "Má»Ÿ Ä‘iá»u hÆ°á»›ng",
-      "closeNavigation": "ÄÃ³ng Ä‘iá»u hÆ°á»›ng",
-      "expandSidebar": "Má»Ÿ rá»™ng thanh bÃªn",
-      "collapseSidebar": "Thu gá»n thanh bÃªn",
-      "searchDashboard": "TÃ¬m kiáº¿m trong báº£ng nhÃ  tuyá»ƒn dá»¥ng",
-      "openProfileMenu": "Má»Ÿ menu há»“ sÆ¡",
-      "closeNavigationDrawer": "ÄÃ³ng ngÄƒn Ä‘iá»u hÆ°á»›ng"
+      "openNavigation": "Mở điều hướng",
+      "closeNavigation": "Đóng điều hướng",
+      "expandSidebar": "Mở rộng thanh bên",
+      "collapseSidebar": "Thu gọn thanh bên",
+      "searchDashboard": "Tìm kiếm trong bảng nhà tuyển dụng",
+      "openProfileMenu": "Mở menu hồ sơ",
+      "closeNavigationDrawer": "Đóng ngăn điều hướng"
     },
     "actions": {
-      "export": "Xuáº¥t file",
+      "export": "Xuất file",
       "view": "Xem",
-      "close": "ÄÃ³ng",
-      "cancel": "Há»§y",
-      "creating": "Äang táº¡o..."
+      "close": "Đóng",
+      "cancel": "Hủy",
+      "creating": "Đang tạo..."
     },
     "statuses": {
-      "OPEN": "Äang má»Ÿ",
-      "PAUSED": "Táº¡m dá»«ng",
-      "SCHEDULED": "ÄÃ£ lÃªn lá»‹ch",
-      "COMPLETED": "ÄÃ£ hoÃ n táº¥t"
+      "OPEN": "Đang mở",
+      "PAUSED": "Tạm dừng",
+      "SCHEDULED": "Đã lên lịch",
+      "COMPLETED": "Đã hoàn tất"
     },
     "company": {
-      "eyebrow": "Quáº£n lÃ½ cÃ´ng ty",
-      "title": "ThÃ´ng tin cÃ´ng ty",
-      "noCompanyDescription": "Xem vÃ  quáº£n lÃ½ thÃ´ng tin cÃ´ng ty cá»§a báº¡n",
-      "noCompany": "KhÃ´ng cÃ³ dá»¯ liá»‡u cÃ´ng ty",
-      "noDescription": "ChÆ°a cÃ³ mÃ´ táº£ cÃ´ng ty",
-      "industry": "NgÃ nh cÃ´ng nghiá»‡p",
-      "size": "Quy mÃ´ cÃ´ng ty",
+      "eyebrow": "Quản lý công ty",
+      "title": "Thông tin công ty",
+      "noCompanyDescription": "Xem và quản lý thông tin công ty của bạn",
+      "noCompany": "Không có dữ liệu công ty",
+      "noDescription": "Chưa có mô tả công ty",
+      "industry": "Ngành công nghiệp",
+      "size": "Quy mô công ty",
       "email": "Email",
-      "phone": "Äiá»‡n thoáº¡i",
-      "location": "Äá»‹a chá»‰",
+      "phone": "Điện thoại",
+      "location": "Địa chỉ",
       "website": "Website",
-      "about": "Giá»›i thiá»‡u cÃ´ng ty",
-      "staffCount": "Sá»‘ nhÃ¢n viÃªn",
-      "notSpecified": "ChÆ°a xÃ¡c Ä‘á»‹nh"
+      "about": "Giới thiệu công ty",
+      "staffCount": "Số nhân viên",
+      "notSpecified": "Chưa xác định"
     },
     "overview": {
-      "eyebrow": "Trung tÃ¢m Ä‘iá»u phá»‘i tuyá»ƒn dá»¥ng",
-      "welcomeTitle": "ChÃ o {{name}}, pipeline tuyá»ƒn dá»¥ng hÃ´m nay tháº¿ nÃ o?",
-      "descriptionWithCompany": "Báº¡n Ä‘ang quáº£n lÃ½ hoáº¡t Ä‘á»™ng tuyá»ƒn dá»¥ng cho {{company}}. Dá»¯ liá»‡u bÃªn dÆ°á»›i Ä‘Æ°á»£c láº¥y trá»±c tiáº¿p tá»« backend hiá»‡n táº¡i.",
-      "descriptionFallback": "Theo dÃµi hiá»‡u quáº£ tuyá»ƒn dá»¥ng, á»©ng viÃªn má»›i vÃ  lá»‹ch phá»ng váº¥n táº¡i má»™t nÆ¡i.",
-      "createJob": "Táº¡o tin tuyá»ƒn dá»¥ng má»›i",
-      "viewCandidates": "Xem danh sÃ¡ch á»©ng viÃªn",
-      "loadingTitle": "Äang táº£i báº£ng Ä‘iá»u khiá»ƒn",
-      "loadingDescription": "Há»‡ thá»‘ng Ä‘ang tá»•ng há»£p dá»¯ liá»‡u tuyá»ƒn dá»¥ng tá»« backend.",
-      "failedTitle": "KhÃ´ng táº£i Ä‘Æ°á»£c báº£ng Ä‘iá»u khiá»ƒn",
+      "eyebrow": "Trung tâm điều phối tuyển dụng",
+      "welcomeTitle": "Chào {{name}}, pipeline tuyển dụng hôm nay thế nào?",
+      "descriptionWithCompany": "Bạn đang quản lý hoạt động tuyển dụng cho {{company}}. Dữ liệu bên dưới được lấy trực tiếp từ backend hiện tại.",
+      "descriptionFallback": "Theo dõi hiệu quả tuyển dụng, ứng viên mới và lịch phỏng vấn tại một nơi.",
+      "createJob": "Tạo tin tuyển dụng mới",
+      "viewCandidates": "Xem danh sách ứng viên",
+      "loadingTitle": "Đang tải bảng điều khiển",
+      "loadingDescription": "Hệ thống đang tổng hợp dữ liệu tuyển dụng từ backend.",
+      "failedTitle": "Không tải được bảng điều khiển",
       "stats": {
-        "openJobs": "Tin tuyá»ƒn dá»¥ng Ä‘ang má»Ÿ",
-        "applicationsReceived": "{{count}} há»“ sÆ¡ Ä‘Ã£ nháº­n",
-        "newCandidates": "á»¨ng viÃªn má»›i",
-        "last7Days": "Trong 7 ngÃ y gáº§n Ä‘Ã¢y",
-        "interviewSchedule": "Lá»‹ch phá»ng váº¥n",
-        "beingScheduled": "Äang Ä‘Æ°á»£c lÃªn lá»‹ch",
-        "successfulHires": "Tuyá»ƒn thÃ nh cÃ´ng",
-        "activeChats": "{{count}} cuá»™c trÃ² chuyá»‡n Ä‘ang hoáº¡t Ä‘á»™ng"
+        "openJobs": "Tin tuyển dụng đang mở",
+        "applicationsReceived": "{{count}} hồ sơ đã nhận",
+        "newCandidates": "Ứng viên mới",
+        "last7Days": "Trong 7 ngày gần đây",
+        "interviewSchedule": "Lịch phỏng vấn",
+        "beingScheduled": "Đang được lên lịch",
+        "successfulHires": "Tuyển thành công",
+        "activeChats": "{{count}} cuộc trò chuyện đang hoạt động"
       },
       "funnel": {
-        "title": "Phá»…u tuyá»ƒn dá»¥ng",
-        "description": "Tá»•ng há»£p tá»« tráº¡ng thÃ¡i á»©ng tuyá»ƒn hiá»‡n táº¡i trong há»‡ thá»‘ng.",
-        "snapshot": "áº¢nh chá»¥p",
-        "live": "Trá»±c tiáº¿p",
-        "newCvs": "CV má»›i",
-        "shortlisted": "VÃ o danh sÃ¡ch chá»n",
-        "interviews": "Phá»ng váº¥n",
-        "hired": "ÄÃ£ tuyá»ƒn",
-        "rejected": "ÄÃ£ tá»« chá»‘i",
-        "profiles": "{{count}} há»“ sÆ¡"
+        "title": "Phễu tuyển dụng",
+        "description": "Tổng hợp từ trạng thái ứng tuyển hiện tại trong hệ thống.",
+        "snapshot": "Ảnh chụp",
+        "live": "Trực tiếp",
+        "newCvs": "CV mới",
+        "shortlisted": "Vào danh sách chọn",
+        "interviews": "Phỏng vấn",
+        "hired": "Đã tuyển",
+        "rejected": "Đã từ chối",
+        "profiles": "{{count}} hồ sơ"
       },
       "today": {
-        "title": "Lá»‹ch hÃ´m nay",
-        "description": "CÃ¡c lá»‹ch phá»ng váº¥n diá»…n ra trong ngÃ y hÃ´m nay.",
-        "emptyTitle": "HÃ´m nay chÆ°a cÃ³ lá»‹ch phá»ng váº¥n",
-        "emptyDescription": "Khi cÃ³ lá»‹ch phá»ng váº¥n trong ngÃ y, chÃºng sáº½ xuáº¥t hiá»‡n táº¡i Ä‘Ã¢y.",
-        "noTime": "ChÆ°a Ä‘áº·t thá»i gian",
-        "candidate": "á»¨ng viÃªn"
+        "title": "Lịch hôm nay",
+        "description": "Các lịch phỏng vấn diễn ra trong ngày hôm nay.",
+        "emptyTitle": "Hôm nay chưa có lịch phỏng vấn",
+        "emptyDescription": "Khi có lịch phỏng vấn trong ngày, chúng sẽ xuất hiện tại đây.",
+        "noTime": "Chưa đặt thời gian",
+        "candidate": "Ứng viên"
       },
       "activeJobs": {
-        "title": "Tin tuyá»ƒn dá»¥ng Ä‘ang hoáº¡t Ä‘á»™ng",
-        "description": "CÃ¡c vá»‹ trÃ­ Ä‘ang má»Ÿ gáº§n Ä‘Ã¢y nháº¥t.",
-        "viewAll": "Xem táº¥t cáº£"
+        "title": "Tin tuyển dụng đang hoạt động",
+        "description": "Các vị trí đang mở gần đây nhất.",
+        "viewAll": "Xem tất cả"
       },
       "topCandidates": {
-        "title": "á»¨ng viÃªn ná»•i báº­t",
-        "description": "CÃ¡c há»“ sÆ¡ á»©ng tuyá»ƒn má»›i Ä‘Æ°á»£c gá»­i tá»« backend.",
-        "viewCandidates": "Xem á»©ng viÃªn"
+        "title": "Ứng viên nổi bật",
+        "description": "Các hồ sơ ứng tuyển mới được gửi từ backend.",
+        "viewCandidates": "Xem ứng viên"
       }
     },
     "jobs": {
       "page": {
-        "eyebrow": "Quáº£n lÃ½ viá»‡c lÃ m",
-        "title": "Tin tuyá»ƒn dá»¥ng cá»§a cÃ´ng ty",
-        "description": "Theo dÃµi vá»‹ trÃ­ Ä‘ang má»Ÿ, sá»‘ lÆ°á»£ng á»©ng viÃªn vÃ  thá»i gian cáº­p nháº­t má»›i nháº¥t.",
-        "addJob": "ThÃªm viá»‡c lÃ m",
-        "sectionTitle": "Táº¥t cáº£ tin tuyá»ƒn dá»¥ng",
-        "sectionDescription": "Dá»¯ liá»‡u Ä‘Æ°á»£c láº¥y trá»±c tiáº¿p tá»« endpoint viá»‡c lÃ m cá»§a nhÃ  tuyá»ƒn dá»¥ng.",
-        "loadingTitle": "Äang táº£i viá»‡c lÃ m",
-        "loadingDescription": "Há»‡ thá»‘ng Ä‘ang láº¥y danh sÃ¡ch tin tuyá»ƒn dá»¥ng cá»§a cÃ´ng ty.",
-        "failedTitle": "KhÃ´ng táº£i Ä‘Æ°á»£c viá»‡c lÃ m"
+        "eyebrow": "Quản lý việc làm",
+        "title": "Tin tuyển dụng của công ty",
+        "description": "Theo dõi vị trí đang mở, số lượng ứng viên và thời gian cập nhật mới nhất.",
+        "addJob": "Thêm việc làm",
+        "sectionTitle": "Tất cả tin tuyển dụng",
+        "sectionDescription": "Dữ liệu được lấy trực tiếp từ endpoint việc làm của nhà tuyển dụng.",
+        "loadingTitle": "Đang tải việc làm",
+        "loadingDescription": "Hệ thống đang lấy danh sách tin tuyển dụng của công ty.",
+        "failedTitle": "Không tải được việc làm"
       },
       "empty": {
-        "noJobsTitle": "ChÆ°a cÃ³ tin tuyá»ƒn dá»¥ng",
-        "noJobsDescription": "Táº¡o vá»‹ trÃ­ Ä‘áº§u tiÃªn Ä‘á»ƒ báº¯t Ä‘áº§u nháº­n há»“ sÆ¡ á»©ng viÃªn.",
-        "noResultsTitle": "KhÃ´ng tÃ¬m tháº¥y viá»‡c lÃ m",
-        "noResultsDescription": "HÃ£y thá»­ thay Ä‘á»•i tá»« khÃ³a tÃ¬m kiáº¿m."
+        "noJobsTitle": "Chưa có tin tuyển dụng",
+        "noJobsDescription": "Tạo vị trí đầu tiên để bắt đầu nhận hồ sơ ứng viên.",
+        "noResultsTitle": "Không tìm thấy việc làm",
+        "noResultsDescription": "Hãy thử thay đổi từ khóa tìm kiếm."
       },
       "filters": {
-        "searchPlaceholder": "TÃ¬m theo tiÃªu Ä‘á», danh má»¥c, Ä‘á»‹a Ä‘iá»ƒm..."
+        "searchPlaceholder": "Tìm theo tiêu đề, danh mục, địa điểm..."
       },
       "table": {
-        "jobTitle": "TiÃªu Ä‘á» viá»‡c lÃ m",
-        "category": "Danh má»¥c",
-        "location": "Äá»‹a Ä‘iá»ƒm",
-        "salary": "Má»©c lÆ°Æ¡ng",
-        "applicants": "á»¨ng viÃªn",
-        "status": "Tráº¡ng thÃ¡i",
-        "updated": "Cáº­p nháº­t",
-        "updatedDate": "NgÃ y cáº­p nháº­t",
-        "action": "Thao tÃ¡c",
-        "jobType": "Loáº¡i viá»‡c lÃ m",
-        "experience": "Kinh nghiá»‡m",
-        "level": "Cáº¥p báº­c"
+        "jobTitle": "Tiêu đề việc làm",
+        "category": "Danh mục",
+        "location": "Địa điểm",
+        "salary": "Mức lương",
+        "applicants": "Ứng viên",
+        "status": "Trạng thái",
+        "updated": "Cập nhật",
+        "updatedDate": "Ngày cập nhật",
+        "action": "Thao tác",
+        "jobType": "Loại việc làm",
+        "experience": "Kinh nghiệm",
+        "level": "Cấp bậc"
       },
       "modal": {
-        "jobDetails": "Chi tiáº¿t viá»‡c lÃ m",
-        "remote": "LÃ m tá»« xa",
-        "negotiable": "Thá»a thuáº­n",
-        "notSpecified": "ChÆ°a xÃ¡c Ä‘á»‹nh",
-        "viewApplications": "Xem há»“ sÆ¡ á»©ng tuyá»ƒn"
+        "jobDetails": "Chi tiết việc làm",
+        "remote": "Làm từ xa",
+        "negotiable": "Thỏa thuận",
+        "notSpecified": "Chưa xác định",
+        "viewApplications": "Xem hồ sơ ứng tuyển"
       },
       "create": {
-        "back": "Quay láº¡i viá»‡c lÃ m",
-        "eyebrow": "Táº¡o tin má»›i",
-        "title": "ThÃªm vá»‹ trÃ­ tuyá»ƒn dá»¥ng má»›i",
-        "description": "Äiá»n thÃ´ng tin bÃªn dÆ°á»›i Ä‘á»ƒ táº¡o tin tuyá»ƒn dá»¥ng má»›i. Vá»‹ trÃ­ sáº½ Ä‘Æ°á»£c Ä‘Äƒng ngay cho nhÃ³m á»©ng viÃªn.",
-        "sectionTitle": "Chi tiáº¿t viá»‡c lÃ m",
-        "sectionDescription": "Nháº­p Ä‘áº§y Ä‘á»§ thÃ´ng tin cáº§n thiáº¿t cho tin tuyá»ƒn dá»¥ng.",
-        "loadError": "KhÃ´ng thá»ƒ táº£i tÃ¹y chá»n biá»ƒu máº«u viá»‡c lÃ m tá»« backend.",
-        "requiredError": "Vui lÃ²ng Ä‘iá»n Ä‘áº§y Ä‘á»§ cÃ¡c trÆ°á»ng báº¯t buá»™c.",
-        "submitError": "Hiá»‡n chÆ°a thá»ƒ táº¡o viá»‡c lÃ m nÃ y.",
-        "fallbackRequirement": "YÃªu cáº§u sáº½ Ä‘Æ°á»£c nhÃ  tuyá»ƒn dá»¥ng cáº­p nháº­t sau.",
+        "back": "Quay lại việc làm",
+        "eyebrow": "Tạo tin mới",
+        "title": "Thêm vị trí tuyển dụng mới",
+        "description": "Điền thông tin bên dưới để tạo tin tuyển dụng mới. Vị trí sẽ được đăng ngay cho nhóm ứng viên.",
+        "sectionTitle": "Chi tiết việc làm",
+        "sectionDescription": "Nhập đầy đủ thông tin cần thiết cho tin tuyển dụng.",
+        "loadError": "Không thể tải tùy chọn biểu mẫu việc làm từ backend.",
+        "requiredError": "Vui lòng điền đầy đủ các trường bắt buộc.",
+        "submitError": "Hiện chưa thể tạo việc làm này.",
+        "fallbackRequirement": "Yêu cầu sẽ được nhà tuyển dụng cập nhật sau.",
         "labels": {
-          "positionTitle": "TÃªn vá»‹ trÃ­ *",
-          "description": "MÃ´ táº£ *",
-          "category": "Danh má»¥c *",
-          "jobType": "Loáº¡i viá»‡c lÃ m *",
-          "location": "Äá»‹a Ä‘iá»ƒm",
-          "salary": "Má»©c lÆ°Æ¡ng *",
-          "requirements": "YÃªu cáº§u"
+          "positionTitle": "Tên vị trí *",
+          "description": "Mô tả *",
+          "category": "Danh mục *",
+          "jobType": "Loại việc làm *",
+          "location": "Địa điểm",
+          "salary": "Mức lương *",
+          "requirements": "Yêu cầu"
         },
         "placeholders": {
-          "positionTitle": "Ká»¹ sÆ° Backend Senior",
-          "description": "MÃ´ táº£ vai trÃ², trÃ¡ch nhiá»‡m vÃ  bá»‘i cáº£nh Ä‘á»™i nhÃ³m.",
-          "location": "ÄÃ  Náºµng",
+          "positionTitle": "Kỹ sư Backend Senior",
+          "description": "Mô tả vai trò, trách nhiệm và bối cảnh đội nhóm.",
+          "location": "Đà Nẵng",
           "salary": "2500 - 3500",
-          "requirements": "Má»—i dÃ²ng lÃ  má»™t yÃªu cáº§u"
+          "requirements": "Mỗi dòng là một yêu cầu"
         },
-        "submit": "Táº¡o viá»‡c lÃ m"
+        "submit": "Tạo việc làm"
       }
     },
     "interviews": {
       "page": {
-        "eyebrow": "Lá»‹ch phá»ng váº¥n",
-        "title": "Lá»‹ch phá»ng váº¥n",
-        "description": "Lá»‹ch phá»ng váº¥n cá»§a cÃ´ng ty gá»“m á»©ng viÃªn, vÃ²ng phá»ng váº¥n vÃ  ngÆ°á»i phá»ng váº¥n.",
-        "addSchedule": "ThÃªm lá»‹ch",
-        "sectionTitle": "Táº¥t cáº£ lá»‹ch phá»ng váº¥n",
-        "sectionDescription": "Dá»¯ liá»‡u Ä‘Æ°á»£c láº¥y tá»« InterviewSchedule qua endpoint nhÃ  tuyá»ƒn dá»¥ng.",
-        "loadingTitle": "Äang táº£i lá»‹ch phá»ng váº¥n",
-        "loadingDescription": "Há»‡ thá»‘ng Ä‘ang Ä‘á»“ng bá»™ lá»‹ch phá»ng váº¥n má»›i nháº¥t.",
-        "failedTitle": "KhÃ´ng táº£i Ä‘Æ°á»£c lá»‹ch phá»ng váº¥n"
+        "eyebrow": "Lịch phỏng vấn",
+        "title": "Lịch phỏng vấn",
+        "description": "Lịch phỏng vấn của công ty gồm ứng viên, vòng phỏng vấn và người phỏng vấn.",
+        "addSchedule": "Thêm lịch",
+        "sectionTitle": "Tất cả lịch phỏng vấn",
+        "sectionDescription": "Dữ liệu được lấy từ InterviewSchedule qua endpoint nhà tuyển dụng.",
+        "loadingTitle": "Đang tải lịch phỏng vấn",
+        "loadingDescription": "Hệ thống đang đồng bộ lịch phỏng vấn mới nhất.",
+        "failedTitle": "Không tải được lịch phỏng vấn"
       },
       "empty": {
-        "noInterviewsTitle": "ChÆ°a cÃ³ lá»‹ch phá»ng váº¥n",
-        "noInterviewsDescription": "Khi báº¡n táº¡o lá»‹ch phá»ng váº¥n, lá»‹ch sáº½ xuáº¥t hiá»‡n táº¡i Ä‘Ã¢y.",
-        "noResultsTitle": "KhÃ´ng tÃ¬m tháº¥y lá»‹ch phá»ng váº¥n",
-        "noResultsDescription": "HÃ£y thá»­ thay Ä‘á»•i tá»« khÃ³a tÃ¬m kiáº¿m hoáº·c bá»™ lá»c."
+        "noInterviewsTitle": "Chưa có lịch phỏng vấn",
+        "noInterviewsDescription": "Khi bạn tạo lịch phỏng vấn, lịch sẽ xuất hiện tại đây.",
+        "noResultsTitle": "Không tìm thấy lịch phỏng vấn",
+        "noResultsDescription": "Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc."
       },
       "filters": {
-        "searchPlaceholder": "TÃ¬m theo á»©ng viÃªn, viá»‡c lÃ m, Ä‘á»‹a Ä‘iá»ƒm...",
-        "allStatus": "Táº¥t cáº£ tráº¡ng thÃ¡i",
-        "sortDate": "Sáº¯p xáº¿p: NgÃ y",
-        "sortStatus": "Sáº¯p xáº¿p: Tráº¡ng thÃ¡i"
+        "searchPlaceholder": "Tìm theo ứng viên, việc làm, địa điểm...",
+        "allStatus": "Tất cả trạng thái",
+        "sortDate": "Sắp xếp: Ngày",
+        "sortStatus": "Sắp xếp: Trạng thái"
       },
       "table": {
-        "candidate": "á»¨ng viÃªn",
-        "jobTitle": "Vá»‹ trÃ­ viá»‡c lÃ m",
-        "date": "NgÃ y",
-        "time": "Giá»",
-        "dateTime": "NgÃ y & giá»",
-        "interviewType": "HÃ¬nh thá»©c phá»ng váº¥n",
-        "location": "Äá»‹a Ä‘iá»ƒm",
-        "status": "Tráº¡ng thÃ¡i",
-        "action": "Thao tÃ¡c",
-        "unknown": "ChÆ°a rÃµ",
-        "notSpecified": "ChÆ°a xÃ¡c Ä‘á»‹nh",
-        "interviewer": "NgÆ°á»i phá»ng váº¥n",
-        "round": "VÃ²ng {{round}}"
+        "candidate": "Ứng viên",
+        "jobTitle": "Vị trí việc làm",
+        "date": "Ngày",
+        "time": "Giờ",
+        "dateTime": "Ngày & giờ",
+        "interviewType": "Hình thức phỏng vấn",
+        "location": "Địa điểm",
+        "status": "Trạng thái",
+        "action": "Thao tác",
+        "unknown": "Chưa rõ",
+        "notSpecified": "Chưa xác định",
+        "interviewer": "Người phỏng vấn",
+        "round": "Vòng {{round}}"
       },
       "modal": {
-        "schedule": "Lá»‹ch phá»ng váº¥n",
-        "meetingDetails": "ThÃ´ng tin cuá»™c há»p",
-        "meetingLink": "Link cuá»™c há»p",
-        "interviewLocation": "Äá»‹a Ä‘iá»ƒm phá»ng váº¥n",
-        "candidateInformation": "ThÃ´ng tin á»©ng viÃªn",
-        "notes": "Ghi chÃº phá»ng váº¥n",
-        "reschedule": "Äá»•i lá»‹ch"
+        "schedule": "Lịch phỏng vấn",
+        "meetingDetails": "Thông tin cuộc họp",
+        "meetingLink": "Link cuộc họp",
+        "interviewLocation": "Địa điểm phỏng vấn",
+        "candidateInformation": "Thông tin ứng viên",
+        "notes": "Ghi chú phỏng vấn",
+        "reschedule": "Đổi lịch"
       },
       "scheduleForm": {
-        "title": "LÃªn lá»‹ch phá»ng váº¥n",
-        "description": "Lá»‹ch má»›i sáº½ Ä‘Æ°á»£c thÃªm vÃ o báº£ng phá»ng váº¥n vÃ  dá»¯ liá»‡u á»©ng viÃªn mock.",
-        "candidateName": "TÃªn á»©ng viÃªn",
-        "candidateNamePlaceholder": "Nguyá»…n VÄƒn A",
+        "title": "Lên lịch phỏng vấn",
+        "description": "Lịch mới sẽ được thêm vào bảng phỏng vấn và dữ liệu ứng viên mock.",
+        "candidateName": "Tên ứng viên",
+        "candidateNamePlaceholder": "Nguyễn Văn A",
         "email": "Email",
         "emailPlaceholder": "ungvien@example.com",
-        "interviewer": "NgÆ°á»i phá»ng váº¥n",
-        "interviewerPlaceholder": "Nguyá»…n Minh Recruiter",
-        "position": "Vá»‹ trÃ­",
-        "dateTime": "NgÃ y & giá»",
-        "interviewType": "HÃ¬nh thá»©c phá»ng váº¥n",
-        "technical": "Ká»¹ thuáº­t",
-        "hrScreen": "SÃ ng lá»c HR",
-        "locationLink": "Äá»‹a Ä‘iá»ƒm / Link",
-        "locationLinkPlaceholder": "Google Meet / VÄƒn phÃ²ng táº§ng 3",
-        "addToSchedule": "ThÃªm vÃ o lá»‹ch"
+        "interviewer": "Người phỏng vấn",
+        "interviewerPlaceholder": "Nguyễn Minh Recruiter",
+        "position": "Vị trí",
+        "dateTime": "Ngày & giờ",
+        "interviewType": "Hình thức phỏng vấn",
+        "technical": "Kỹ thuật",
+        "hrScreen": "Sàng lọc HR",
+        "locationLink": "Địa điểm / Link",
+        "locationLinkPlaceholder": "Google Meet / Văn phòng tầng 3",
+        "addToSchedule": "Thêm vào lịch"
       },
       "create": {
-        "back": "Quay láº¡i phá»ng váº¥n",
-        "eyebrow": "Lá»‹ch phá»ng váº¥n",
-        "title": "Táº¡o lá»‹ch phá»ng váº¥n má»›i",
-        "description": "Thiáº¿t láº­p buá»•i phá»ng váº¥n má»›i vá»›i á»©ng viÃªn cho má»™t vá»‹ trÃ­ cá»¥ thá»ƒ.",
-        "sectionTitle": "LÃªn lá»‹ch phá»ng váº¥n",
-        "sectionDescription": "Äiá»n thÃ´ng tin phá»ng váº¥n gá»“m ngÃ y, giá», Ä‘á»‹a Ä‘iá»ƒm hoáº·c link cuá»™c há»p.",
-        "loadError": "KhÃ´ng thá»ƒ táº£i á»©ng viÃªn tá»« backend.",
-        "submitError": "KhÃ´ng thá»ƒ táº¡o lá»‹ch phá»ng váº¥n.",
-        "selectCandidateTitle": "Chá»n á»©ng viÃªn & vá»‹ trÃ­",
-        "candidate": "á»¨ng viÃªn *",
-        "chooseCandidate": "Chá»n á»©ng viÃªn...",
-        "jobPosition": "Vá»‹ trÃ­ viá»‡c lÃ m",
-        "scheduleTitle": "Lá»‹ch phá»ng váº¥n",
-        "interviewDate": "NgÃ y phá»ng váº¥n *",
-        "startTime": "Giá» báº¯t Ä‘áº§u *",
-        "endTime": "Giá» káº¿t thÃºc *",
-        "methodTitle": "HÃ¬nh thá»©c phá»ng váº¥n",
-        "locationTitle": "Äá»‹a Ä‘iá»ƒm phá»ng váº¥n",
-        "meetingLink": "Link / ná»n táº£ng há»p *",
-        "meetingLinkPlaceholder": "https://meet.google.com/... hoáº·c link Zoom",
-        "locationDetails": "Äá»‹a Ä‘iá»ƒm / thÃ´ng tin cuá»™c gá»i",
-        "locationPlaceholder": "VÄƒn phÃ²ng táº§ng 3 - PhÃ²ng há»p A hoáº·c thÃ´ng tin gá»i Ä‘iá»‡n",
-        "notesTitle": "Ghi chÃº bá»• sung",
-        "notesPlaceholder": "Ghi chÃº ná»™i bá»™ cho lá»‹ch nÃ y",
-        "submit": "Táº¡o lá»‹ch",
+        "back": "Quay lại phỏng vấn",
+        "eyebrow": "Lịch phỏng vấn",
+        "title": "Tạo lịch phỏng vấn mới",
+        "description": "Thiết lập buổi phỏng vấn mới với ứng viên cho một vị trí cụ thể.",
+        "sectionTitle": "Lên lịch phỏng vấn",
+        "sectionDescription": "Điền thông tin phỏng vấn gồm ngày, giờ, địa điểm hoặc link cuộc họp.",
+        "loadError": "Không thể tải ứng viên từ backend.",
+        "submitError": "Không thể tạo lịch phỏng vấn.",
+        "selectCandidateTitle": "Chọn ứng viên & vị trí",
+        "candidate": "Ứng viên *",
+        "chooseCandidate": "Chọn ứng viên...",
+        "jobPosition": "Vị trí việc làm",
+        "scheduleTitle": "Lịch phỏng vấn",
+        "interviewDate": "Ngày phỏng vấn *",
+        "startTime": "Giờ bắt đầu *",
+        "endTime": "Giờ kết thúc *",
+        "methodTitle": "Hình thức phỏng vấn",
+        "locationTitle": "Địa điểm phỏng vấn",
+        "meetingLink": "Link / nền tảng họp *",
+        "meetingLinkPlaceholder": "https://meet.google.com/... hoặc link Zoom",
+        "locationDetails": "Địa điểm / thông tin cuộc gọi",
+        "locationPlaceholder": "Văn phòng tầng 3 - Phòng họp A hoặc thông tin gọi điện",
+        "notesTitle": "Ghi chú bổ sung",
+        "notesPlaceholder": "Ghi chú nội bộ cho lịch này",
+        "submit": "Tạo lịch",
         "validation": {
-          "candidate": "Vui lÃ²ng chá»n á»©ng viÃªn",
-          "date": "Vui lÃ²ng chá»n ngÃ y phá»ng váº¥n",
-          "startTime": "Vui lÃ²ng nháº­p giá» báº¯t Ä‘áº§u",
-          "endTime": "Vui lÃ²ng nháº­p giá» káº¿t thÃºc",
-          "meetingLink": "Vui lÃ²ng cung cáº¥p link há»p cho phá»ng váº¥n online",
-          "location": "Vui lÃ²ng cung cáº¥p Ä‘á»‹a Ä‘iá»ƒm cho phá»ng váº¥n trá»±c tiáº¿p"
+          "candidate": "Vui lòng chọn ứng viên",
+          "date": "Vui lòng chọn ngày phỏng vấn",
+          "startTime": "Vui lòng nhập giờ bắt đầu",
+          "endTime": "Vui lòng nhập giờ kết thúc",
+          "meetingLink": "Vui lòng cung cấp link họp cho phỏng vấn online",
+          "location": "Vui lòng cung cấp địa điểm cho phỏng vấn trực tiếp"
         },
         "types": {
           "Online": "Online",
-          "Offline": "Trá»±c tiáº¿p",
-          "Phone": "Äiá»‡n thoáº¡i"
+          "Offline": "Trực tiếp",
+          "Phone": "Điện thoại"
         }
       }
     },
     "candidates": {
       "page": {
-        "eyebrow": "Pipeline á»©ng viÃªn",
-        "title": "á»¨ng viÃªn Ä‘Ã£ ná»™p há»“ sÆ¡",
-        "description": "Tá»•ng há»£p tá»« há»“ sÆ¡ á»©ng tuyá»ƒn vÃ  thÃ´ng tin á»©ng viÃªn liÃªn quan Ä‘áº¿n viá»‡c lÃ m cá»§a cÃ´ng ty.",
-        "export": "Xuáº¥t file",
-        "sectionTitle": "Danh sÃ¡ch á»©ng viÃªn",
-        "sectionDescription": "Theo dÃµi giai Ä‘oáº¡n hiá»‡n táº¡i, ká»¹ nÄƒng chÃ­nh vÃ  lá»‹ch phá»ng váº¥n sáº¯p tá»›i.",
-        "loadingTitle": "Äang táº£i á»©ng viÃªn",
-        "loadingDescription": "Há»‡ thá»‘ng Ä‘ang láº¥y danh sÃ¡ch á»©ng viÃªn má»›i nháº¥t.",
-        "failedTitle": "KhÃ´ng táº£i Ä‘Æ°á»£c á»©ng viÃªn"
+        "eyebrow": "Pipeline ứng viên",
+        "title": "Ứng viên đã nộp hồ sơ",
+        "description": "Tổng hợp từ hồ sơ ứng tuyển và thông tin ứng viên liên quan đến việc làm của công ty.",
+        "export": "Xuất file",
+        "sectionTitle": "Danh sách ứng viên",
+        "sectionDescription": "Theo dõi giai đoạn hiện tại, kỹ năng chính và lịch phỏng vấn sắp tới.",
+        "loadingTitle": "Đang tải ứng viên",
+        "loadingDescription": "Hệ thống đang lấy danh sách ứng viên mới nhất.",
+        "failedTitle": "Không tải được ứng viên"
       },
       "filters": {
-        "searchPlaceholder": "TÃ¬m theo tÃªn, email, ká»¹ nÄƒng...",
-        "allJobs": "Táº¥t cáº£ viá»‡c lÃ m",
-        "allStages": "Táº¥t cáº£ giai Ä‘oáº¡n"
+        "searchPlaceholder": "Tìm theo tên, email, kỹ năng...",
+        "allJobs": "Tất cả việc làm",
+        "allStages": "Tất cả giai đoạn"
       },
       "empty": {
-        "noCandidatesTitle": "ChÆ°a cÃ³ á»©ng viÃªn",
-        "noCandidatesDescription": "Khi á»©ng viÃªn ná»™p há»“ sÆ¡ vÃ o tin tuyá»ƒn dá»¥ng, há» sáº½ xuáº¥t hiá»‡n táº¡i Ä‘Ã¢y.",
-        "noResultsTitle": "KhÃ´ng tÃ¬m tháº¥y á»©ng viÃªn",
-        "noResultsDescription": "HÃ£y thá»­ thay Ä‘á»•i tá»« khÃ³a tÃ¬m kiáº¿m hoáº·c bá»™ lá»c."
+        "noCandidatesTitle": "Chưa có ứng viên",
+        "noCandidatesDescription": "Khi ứng viên nộp hồ sơ vào tin tuyển dụng, họ sẽ xuất hiện tại đây.",
+        "noResultsTitle": "Không tìm thấy ứng viên",
+        "noResultsDescription": "Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc."
       },
       "table": {
-        "candidateName": "TÃªn á»©ng viÃªn",
-        "jobTitle": "Vá»‹ trÃ­ á»©ng tuyá»ƒn",
+        "candidateName": "Tên ứng viên",
+        "jobTitle": "Vị trí ứng tuyển",
         "email": "Email",
-        "stage": "Giai Ä‘oáº¡n",
-        "skills": "Ká»¹ nÄƒng",
-        "appliedDate": "NgÃ y ná»™p",
-        "action": "Thao tÃ¡c",
-        "applied": "ÄÃ£ ná»™p",
+        "stage": "Giai đoạn",
+        "skills": "Kỹ năng",
+        "appliedDate": "Ngày nộp",
+        "action": "Thao tác",
+        "applied": "Đã nộp",
         "view": "Xem",
-        "unknown": "ChÆ°a rÃµ"
+        "unknown": "Chưa rõ"
       },
       "like": {
         "like": "Like",
-        "liked": "ÄÃ£ like",
-        "updating": "Äang lÆ°u...",
-        "loading": "Äang táº£i á»©ng viÃªn Ä‘Ã£ like..."
+        "liked": "Đã like",
+        "updating": "Đang lưu...",
+        "loading": "Đang tải ứng viên đã like..."
       },
       "modal": {
-        "closeDetails": "ÄÃ³ng chi tiáº¿t á»©ng viÃªn",
-        "appliedFor": "á»¨ng tuyá»ƒn vá»‹ trÃ­: {{job}}",
-        "contactInformation": "ThÃ´ng tin liÃªn há»‡",
-        "phone": "Sá»‘ Ä‘iá»‡n thoáº¡i",
-        "applicationStatus": "Tráº¡ng thÃ¡i á»©ng tuyá»ƒn",
-        "jobPosition": "Vá»‹ trÃ­ viá»‡c lÃ m",
-        "close": "ÄÃ³ng",
-        "reject": "Tá»« chá»‘i",
-        "accept": "Duyá»‡t",
-        "updating": "Äang cáº­p nháº­t...",
-        "acceptedMessage": "ÄÃ£ duyá»‡t á»©ng viÃªn. Báº¡n cÃ³ thá»ƒ lÃªn lá»‹ch phá»ng váº¥n.",
-        "acceptError": "Hiá»‡n chÆ°a thá»ƒ duyá»‡t á»©ng viÃªn nÃ y.",
-        "rejectedMessage": "ÄÃ£ tá»« chá»‘i á»©ng viÃªn.",
-        "rejectError": "Hiá»‡n chÆ°a thá»ƒ tá»« chá»‘i á»©ng viÃªn nÃ y.",
-        "rejectReason": "NhÃ  tuyá»ƒn dá»¥ng Ä‘Ã£ tá»« chá»‘i"
+        "closeDetails": "Đóng chi tiết ứng viên",
+        "appliedFor": "Ứng tuyển vị trí: {{job}}",
+        "contactInformation": "Thông tin liên hệ",
+        "phone": "Số điện thoại",
+        "applicationStatus": "Trạng thái ứng tuyển",
+        "jobPosition": "Vị trí việc làm",
+        "close": "Đóng",
+        "reject": "Từ chối",
+        "accept": "Duyệt",
+        "updating": "Đang cập nhật...",
+        "acceptedMessage": "Đã duyệt ứng viên. Bạn có thể lên lịch phỏng vấn.",
+        "acceptError": "Hiện chưa thể duyệt ứng viên này.",
+        "rejectedMessage": "Đã từ chối ứng viên.",
+        "rejectError": "Hiện chưa thể từ chối ứng viên này.",
+        "rejectReason": "Nhà tuyển dụng đã từ chối"
       },
       "status": {
-        "APPLIED": "ÄÃ£ ná»™p",
-        "PENDING": "Äang chá»",
-        "PASSED": "ÄÃ£ qua vÃ²ng lá»c",
-        "ACCEPTED": "ÄÃ£ duyá»‡t",
-        "REJECTED": "ÄÃ£ tá»« chá»‘i",
-        "INTERVIEW_SCHEDULED": "ÄÃ£ lÃªn lá»‹ch phá»ng váº¥n",
-        "INTERVIEW_COMPLETED": "ÄÃ£ phá»ng váº¥n xong",
-        "INTERVIEW_CANCELLED": "ÄÃ£ há»§y phá»ng váº¥n"
+        "APPLIED": "Đã nộp",
+        "PENDING": "Đang chờ",
+        "PASSED": "Đã qua vòng lọc",
+        "ACCEPTED": "Đã duyệt",
+        "REJECTED": "Đã từ chối",
+        "INTERVIEW_SCHEDULED": "Đã lên lịch phỏng vấn",
+        "INTERVIEW_COMPLETED": "Đã phỏng vấn xong",
+        "INTERVIEW_CANCELLED": "Đã hủy phỏng vấn"
       }
     }
   },
   "seekerCompanies": {
     "common": {
-      "searchLabel": "TÃ¬m cÃ´ng ty",
+      "searchLabel": "Tìm công ty",
       "pageLabel": "Trang {{page}} / {{total}}",
-      "previous": "TrÆ°á»›c",
+      "previous": "Trước",
       "next": "Sau",
-      "viewCompany": "Xem cÃ´ng ty",
-      "showAppliedJobs": "Xem job Ä‘Ã£ á»©ng tuyá»ƒn",
-      "hideAppliedJobs": "áº¨n job Ä‘Ã£ á»©ng tuyá»ƒn",
-      "statusFilter": "Tráº¡ng thÃ¡i á»©ng tuyá»ƒn",
-      "allStatuses": "Táº¥t cáº£ tráº¡ng thÃ¡i",
-      "appliedDate": "NgÃ y á»©ng tuyá»ƒn",
-      "updatedDate": "NgÃ y cáº­p nháº­t",
-      "salary": "Má»©c lÆ°Æ¡ng",
-      "location": "Äá»‹a Ä‘iá»ƒm",
-      "jobType": "Loáº¡i cÃ´ng viá»‡c",
-      "category": "Danh má»¥c",
+      "viewCompany": "Xem công ty",
+      "showAppliedJobs": "Xem job đã ứng tuyển",
+      "hideAppliedJobs": "Ẩn job đã ứng tuyển",
+      "statusFilter": "Trạng thái ứng tuyển",
+      "allStatuses": "Tất cả trạng thái",
+      "appliedDate": "Ngày ứng tuyển",
+      "updatedDate": "Ngày cập nhật",
+      "salary": "Mức lương",
+      "location": "Địa điểm",
+      "jobType": "Loại công việc",
+      "category": "Danh mục",
       "viewJob": "Xem job",
-      "notSpecified": "ChÆ°a xÃ¡c Ä‘á»‹nh"
+      "notSpecified": "Chưa xác định"
     },
     "applied": {
-      "eyebrow": "CÃ´ng ty Ä‘Ã£ á»©ng tuyá»ƒn",
-      "title": "CÃ¡c cÃ´ng ty báº¡n Ä‘Ã£ á»©ng tuyá»ƒn",
-      "description": "Theo dÃµi nhá»¯ng cÃ´ng ty báº¡n Ä‘Ã£ ná»™p há»“ sÆ¡, lá»c theo tráº¡ng thÃ¡i hiá»‡n táº¡i vÃ  xem ngay chi tiáº¿t tá»«ng job Ä‘Ã£ apply mÃ  khÃ´ng cáº§n rá»i trang.",
-      "searchPlaceholder": "TÃ¬m cÃ´ng ty Ä‘Ã£ á»©ng tuyá»ƒn...",
-      "totalLabel": "CÃ´ng ty Ä‘Ã£ á»©ng tuyá»ƒn",
-      "emptyTitle": "ChÆ°a cÃ³ cÃ´ng ty nÃ o Ä‘Ã£ á»©ng tuyá»ƒn",
-      "emptyDescription": "Khi báº¡n á»©ng tuyá»ƒn vÃ o cÃ¡c job trong há»‡ thá»‘ng, cÃ´ng ty sáº½ hiá»ƒn thá»‹ táº¡i Ä‘Ã¢y.",
-      "loadError": "KhÃ´ng thá»ƒ táº£i danh sÃ¡ch cÃ´ng ty Ä‘Ã£ á»©ng tuyá»ƒn",
+      "eyebrow": "Công ty đã ứng tuyển",
+      "title": "Các công ty bạn đã ứng tuyển",
+      "description": "Theo dõi những công ty bạn đã nộp hồ sơ, lọc theo trạng thái hiện tại và xem ngay chi tiết từng job đã apply mà không cần rời trang.",
+      "searchPlaceholder": "Tìm công ty đã ứng tuyển...",
+      "totalLabel": "Công ty đã ứng tuyển",
+      "emptyTitle": "Chưa có công ty nào đã ứng tuyển",
+      "emptyDescription": "Khi bạn ứng tuyển vào các job trong hệ thống, công ty sẽ hiển thị tại đây.",
+      "loadError": "Không thể tải danh sách công ty đã ứng tuyển",
       "meta": {
-        "latestApplied": "Láº§n á»©ng tuyá»ƒn gáº§n nháº¥t",
-        "positionsApplied": "Sá»‘ vá»‹ trÃ­ Ä‘Ã£ á»©ng tuyá»ƒn",
-        "relatedRoles": "Sá»‘ role liÃªn quan"
+        "latestApplied": "Lần ứng tuyển gần nhất",
+        "positionsApplied": "Số vị trí đã ứng tuyển",
+        "relatedRoles": "Số role liên quan"
       },
       "jobs": {
-        "title": "Danh sÃ¡ch job Ä‘Ã£ á»©ng tuyá»ƒn",
-        "empty": "KhÃ´ng cÃ³ job nÃ o khá»›p vá»›i tráº¡ng thÃ¡i hiá»‡n táº¡i trong cÃ´ng ty nÃ y."
+        "title": "Danh sách job đã ứng tuyển",
+        "empty": "Không có job nào khớp với trạng thái hiện tại trong công ty này."
       }
     },
     "saved": {
-      "eyebrow": "CÃ´ng ty Ä‘Ã£ lÆ°u",
-      "title": "CÃ¡c cÃ´ng ty báº¡n Ä‘Ã£ lÆ°u",
-      "description": "Quáº£n lÃ½ danh sÃ¡ch cÃ´ng ty báº¡n Ä‘ang theo dÃµi Ä‘á»ƒ quay láº¡i xem há»“ sÆ¡ vÃ  cÃ¡c cÆ¡ há»™i tuyá»ƒn dá»¥ng báº¥t cá»© lÃºc nÃ o.",
-      "searchPlaceholder": "TÃ¬m cÃ´ng ty Ä‘Ã£ lÆ°u...",
-      "totalLabel": "CÃ´ng ty Ä‘Ã£ lÆ°u",
-      "emptyTitle": "ChÆ°a cÃ³ cÃ´ng ty nÃ o Ä‘Ã£ lÆ°u",
-      "emptyDescription": "Khi báº¡n theo dÃµi cÃ´ng ty trong há»‡ thá»‘ng, danh sÃ¡ch sáº½ hiá»ƒn thá»‹ táº¡i Ä‘Ã¢y.",
-      "loadError": "KhÃ´ng thá»ƒ táº£i danh sÃ¡ch cÃ´ng ty Ä‘Ã£ lÆ°u",
+      "eyebrow": "Công ty đã lưu",
+      "title": "Các công ty bạn đã lưu",
+      "description": "Quản lý danh sách công ty bạn đang theo dõi để quay lại xem hồ sơ và các cơ hội tuyển dụng bất cứ lúc nào.",
+      "searchPlaceholder": "Tìm công ty đã lưu...",
+      "totalLabel": "Công ty đã lưu",
+      "emptyTitle": "Chưa có công ty nào đã lưu",
+      "emptyDescription": "Khi bạn theo dõi công ty trong hệ thống, danh sách sẽ hiển thị tại đây.",
+      "loadError": "Không thể tải danh sách công ty đã lưu",
       "meta": {
-        "savedDate": "NgÃ y lÆ°u",
-        "companyStatus": "Tráº¡ng thÃ¡i cÃ´ng ty",
-        "relatedRoles": "Sá»‘ role liÃªn quan"
+        "savedDate": "Ngày lưu",
+        "companyStatus": "Trạng thái công ty",
+        "relatedRoles": "Số role liên quan"
       }
     },
     "statuses": {
-      "FOLLOWED": "ÄÃ£ lÆ°u",
-      "ACTIVE": "Äang hoáº¡t Ä‘á»™ng",
-      "INACTIVE": "Táº¡m dá»«ng",
-      "APPLIED": "ÄÃ£ ná»™p",
-      "PENDING": "Äang chá»",
-      "PASSED": "ÄÃ£ qua vÃ²ng lá»c",
-      "ACCEPTED": "ÄÃ£ duyá»‡t",
-      "REJECTED": "ÄÃ£ tá»« chá»‘i",
-      "INTERVIEW_SCHEDULED": "ÄÃ£ lÃªn lá»‹ch phá»ng váº¥n",
-      "INTERVIEW_COMPLETED": "ÄÃ£ hoÃ n thÃ nh phá»ng váº¥n",
-      "INTERVIEW_CANCELLED": "ÄÃ£ há»§y phá»ng váº¥n"
+      "FOLLOWED": "Đã lưu",
+      "ACTIVE": "Đang hoạt động",
+      "INACTIVE": "Tạm dừng",
+      "APPLIED": "Đã nộp",
+      "PENDING": "Đang chờ",
+      "PASSED": "Đã qua vòng lọc",
+      "ACCEPTED": "Đã duyệt",
+      "REJECTED": "Đã từ chối",
+      "INTERVIEW_SCHEDULED": "Đã lên lịch phỏng vấn",
+      "INTERVIEW_COMPLETED": "Đã hoàn thành phỏng vấn",
+      "INTERVIEW_CANCELLED": "Đã hủy phỏng vấn"
     }
   },
   "seekerTracking": {
     "common": {
-      "loadError": "KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u theo dÃµi cá»§a seeker",
+      "loadError": "Không thể tải dữ liệu theo dõi của seeker",
       "pageLabel": "Trang {{page}} / {{total}}",
-      "previous": "TrÆ°á»›c",
+      "previous": "Trước",
       "next": "Sau",
       "viewJob": "Xem job",
-      "viewInterviews": "Xem lá»‹ch phá»ng váº¥n",
-      "viewApplications": "Xem Ä‘Æ¡n á»©ng tuyá»ƒn",
-      "notSpecified": "ChÆ°a xÃ¡c Ä‘á»‹nh",
-      "exportCalendar": "Xuáº¥t .ics",
-      "exportCalendarShort": "Xuáº¥t lá»‹ch",
-      "copyMeetingLink": "Sao chÃ©p liÃªn káº¿t phá»ng váº¥n",
-      "meetingLinkCopied": "ÄÃ£ sao chÃ©p liÃªn káº¿t phá»ng váº¥n vÃ o bá»™ nhá»›.",
-      "openGoogleCalendar": "Má»Ÿ Google Calendar",
-      "openInterviewLink": "Má»Ÿ link phá»ng váº¥n",
-      "joinInterview": "VÃ o buá»•i phá»ng váº¥n",
-      "calendarExported": "ÄÃ£ táº¡o file lá»‹ch {{fileName}}.",
-      "toastSuccessTitle": "ThÃ nh cÃ´ng",
-      "closeToast": "ÄÃ³ng"
+      "viewInterviews": "Xem lịch phỏng vấn",
+      "viewApplications": "Xem đơn ứng tuyển",
+      "notSpecified": "Chưa xác định",
+      "exportCalendar": "Xuất .ics",
+      "exportCalendarShort": "Xuất lịch",
+      "copyMeetingLink": "Sao chép liên kết phỏng vấn",
+      "meetingLinkCopied": "Đã sao chép liên kết phỏng vấn vào bộ nhớ.",
+      "openGoogleCalendar": "Mở Google Calendar",
+      "openInterviewLink": "Mở link phỏng vấn",
+      "joinInterview": "Vào buổi phỏng vấn",
+      "calendarExported": "Đã tạo file lịch {{fileName}}.",
+      "toastSuccessTitle": "Thành công",
+      "closeToast": "Đóng"
     },
     "applicationStatus": {
-      "PENDING": "Äang chá»",
-      "ACCEPTED": "ÄÃ£ qua vÃ²ng lá»c",
-      "REJECTED": "ÄÃ£ bá»‹ tá»« chá»‘i"
+      "PENDING": "Đang chờ",
+      "ACCEPTED": "Đã qua vòng lọc",
+      "REJECTED": "Đã bị từ chối"
     },
     "interviewStatus": {
-      "SCHEDULED": "ÄÃ£ lÃªn lá»‹ch",
-      "COMPLETED": "ÄÃ£ hoÃ n thÃ nh",
-      "CANCELLED": "ÄÃ£ há»§y"
+      "SCHEDULED": "Đã lên lịch",
+      "COMPLETED": "Đã hoàn thành",
+      "CANCELLED": "Đã hủy"
     },
     "interviewType": {
-      "video": "Phá»ng váº¥n video",
-      "phone": "Phá»ng váº¥n Ä‘iá»‡n thoáº¡i",
-      "onsite": "Phá»ng váº¥n trá»±c tiáº¿p"
+      "video": "Phỏng vấn video",
+      "phone": "Phỏng vấn điện thoại",
+      "onsite": "Phỏng vấn trực tiếp"
     },
     "applications": {
-      "eyebrow": "Theo dÃµi á»©ng tuyá»ƒn",
-      "title": "Theo dÃµi cÃ¡c job báº¡n Ä‘Ã£ á»©ng tuyá»ƒn",
-      "description": "Xem láº¡i tá»«ng Ä‘Æ¡n Ä‘Ã£ ná»™p, theo dÃµi tráº¡ng thÃ¡i hiá»‡n táº¡i vÃ  nháº­n biáº¿t nhanh lá»‹ch phá»ng váº¥n tiáº¿p theo mÃ  khÃ´ng cáº§n chuyá»ƒn nhiá»u mÃ n hÃ¬nh.",
+      "eyebrow": "Theo dõi ứng tuyển",
+      "title": "Theo dõi các job bạn đã ứng tuyển",
+      "description": "Xem lại từng đơn đã nộp, theo dõi trạng thái hiện tại và nhận biết nhanh lịch phỏng vấn tiếp theo mà không cần chuyển nhiều màn hình.",
       "metrics": {
-        "total": "ÄÆ¡n á»©ng tuyá»ƒn",
-        "pending": "Äang chá»",
-        "accepted": "ÄÃ£ qua vÃ²ng lá»c",
-        "interviews": "CÃ³ phá»ng váº¥n"
+        "total": "Đơn ứng tuyển",
+        "pending": "Đang chờ",
+        "accepted": "Đã qua vòng lọc",
+        "interviews": "Có phỏng vấn"
       },
       "filters": {
-        "searchPlaceholder": "TÃ¬m theo tÃªn job, cÃ´ng ty, Ä‘á»‹a Ä‘iá»ƒm...",
-        "status": "Tráº¡ng thÃ¡i á»©ng tuyá»ƒn",
-        "allStatuses": "Táº¥t cáº£ tráº¡ng thÃ¡i"
+        "searchPlaceholder": "Tìm theo tên job, công ty, địa điểm...",
+        "status": "Trạng thái ứng tuyển",
+        "allStatuses": "Tất cả trạng thái"
       },
       "meta": {
-        "appliedDate": "NgÃ y á»©ng tuyá»ƒn",
-        "updatedDate": "NgÃ y cáº­p nháº­t",
-        "interviewCount": "Sá»‘ buá»•i phá»ng váº¥n"
+        "appliedDate": "Ngày ứng tuyển",
+        "updatedDate": "Ngày cập nhật",
+        "interviewCount": "Số buổi phỏng vấn"
       },
       "nextInterview": {
-        "title": "Lá»‹ch phá»ng váº¥n tiáº¿p theo",
-        "description": "ÄÆ°á»£c lÃªn lá»‹ch vÃ o {{date}} vá»›i {{interviewer}}."
+        "title": "Lịch phỏng vấn tiếp theo",
+        "description": "Được lên lịch vào {{date}} với {{interviewer}}."
       },
       "actions": {
-        "showAllInterviews": "Xem toÃ n bá»™ lá»‹ch",
-        "hideAllInterviews": "áº¨n toÃ n bá»™ lá»‹ch",
-        "allInterviewsTitle": "ToÃ n bá»™ lá»‹ch phá»ng váº¥n cá»§a application nÃ y"
+        "showAllInterviews": "Xem toàn bộ lịch",
+        "hideAllInterviews": "Ẩn toàn bộ lịch",
+        "allInterviewsTitle": "Toàn bộ lịch phỏng vấn của application này"
       },
-      "rejectionLabel": "Ghi chÃº tá»« nhÃ  tuyá»ƒn dá»¥ng:",
+      "rejectionLabel": "Ghi chú từ nhà tuyển dụng:",
       "empty": {
-        "title": "ChÆ°a tÃ¬m tháº¥y Ä‘Æ¡n á»©ng tuyá»ƒn nÃ o",
-        "description": "CÃ¡c job báº¡n Ä‘Ã£ ná»™p há»“ sÆ¡ sáº½ xuáº¥t hiá»‡n táº¡i Ä‘Ã¢y khi báº¡n báº¯t Ä‘áº§u á»©ng tuyá»ƒn trong há»‡ thá»‘ng."
+        "title": "Chưa tìm thấy đơn ứng tuyển nào",
+        "description": "Các job bạn đã nộp hồ sơ sẽ xuất hiện tại đây khi bạn bắt đầu ứng tuyển trong hệ thống."
       }
     },
     "interviews": {
-      "eyebrow": "Lá»‹ch phá»ng váº¥n",
-      "title": "Quáº£n lÃ½ lá»‹ch phá»ng váº¥n táº¡i má»™t nÆ¡i",
-      "description": "Theo dÃµi cÃ¡c buá»•i sáº¯p tá»›i, cÃ¡c buá»•i Ä‘Ã£ hoÃ n thÃ nh vÃ  cÃ¡c lá»‹ch bá»‹ há»§y gáº¯n vá»›i nhá»¯ng job báº¡n Ä‘Ã£ á»©ng tuyá»ƒn.",
+      "eyebrow": "Lịch phỏng vấn",
+      "title": "Quản lý lịch phỏng vấn tại một nơi",
+      "description": "Theo dõi các buổi sắp tới, các buổi đã hoàn thành và các lịch bị hủy gắn với những job bạn đã ứng tuyển.",
       "metrics": {
-        "total": "Buá»•i phá»ng váº¥n",
-        "upcoming": "Sáº¯p tá»›i",
-        "completed": "ÄÃ£ hoÃ n thÃ nh",
-        "cancelled": "ÄÃ£ há»§y"
+        "total": "Buổi phỏng vấn",
+        "upcoming": "Sắp tới",
+        "completed": "Đã hoàn thành",
+        "cancelled": "Đã hủy"
       },
       "filters": {
-        "searchPlaceholder": "TÃ¬m theo job, cÃ´ng ty, ngÆ°á»i phá»ng váº¥n...",
-        "status": "Tráº¡ng thÃ¡i phá»ng váº¥n",
-        "allStatuses": "Táº¥t cáº£ tráº¡ng thÃ¡i"
+        "searchPlaceholder": "Tìm theo job, công ty, người phỏng vấn...",
+        "status": "Trạng thái phỏng vấn",
+        "allStatuses": "Tất cả trạng thái"
       },
       "cards": {
-        "schedule": "Thá»i gian",
-        "duration": "Thá»i lÆ°á»£ng",
-        "interviewer": "NgÆ°á»i phá»ng váº¥n",
-        "applicationStatus": "Tráº¡ng thÃ¡i á»©ng tuyá»ƒn",
+        "schedule": "Thời gian",
+        "duration": "Thời lượng",
+        "interviewer": "Người phỏng vấn",
+        "applicationStatus": "Trạng thái ứng tuyển",
         "joinLink": "Link tham gia",
-        "feedback": "Pháº£n há»“i",
-        "reason": "LÃ½ do:"
+        "feedback": "Phản hồi",
+        "reason": "Lý do:"
       },
-      "durationValue": "{{count}} phÃºt",
+      "durationValue": "{{count}} phút",
       "empty": {
-        "title": "ChÆ°a cÃ³ lá»‹ch phá»ng váº¥n nÃ o",
-        "description": "Khi nhÃ  tuyá»ƒn dá»¥ng táº¡o lá»‹ch phá»ng váº¥n cho báº¡n, thÃ´ng tin sáº½ hiá»ƒn thá»‹ táº¡i Ä‘Ã¢y."
+        "title": "Chưa có lịch phỏng vấn nào",
+        "description": "Khi nhà tuyển dụng tạo lịch phỏng vấn cho bạn, thông tin sẽ hiển thị tại đây."
       }
     }
   },
   "seekerProfile": {
     "common": {
-      "edit": "Chá»‰nh sá»­a",
-      "notUpdated": "ChÆ°a cáº­p nháº­t"
+      "edit": "Chỉnh sửa",
+      "notUpdated": "Chưa cập nhật"
     },
     "hero": {
-      "defaultTitle": "Há»“ sÆ¡ á»©ng viÃªn",
-      "description": "Quáº£n lÃ½ hÃ nh trÃ¬nh cÃ¡ nhÃ¢n, ká»¹ nÄƒng ná»•i báº­t vÃ  nhiá»u phiÃªn báº£n CV trong má»™t khÃ´ng gian gá»n gÃ ng.",
+      "defaultTitle": "Hồ sơ ứng viên",
+      "description": "Quản lý hành trình cá nhân, kỹ năng nổi bật và nhiều phiên bản CV trong một không gian gọn gàng.",
       "badges": {
-        "openToInternship": "Sáºµn sÃ ng cho thá»±c táº­p",
-        "activelyBuildingCv": "Äang hoÃ n thiá»‡n CV"
+        "openToInternship": "Sẵn sàng cho thực tập",
+        "activelyBuildingCv": "Đang hoàn thiện CV"
       },
       "metrics": {
-        "accountCode": "MÃ£ tÃ i khoáº£n",
+        "accountCode": "Mã tài khoản",
         "email": "Email",
-        "phone": "Äiá»‡n thoáº¡i",
+        "phone": "Điện thoại",
         "joined": "Tham gia"
       }
     },
     "quickActions": {
-      "title": "Thao tÃ¡c nhanh",
+      "title": "Thao tác nhanh",
       "editProfile": {
-        "title": "Chá»‰nh sá»­a há»“ sÆ¡",
-        "description": "Cáº­p nháº­t thÃ´ng tin cÃ¡ nhÃ¢n, há»c váº¥n vÃ  cÃ¡c dáº¥u áº¥n ká»¹ nÄƒng."
+        "title": "Chỉnh sửa hồ sơ",
+        "description": "Cập nhật thông tin cá nhân, học vấn và các dấu ấn kỹ năng."
       },
       "uploadCv": {
-        "title": "Táº£i CV má»›i",
-        "description": "ThÃªm phiÃªn báº£n há»“ sÆ¡ phÃ¹ há»£p vá»›i vá»‹ trÃ­ á»©ng tuyá»ƒn."
+        "title": "Tải CV mới",
+        "description": "Thêm phiên bản hồ sơ phù hợp với vị trí ứng tuyển."
       },
       "reviewProfile": {
-        "title": "Kiá»ƒm tra há»“ sÆ¡",
-        "description": "RÃ  soÃ¡t nhanh cÃ¡c má»¥c cÃ²n thiáº¿u trÆ°á»›c khi á»©ng tuyá»ƒn."
+        "title": "Kiểm tra hồ sơ",
+        "description": "Rà soát nhanh các mục còn thiếu trước khi ứng tuyển."
       }
     },
     "snapshot": {
-      "eyebrow": "TÃ³m táº¯t hÃ nh trÃ¬nh",
-      "title": "Theo dÃµi nhanh hÃ nh trÃ¬nh á»©ng tuyá»ƒn",
-      "description": "Xem nhanh tráº¡ng thÃ¡i á»©ng tuyá»ƒn, sá»‘ buá»•i phá»ng váº¥n vÃ  lá»‹ch sáº¯p tá»›i ngay trong há»“ sÆ¡ cÃ¡ nhÃ¢n.",
-      "viewApplications": "Xem Ä‘Æ¡n á»©ng tuyá»ƒn",
-      "viewInterviews": "Xem lá»‹ch phá»ng váº¥n",
+      "eyebrow": "Tóm tắt hành trình",
+      "title": "Theo dõi nhanh hành trình ứng tuyển",
+      "description": "Xem nhanh trạng thái ứng tuyển, số buổi phỏng vấn và lịch sắp tới ngay trong hồ sơ cá nhân.",
+      "viewApplications": "Xem đơn ứng tuyển",
+      "viewInterviews": "Xem lịch phỏng vấn",
       "metrics": {
-        "applications": "ÄÆ¡n á»©ng tuyá»ƒn",
-        "pending": "Äang chá»",
-        "accepted": "ÄÃ£ qua vÃ²ng lá»c",
-        "interviews": "Buá»•i phá»ng váº¥n"
+        "applications": "Đơn ứng tuyển",
+        "pending": "Đang chờ",
+        "accepted": "Đã qua vòng lọc",
+        "interviews": "Buổi phỏng vấn"
       }
     },
     "reminder": {
-      "eyebrow": "Nháº¯c lá»‹ch sáº¯p tá»›i",
-      "title": "Nháº¯c lá»‹ch sáº¯p tá»›i",
-      "scheduledWith": "{{date}} vá»›i {{interviewer}}",
-      "viewAllTitle": "Xem toÃ n bá»™ lá»‹ch",
-      "viewAllDescription": "Má»Ÿ danh sÃ¡ch Ä‘áº§y Ä‘á»§ cÃ¡c buá»•i phá»ng váº¥n liÃªn quan Ä‘áº¿n cÃ¡c application cá»§a báº¡n.",
-      "exportTitle": "Xuáº¥t lá»‹ch .ics",
-      "exportDescription": "LÆ°u buá»•i phá»ng váº¥n gáº§n nháº¥t vÃ o Google Calendar, Outlook hoáº·c Apple Calendar.",
-      "empty": "ChÆ°a cÃ³ buá»•i phá»ng váº¥n nÃ o sáº¯p tá»›i. Khi nhÃ  tuyá»ƒn dá»¥ng lÃªn lá»‹ch, pháº§n nháº¯c lá»‹ch sáº½ hiá»ƒn thá»‹ ngay táº¡i Ä‘Ã¢y."
+      "eyebrow": "Nhắc lịch sắp tới",
+      "title": "Nhắc lịch sắp tới",
+      "scheduledWith": "{{date}} với {{interviewer}}",
+      "viewAllTitle": "Xem toàn bộ lịch",
+      "viewAllDescription": "Mở danh sách đầy đủ các buổi phỏng vấn liên quan đến các application của bạn.",
+      "exportTitle": "Xuất lịch .ics",
+      "exportDescription": "Lưu buổi phỏng vấn gần nhất vào Google Calendar, Outlook hoặc Apple Calendar.",
+      "empty": "Chưa có buổi phỏng vấn nào sắp tới. Khi nhà tuyển dụng lên lịch, phần nhắc lịch sẽ hiển thị ngay tại đây."
     },
     "tabs": {
-      "profile": "Há»“ sÆ¡",
-      "cv": "Quáº£n lÃ½ CV"
+      "profile": "Hồ sơ",
+      "cv": "Quản lý CV"
     },
     "sections": {
-      "basicInfo": "ThÃ´ng tin cÆ¡ báº£n",
-      "education": "Há»c váº¥n",
-      "certifications": "Chá»©ng chá»‰",
-      "awards": "ThÃ nh tÃ­ch",
-      "skills": "Ká»¹ nÄƒng chuyÃªn mÃ´n",
-      "projects": "Dá»± Ã¡n ná»•i báº­t",
-      "experience": "Kinh nghiá»‡m thá»±c táº­p",
-      "about": "Giá»›i thiá»‡u & Ä‘iá»ƒm máº¡nh",
-      "cvOverview": "Tá»•ng quan CV",
-      "cvLibrary": "ThÆ° viá»‡n CV",
-      "cvChecklist": "Checklist trÆ°á»›c khi á»©ng tuyá»ƒn"
+      "basicInfo": "Thông tin cơ bản",
+      "education": "Học vấn",
+      "certifications": "Chứng chỉ",
+      "awards": "Thành tích",
+      "skills": "Kỹ năng chuyên môn",
+      "projects": "Dự án nổi bật",
+      "experience": "Kinh nghiệm thực tập",
+      "about": "Giới thiệu & điểm mạnh",
+      "cvOverview": "Tổng quan CV",
+      "cvLibrary": "Thư viện CV",
+      "cvChecklist": "Checklist trước khi ứng tuyển"
     },
     "basicInfo": {
-      "fullName": "Há» vÃ  tÃªn",
+      "fullName": "Họ và tên",
       "email": "Email",
-      "phone": "Sá»‘ Ä‘iá»‡n thoáº¡i",
-      "gender": "Giá»›i tÃ­nh",
-      "country": "Quá»‘c gia",
-      "countryValue": "Viá»‡t Nam",
-      "personalLinks": "LiÃªn káº¿t cÃ¡ nhÃ¢n"
+      "phone": "Số điện thoại",
+      "gender": "Giới tính",
+      "country": "Quốc gia",
+      "countryValue": "Việt Nam",
+      "personalLinks": "Liên kết cá nhân"
     },
     "links": {
       "github": "GitHub",
@@ -870,19 +870,19 @@
     },
     "education": {
       "school": {
-        "label": "TrÆ°á»ng",
-        "value": "Äáº¡i há»c ÄÃ  Náºµng - Äáº¡i há»c BÃ¡ch khoa"
+        "label": "Trường",
+        "value": "Đại học Đà Nẵng - Đại học Bách khoa"
       },
       "major": {
-        "label": "ChuyÃªn ngÃ nh",
-        "value": "CÃ´ng nghá»‡ thÃ´ng tin"
+        "label": "Chuyên ngành",
+        "value": "Công nghệ thông tin"
       },
       "year": {
-        "label": "NÄƒm há»c",
-        "value": "NÄƒm 3"
+        "label": "Năm học",
+        "value": "Năm 3"
       },
       "graduation": {
-        "label": "Tá»‘t nghiá»‡p dá»± kiáº¿n",
+        "label": "Tốt nghiệp dự kiến",
         "value": "08/2027"
       },
       "gpa": {
@@ -891,7 +891,7 @@
       }
     },
     "certifications": {
-      "achievedOn": "Äáº¡t Ä‘Æ°á»£c vÃ o {{date}}",
+      "achievedOn": "Đạt được vào {{date}}",
       "jlpt": {
         "name": "JLPT N3",
         "date": "07/2025"
@@ -907,17 +907,17 @@
     },
     "awards": {
       "hackathon": {
-        "title": "Top 5 cuá»™c thi Hackathon ná»™i bá»™",
+        "title": "Top 5 cuộc thi Hackathon nội bộ",
         "date": "05/2025"
       },
       "semester": {
-        "title": "Sinh viÃªn tiÃªu biá»ƒu há»c ká»³",
+        "title": "Sinh viên tiêu biểu học kỳ",
         "date": "01/2025"
       }
     },
     "skills": {
       "programming": {
-        "category": "NgÃ´n ngá»¯ láº­p trÃ¬nh"
+        "category": "Ngôn ngữ lập trình"
       },
       "frameworks": {
         "category": "Framework"
@@ -926,124 +926,123 @@
         "category": "Database"
       },
       "tools": {
-        "category": "CÃ´ng cá»¥"
+        "category": "Công cụ"
       }
     },
     "projects": {
-      "badge": "Dá»± Ã¡n",
+      "badge": "Dự án",
       "recruitment": {
-        "title": "Ná»n táº£ng tuyá»ƒn dá»¥ng nhÃ¢n sá»± IT",
-        "description": "XÃ¢y dá»±ng ná»n táº£ng tuyá»ƒn dá»¥ng cho á»©ng viÃªn IT vá»›i job browsing, profile cÃ´ng ty, chat vÃ  quáº£n lÃ½ á»©ng tuyá»ƒn.",
-        "status": "Äang phÃ¡t triá»ƒn"
+        "title": "Nền tảng tuyển dụng nhân sự IT",
+        "description": "Xây dựng nền tảng tuyển dụng cho ứng viên IT với job browsing, profile công ty, chat và quản lý ứng tuyển.",
+        "status": "Đang phát triển"
       },
       "equipment": {
-        "title": "Quáº£n lÃ½ thiáº¿t bá»‹ sinh viÃªn",
-        "description": "Thiáº¿t káº¿ giao diá»‡n vÃ  luá»“ng quáº£n lÃ½ thiáº¿t bá»‹ cho phÃ²ng lab trÆ°á»ng há»c, táº­p trung vÃ o tráº£i nghiá»‡m sá»­ dá»¥ng vÃ  bÃ¡o cÃ¡o thá»‘ng kÃª.",
-        "status": "HoÃ n thÃ nh"
+        "title": "Quản lý thiết bị sinh viên",
+        "description": "Thiết kế giao diện và luồng quản lý thiết bị cho phòng lab trường học, tập trung vào trải nghiệm sử dụng và báo cáo thống kê.",
+        "status": "Hoàn thành"
       }
     },
     "experience": {
       "sun": {
         "company": "Sun* Internal Project",
         "role": "Frontend Developer Intern",
-        "period": "03/2026 - Hiá»‡n táº¡i",
-        "summary": "PhÃ¡t triá»ƒn UI cho cÃ¡c module cÃ´ng ty, cÃ´ng viá»‡c, profile seeker; phá»‘i há»£p API integration vÃ  tinh chá»‰nh tráº£i nghiá»‡m ngÆ°á»i dÃ¹ng."
+        "period": "03/2026 - Hiện tại",
+        "summary": "Phát triển UI cho các module công ty, công việc, profile seeker; phối hợp API integration và tinh chỉnh trải nghiệm người dùng."
       }
     },
     "about": {
-      "introductionTitle": "Giá»›i thiá»‡u",
-      "introductionDescription": "MÃ¬nh lÃ  sinh viÃªn IT Ä‘á»‹nh hÆ°á»›ng Frontend vÃ  Full-stack, yÃªu thÃ­ch xÃ¢y dá»±ng sáº£n pháº©m cÃ³ tráº£i nghiá»‡m rÃµ rÃ ng, hiá»‡n Ä‘áº¡i vÃ  há»¯u Ã­ch cho ngÆ°á»i dÃ¹ng cuá»‘i.",
-      "strengthsTitle": "Äiá»ƒm máº¡nh",
+      "introductionTitle": "Giới thiệu",
+      "introductionDescription": "Mình là sinh viên IT định hướng Frontend và Full-stack, yêu thích xây dựng sản phẩm có trải nghiệm rõ ràng, hiện đại và hữu ích cho người dùng cuối.",
+      "strengthsTitle": "Điểm mạnh",
       "strengths": {
-        "first": "Chá»§ Ä‘á»™ng hoÃ n thiá»‡n UI vÃ  phá»‘i há»£p API integration.",
-        "second": "CÃ³ tÆ° duy sáº£n pháº©m, quan tÃ¢m Ä‘áº¿n tráº£i nghiá»‡m ngÆ°á»i dÃ¹ng.",
-        "third": "Thoáº£i mÃ¡i vá»›i codebase TypeScript, React, Tailwind vÃ  Java backend."
+        "first": "Chủ động hoàn thiện UI và phối hợp API integration.",
+        "second": "Có tư duy sản phẩm, quan tâm đến trải nghiệm người dùng.",
+        "third": "Thoải mái với codebase TypeScript, React, Tailwind và Java backend."
       }
     },
     "cvOverview": {
-      "eyebrow": "CV Ä‘ang sá»­ dá»¥ng",
+      "eyebrow": "CV đang sử dụng",
       "title": "CV Frontend Developer",
-      "description": "ÄÃ¢y lÃ  phiÃªn báº£n CV Ä‘ang Ä‘Æ°á»£c dÃ¹ng máº·c Ä‘á»‹nh khi á»©ng tuyá»ƒn. Báº¡n cÃ³ thá»ƒ táº£i báº£n má»›i hoáº·c táº¡o nhiá»u phiÃªn báº£n theo vá»‹ trÃ­ mong muá»‘n.",
+      "description": "Đây là phiên bản CV đang được dùng mặc định khi ứng tuyển. Bạn có thể tải bản mới hoặc tạo nhiều phiên bản theo vị trí mong muốn.",
       "actions": {
-        "upload": "Táº£i CV má»›i",
-        "create": "Táº¡o CV thá»§ cÃ´ng"
+        "upload": "Tải CV mới",
+        "create": "Tạo CV thủ công"
       },
       "metrics": {
         "count": {
-          "label": "Sá»‘ CV",
-          "value": "2 phiÃªn báº£n"
+          "label": "Số CV",
+          "value": "2 phiên bản"
         },
         "default": {
-          "label": "CV máº·c Ä‘á»‹nh",
-          "value": "1 báº£n"
+          "label": "CV mặc định",
+          "value": "1 bản"
         },
         "recent": {
-          "label": "Láº§n cáº­p nháº­t gáº§n nháº¥t",
-          "value": "2 ngÃ y trÆ°á»›c"
+          "label": "Lần cập nhật gần nhất",
+          "value": "2 ngày trước"
         }
       }
     },
     "cvLibrary": {
       "actions": {
         "view": "Xem CV",
-        "rename": "Äá»•i tÃªn",
-        "setDefault": "Äáº·t máº·c Ä‘á»‹nh"
+        "rename": "Đổi tên",
+        "setDefault": "Đặt mặc định"
       },
       "frontend": {
         "title": "CV Frontend Developer",
-        "language": "Tiáº¿ng Anh",
-        "updatedAt": "Cáº­p nháº­t 2 ngÃ y trÆ°á»›c",
-        "status": "Äang sá»­ dá»¥ng"
+        "language": "Tiếng Anh",
+        "updatedAt": "Cập nhật 2 ngày trước",
+        "status": "Đang sử dụng"
       },
       "fullstack": {
         "title": "CV Full-stack Intern",
-        "language": "Tiáº¿ng Viá»‡t",
-        "updatedAt": "Cáº­p nháº­t 1 tuáº§n trÆ°á»›c",
-        "status": "Báº£n nhÃ¡p"
+        "language": "Tiếng Việt",
+        "updatedAt": "Cập nhật 1 tuần trước",
+        "status": "Bản nháp"
       }
     },
     "cvChecklist": {
       "items": {
-        "titleMatch": "TiÃªu Ä‘á» CV bÃ¡m sÃ¡t vá»‹ trÃ­ á»©ng tuyá»ƒn",
-        "skillsMatch": "Pháº§n ká»¹ nÄƒng khá»›p JD vÃ  cÃ³ má»©c Ä‘á»™ Æ°u tiÃªn",
-        "contact": "ThÃ´ng tin liÃªn há»‡ Ä‘áº§y Ä‘á»§ vÃ  chÃ­nh xÃ¡c",
-        "projects": "Project ná»•i báº­t cÃ³ mÃ´ táº£ vai trÃ² rÃµ rÃ ng"
+        "titleMatch": "Tiêu đề CV bám sát vị trí ứng tuyển",
+        "skillsMatch": "Phần kỹ năng khớp JD và có mức độ ưu tiên",
+        "contact": "Thông tin liên hệ đầy đủ và chính xác",
+        "projects": "Project nổi bật có mô tả vai trò rõ ràng"
       }
     },
     "sidebar": {
-      "userFallback": "á»¨ng viÃªn",
-      "profileLabel": "Há»“ sÆ¡",
-      "cvLabel": "ThÆ° viá»‡n CV"
+      "userFallback": "Ứng viên",
+      "profileLabel": "Hồ sơ",
+      "cvLabel": "Thư viện CV"
     }
   },
   "admin": {
-    "dashboard": "Báº£ng Ä‘iá»u khiá»ƒn",
-    "welcomeBack": "ChÃ o má»«ng trá»Ÿ láº¡i, {{name}}",
-    "searchPlaceholder": "TÃ¬m ngÆ°á»i dÃ¹ng, viá»‡c lÃ m, cÃ´ng ty...",
-    "notifications": "ThÃ´ng bÃ¡o",
-    "console": "Báº£ng quáº£n trá»‹",
-    "goHome": "Vá» trang chá»§",
-    "expandSidebar": "Má»Ÿ rá»™ng thanh bÃªn",
-    "collapseSidebar": "Thu gá»n thanh bÃªn",
+    "dashboard": "Bảng điều khiển",
+    "welcomeBack": "Chào mừng trở lại, {{name}}",
+    "searchPlaceholder": "Tìm người dùng, việc làm, công ty...",
+    "notifications": "Thông báo",
+    "console": "Bảng quản trị",
+    "goHome": "Về trang chủ",
+    "expandSidebar": "Mở rộng thanh bên",
+    "collapseSidebar": "Thu gọn thanh bên",
     "menu": {
-      "dashboard": "Tá»•ng quan",
-      "users": "NgÆ°á»i dÃ¹ng",
-      "approvals": "Duyá»‡t Ä‘Äƒng kÃ½",
-      "companies": "CÃ´ng ty",
-      "jobs": "CÃ´ng viá»‡c",
-      "reports": "BÃ¡o cÃ¡o",
-      "settings": "CÃ i Ä‘áº·t"
+      "dashboard": "Tổng quan",
+      "users": "Người dùng",
+      "approvals": "Duyệt đăng ký",
+      "companies": "Công ty",
+      "jobs": "Công việc",
+      "reports": "Báo cáo",
+      "settings": "Cài đặt"
     },
     "theme": {
-      "mode": "Cháº¿ Ä‘á»™",
-      "theme": "Giao diá»‡n",
-      "dark": "Tá»‘i",
-      "light": "SÃ¡ng"
+      "mode": "Chế độ",
+      "theme": "Giao diện",
+      "dark": "Tối",
+      "light": "Sáng"
     },
-    "logout": "ÄÄƒng xuáº¥t",
-    "workspaceSynced": "KhÃ´ng gian quáº£n trá»‹ Ä‘Ã£ Ä‘á»“ng bá»™",
-    "expand": "Má»Ÿ rá»™ng",
-    "collapse": "Thu gá»n"
+    "logout": "Đăng xuất",
+    "workspaceSynced": "Không gian quản trị đã đồng bộ",
+    "expand": "Mở rộng",
+    "collapse": "Thu gọn"
   }
 }
-

@@ -59,6 +59,9 @@ export type CvDetail = {
     id: number
     fullName?: string | null
     email: string
+    githubUrl?: string | null
+    linkedinUrl?: string | null
+    portfolioUrl?: string | null
   }
   educations: CvEducation[]
   experiences: CvExperience[]
@@ -122,6 +125,15 @@ export const uploadCvFileApi = async (file: File) => {
 
   return response.data
 }
+
+export type SeekerProfilePayload = {
+  githubUrl?: string | null
+  linkedinUrl?: string | null
+  portfolioUrl?: string | null
+}
+
+export const updateSeekerProfileApi = async (data: SeekerProfilePayload) =>
+  (await axiosInstance.put('/cv/seeker-profile', data)).data
 
 export const createCvEducationApi = async (data: CvEducationPayload) =>
   (await axiosInstance.post('/cv/education', data)).data

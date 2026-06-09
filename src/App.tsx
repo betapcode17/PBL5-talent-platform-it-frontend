@@ -3,6 +3,7 @@ import './App.css'
 import { AppRoutes } from './routes/AppRoutes'
 import ChatWidget from './components/chatbot/ChatbotWidget'
 import ChatWidgetToggle from './components/chatbot/ChatbotWidgetToggle'
+import { NotificationSocketBridge } from './components/notifications/NotificationSocketBridge'
 import { ScrollToTop } from './hooks/useScrollToTop'
 
 const ChatOverlay = () => {
@@ -37,6 +38,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <NotificationSocketBridge />
       <AppRoutes />
       <ChatOverlay />
     </BrowserRouter>

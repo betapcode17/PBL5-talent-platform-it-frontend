@@ -1,4 +1,7 @@
+import axios, { AxiosError } from 'axios'
 import axiosInstance from '@/api/axiosInstance'
+import { getMyApplicationsApi } from '@/api/applications'
+import { useAuthStore } from '@/store/authStore'
 import type { BrowseJob, BrowseJobsFilterOptions, BrowseJobsQueryParams, BrowseJobsResponse } from '@/types/browse-jobs'
 import { formatSalaryDisplay } from '@/utils/salary'
 
@@ -280,23 +283,64 @@ const applyClientFilters = (jobs: SearchJobsApiItem[], params: BrowseJobsQueryPa
   })
 }
 
-export const fetchBrowseJobs = async (
+const fetchSearchJobsApi = async (
   params: BrowseJobsQueryParams,
-  signal?: AbortSignal
-): Promise<BrowseJobsResponse> => {
+  signal?: AbortSignal,
+  excludeApplied?: boolean
+) => {
   const response = await axiosInstance.get<SearchJobsApiResponse>('/jobs/search', {
     params: {
       q: params.searchQuery || undefined,
       location: params.selectedLocation || undefined,
       salaryMin: params.salaryMin || undefined,
-      excludeApplied: true,
+      excludeApplied: excludeApplied ? true : undefined,
       page: 1,
       limit: 100
     },
-    signal
+    signal,
+    skipErrorLog: excludeApplied === true
   })
 
-  const filteredJobs = applyClientFilters(response.data.jobs, params).map(toBrowseJob)
+  return response.data
+}
+
+const shouldUseExcludeApplied = () => {
+  const { isAuthenticated, user } = useAuthStore.getState()
+  return isAuthenticated && user?.role === 'SEEKER'
+}
+
+export const fetchBrowseJobs = async (
+  params: BrowseJobsQueryParams,
+  signal?: AbortSignal
+): Promise<BrowseJobsResponse> => {
+  const useExcludeApplied = shouldUseExcludeApplied()
+
+  let responseData: SearchJobsApiResponse
+
+  try {
+    responseData = await fetchSearchJobsApi(params, signal, useExcludeApplied)
+  } catch (error) {
+    const axiosError = error as AxiosError
+
+    if (!useExcludeApplied || !axios.isAxiosError(axiosError) || axiosError.response?.status !== 400) {
+      throw error
+    }
+
+    responseData = await fetchSearchJobsApi(params, signal, false)
+
+    try {
+      const applied = await getMyApplicationsApi({ page: 1, limit: 100 })
+      const appliedJobIds = new Set(applied.applications.map((application) => application.job.id))
+      responseData = {
+        ...responseData,
+        jobs: responseData.jobs.filter((job) => !appliedJobIds.has(job.id))
+      }
+    } catch {
+      // Ignore fallback filtering failure and keep the job list available.
+    }
+  }
+
+  const filteredJobs = applyClientFilters(responseData.jobs, params).map(toBrowseJob)
   const totalItems = filteredJobs.length
   const totalPages = Math.max(1, Math.ceil(totalItems / params.pageSize))
   const safeCurrentPage = Math.min(params.currentPage, totalPages)
@@ -313,6 +357,6 @@ export const fetchBrowseJobs = async (
       from: totalItems === 0 ? 0 : startIndex + 1,
       to: totalItems === 0 ? 0 : Math.min(startIndex + params.pageSize, totalItems)
     },
-    filters: mapFilterOptions(response.data.filters)
+    filters: mapFilterOptions(responseData.filters)
   }
 }

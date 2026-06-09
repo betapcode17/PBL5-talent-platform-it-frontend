@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 import LanguageSwitcher from '@/components/i18n/LanguageSwitcher'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import Container from '@/components/ui/Container'
 import Logo from '@/components/ui/Logo'
 import { cn } from '@/lib/utils'
@@ -203,6 +204,7 @@ const Navbar = ({
             {showAuthButtons ? (
               isAuthenticated ? (
                 <>
+                  <NotificationBell />
                   <Link
                     to='/chat'
                     className={cn(

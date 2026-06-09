@@ -1,7 +1,4 @@
 import {
-  Bell,
-  BriefcaseBusiness,
-  CalendarClock,
   LogOut,
   Menu,
   MessageCircle,
@@ -9,7 +6,6 @@ import {
   Search,
   Sun,
   User,
-  Users,
   X
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -17,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import LanguageSwitcher from '@/components/i18n/LanguageSwitcher'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
@@ -30,33 +27,6 @@ type EmployeeHeaderProps = {
 const iconButtonClassName =
   'inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200/85 bg-white text-slate-600 shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/35 dark:border-white/8 dark:bg-[#121423]/90 dark:text-slate-300 dark:shadow-none dark:hover:bg-white/8 dark:hover:text-white'
 
-const notifications = [
-  {
-    titleKey: 'employer.notifications.reviewCandidates.title',
-    descriptionKey: 'employer.notifications.reviewCandidates.description',
-    timeKey: 'employer.notifications.reviewCandidates.time',
-    href: '/employer/candidates',
-    icon: Users,
-    tone: 'bg-sky-50 text-sky-600'
-  },
-  {
-    titleKey: 'employer.notifications.checkInterviews.title',
-    descriptionKey: 'employer.notifications.checkInterviews.description',
-    timeKey: 'employer.notifications.checkInterviews.time',
-    href: '/employer/interviews',
-    icon: CalendarClock,
-    tone: 'bg-orange-50 text-orange-600'
-  },
-  {
-    titleKey: 'employer.notifications.keepJobsUpdated.title',
-    descriptionKey: 'employer.notifications.keepJobsUpdated.description',
-    timeKey: 'employer.notifications.keepJobsUpdated.time',
-    href: '/employer/jobs',
-    icon: BriefcaseBusiness,
-    tone: 'bg-violet-50 text-violet-600'
-  }
-]
-
 const EmployeeHeader = ({
   onMobileMenuClick,
   onToggleTheme,
@@ -65,11 +35,9 @@ const EmployeeHeader = ({
 }: EmployeeHeaderProps) => {
   const { t } = useTranslation()
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const navigate = useNavigate()
   const { user, logout } = useAuthStore()
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const notificationsRef = useRef<HTMLDivElement>(null)
 
   const initials = (user?.full_name || 'HR')
     .split(' ')
@@ -83,19 +51,11 @@ const EmployeeHeader = ({
         setIsProfileDropdownOpen(false)
       }
 
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-        setIsNotificationsOpen(false)
-      }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  const handleNotificationClick = (href: string) => {
-    setIsNotificationsOpen(false)
-    navigate(href)
-  }
 
   const handleViewProfile = () => {
     setIsProfileDropdownOpen(false)
@@ -156,68 +116,13 @@ const EmployeeHeader = ({
                 {theme === 'dark' ? <Sun className='h-5 w-5' /> : <MoonStar className='h-5 w-5' />}
               </button>
 
-              <div className='relative' ref={notificationsRef}>
-                <button
-                  type='button'
-                  onClick={() => {
-                    setIsNotificationsOpen((current) => !current)
-                    setIsProfileDropdownOpen(false)
-                  }}
-                  className={cn(iconButtonClassName, 'relative')}
-                  aria-label={t('employer.openNotifications')}
-                  aria-expanded={isNotificationsOpen}
-                >
-                  <Bell className='h-5 w-5' />
-                  <span className='absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#121423]'></span>
-                </button>
-
-                {isNotificationsOpen && (
-                  <div className='absolute right-0 z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_30px_70px_rgba(15,23,42,0.16)] dark:border-white/8 dark:bg-[#121423] dark:shadow-[0_30px_80px_rgba(0,0,0,0.38)]'>
-                    <div className='border-b border-slate-200 bg-gradient-to-r from-slate-50 via-white to-violet-50 px-5 py-4 dark:border-white/8 dark:from-white/6 dark:via-white/4 dark:to-violet-500/10'>
-                      <div className='flex items-center justify-between gap-3'>
-                        <div>
-                          <p className='text-sm font-semibold text-slate-950 dark:text-white'>{t('employer.notifications.title')}</p>
-                          <p className='mt-1 text-xs text-slate-500 dark:text-slate-400'>{t('employer.notifications.description')}</p>
-                        </div>
-                        <span className='rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-600'>{notifications.length}</span>
-                      </div>
-                    </div>
-
-                    <div className='max-h-[22rem] overflow-y-auto p-2'>
-                      {notifications.map((item) => {
-                        const Icon = item.icon
-
-                        return (
-                          <button
-                            key={item.titleKey}
-                            type='button'
-                            onClick={() => handleNotificationClick(item.href)}
-                            className='group flex w-full gap-3 rounded-3xl px-3 py-3 text-left transition-colors hover:bg-slate-50 dark:hover:bg-white/6'
-                          >
-                            <span className={cn('mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl', item.tone)}>
-                              <Icon className='h-5 w-5' />
-                            </span>
-                            <span className='min-w-0 flex-1'>
-                              <span className='flex items-start justify-between gap-3'>
-                                <span className='text-sm font-semibold text-slate-900 group-hover:text-violet-700 dark:text-slate-100 dark:group-hover:text-violet-200'>{t(item.titleKey)}</span>
-                                <span className='shrink-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500'>{t(item.timeKey)}</span>
-                              </span>
-                              <span className='mt-1 block text-xs leading-5 text-slate-500 dark:text-slate-400'>{t(item.descriptionKey)}</span>
-                            </span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <NotificationBell buttonClassName={cn(iconButtonClassName, 'relative')} />
 
               <div className='relative min-w-0' ref={dropdownRef}>
                 <button
                   type='button'
                   onClick={() => {
                     setIsProfileDropdownOpen((current) => !current)
-                    setIsNotificationsOpen(false)
                   }}
                   className='hidden min-w-[14rem] max-w-[18rem] items-center gap-3 rounded-[22px] border border-slate-200/85 bg-white px-3.5 py-2 shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/35 sm:flex dark:border-white/8 dark:bg-[#121423]/90 dark:shadow-none dark:hover:bg-white/8'
                 >
@@ -234,7 +139,6 @@ const EmployeeHeader = ({
                   type='button'
                   onClick={() => {
                     setIsProfileDropdownOpen((current) => !current)
-                    setIsNotificationsOpen(false)
                   }}
                   className='inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200/85 bg-white text-sm font-bold text-slate-700 shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/35 sm:hidden dark:border-white/8 dark:bg-[#121423]/90 dark:text-slate-200 dark:shadow-none dark:hover:bg-white/8'
                   aria-label={t('employer.header.openProfileMenu')}

@@ -1,5 +1,6 @@
 import axiosInstance from '@/api/axiosInstance'
 import type { BrowseJob, BrowseJobsFilterOptions, BrowseJobsQueryParams, BrowseJobsResponse } from '@/types/browse-jobs'
+import { formatSalaryDisplay } from '@/utils/salary'
 
 type SearchJobsApiItem = {
   id: number
@@ -16,10 +17,12 @@ type SearchJobsApiItem = {
   level?: string | null
   skills?: string[]
   createdDate?: string | null
+  isActive?: boolean
   company?: {
     company_id: number
     company_name: string
     city?: string | null
+    is_active?: boolean
   } | null
   category?: {
     category_id: number
@@ -82,22 +85,22 @@ const getCompanyInitials = (name: string) =>
 
 const formatSalary = (job: SearchJobsApiItem) => {
   if (job.salary?.trim()) {
-    return job.salary
+    return formatSalaryDisplay(job.salary) ?? job.salary
   }
 
   const min = job.salaryRange?.min
   const max = job.salaryRange?.max
 
   if (typeof min === 'number' && typeof max === 'number') {
-    return `$${min.toLocaleString()} - $${max.toLocaleString()}`
+    return formatSalaryDisplay(`${min}-${max}`) ?? `${min.toLocaleString()} - ${max.toLocaleString()} VND`
   }
 
   if (typeof min === 'number') {
-    return `From $${min.toLocaleString()}`
+    return formatSalaryDisplay(String(min)) ?? `From ${min.toLocaleString()} VND`
   }
 
   if (typeof max === 'number') {
-    return `Up to $${max.toLocaleString()}`
+    return formatSalaryDisplay(String(max)) ?? `Up to ${max.toLocaleString()} VND`
   }
 
   return 'Salary negotiable'
@@ -256,6 +259,11 @@ const applyClientFilters = (jobs: SearchJobsApiItem[], params: BrowseJobsQueryPa
   const normalizedMax = rawMax !== null && Number.isFinite(rawMax) ? rawMax : null
 
   return jobs.filter((job) => {
+    const isVisible = job.isActive !== false && job.company?.is_active !== false
+    if (!isVisible) {
+      return false
+    }
+
     const mapped = toBrowseJob(job, 0)
     const salaryRange = parseSalaryRange(job)
     const matchesLanguage =

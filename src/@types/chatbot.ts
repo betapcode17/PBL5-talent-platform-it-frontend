@@ -17,6 +17,11 @@ export interface ChatMessage {
   detectedIntent?: string | null
   jobResults?: ChatbotJobResult[]
   jobResultsTotal?: number | null
+  jobResultsSummary?: string | null
+  messageType?: string | null
+  conversationType?: string | null
+  cvAnalysis?: CVFileAnalysisResponse | null
+  cvJdMatch?: CVJDMatchResponse | null
   retrieval?: ChatbotRetrievalSummary | null
   meta?: ChatbotResponseMeta | null
   responseMode?: string | null
@@ -25,6 +30,7 @@ export interface ChatMessage {
 export interface Conversation {
   id: string | number
   title: string
+  conversationType?: string | null
   lastMessage: string
   createdAt: Date
   updateAt: Date
@@ -41,6 +47,10 @@ export interface ChatbotSource {
   title?: string | null
   company?: string | null
   url?: string | null
+  isActive?: boolean | null
+  companyIsActive?: boolean | null
+  is_active?: boolean | null
+  company_is_active?: boolean | null
 }
 
 export interface ChatbotJobResult {
@@ -55,6 +65,12 @@ export interface ChatbotJobResult {
   jobType?: string | null
   score?: number | null
   url?: string | null
+  isActive?: boolean | null
+  companyIsActive?: boolean | null
+  is_active?: boolean | null
+  company_is_active?: boolean | null
+  companyStatus?: string | null
+  status?: string | null
 }
 
 export interface ChatbotResponseData {
@@ -62,12 +78,18 @@ export interface ChatbotResponseData {
   jobs?: ChatbotJobResult[]
   total?: number | null
   totalJobsFound?: number | null
+  jobSearch?: {
+    summary?: string | null
+    total?: number | null
+    itemsCount?: number | null
+  } | null
 }
 
 export interface ChatbotStructuredResponse {
   type?: string | null
   items?: ChatbotJobResult[]
   total?: number | null
+  summary?: string | null
 }
 
 export interface ChatbotRetrievalSummary {
@@ -105,6 +127,12 @@ export interface SendMessageResponse {
   responseMode?: string | null
 }
 
+export interface ChatStreamHandlers {
+  onConversation?: (conversationId: string | number) => void
+  onStatus?: (payload: { stage?: string; message?: string }) => void
+  onChunk?: (chunk: string) => void
+}
+
 export interface CVJobMatchInsight {
   job_id?: number | null
   job_title: string
@@ -129,6 +157,8 @@ export interface LearningRecommendation {
 export interface CVFileAnalysisResponse {
   cv_id: number
   filename: string
+  conversation_id?: string | null
+  conversation_message_id?: string | null
   insights: {
     cv_id: number
     quality_score: number
@@ -141,6 +171,27 @@ export interface CVFileAnalysisResponse {
   matched_jobs: CVJobMatchInsight[]
   learning_suggestions: LearningRecommendation[]
   market_summary: Record<string, unknown>
+}
+
+export interface CVJDMatchResponse {
+  job_title: string
+  conversation_id?: string | null
+  conversation_message_id?: string | null
+  overall_score: number
+  match_level: string
+  summary: string
+  score_details: {
+    skills_score: number
+    experience_score: number
+    technology_score: number
+    education_score: number
+    responsibility_score: number
+  }
+  matched_keywords: string[]
+  missing_keywords: string[]
+  strengths: string[]
+  weaknesses: string[]
+  recommendations: string[]
 }
 
 export type ChatMode = 'jobs' | 'cv'

@@ -13,9 +13,11 @@ export const getCompaniesApi = async (params: GetCompaniesRequest): Promise<GetC
 
   const raw = response.data
 
+  const visibleCompanies = (raw.companies ?? []).filter((company: { is_active?: boolean }) => company.is_active !== false)
+
   return {
-    data: raw.companies,
-    total: raw.total,
+    data: visibleCompanies,
+    total: visibleCompanies.length === raw.companies?.length ? raw.total : visibleCompanies.length,
     page: params.page || 1,
     limit: params.limit || 10
   }

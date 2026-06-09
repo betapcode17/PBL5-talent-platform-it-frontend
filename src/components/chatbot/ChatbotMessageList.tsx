@@ -1,24 +1,58 @@
+import { useMemo } from 'react'
 import type { ChatMessage } from '@/@types/chatbot'
-import ChatMessageBubble from './ChatbotMessageBubble'
 import { useAutoScroll } from '@/hooks/useAutoScroll'
+import type { HeaderMessageFilter } from './ChatbotHeader'
+import ChatMessageBubble from './ChatbotMessageBubble'
 
 interface ChatMessageListProps {
   messages: ChatMessage[]
   isSending: boolean
+  streamStatus?: string | null
   isLoading?: boolean
+  messageFilter?: HeaderMessageFilter
 }
 
-const ChatMessageList = ({ messages, isSending, isLoading = false }: ChatMessageListProps) => {
-  const bottomRef = useAutoScroll([messages])
+const isCvMessage = (message: ChatMessage) => {
+  const type = String(message.messageType || '').toLowerCase()
+  const intent = String(message.detectedIntent || '').toLowerCase()
+  return !!message.cvAnalysis || type.includes('cv') || intent.includes('cv')
+}
+
+const ChatMessageList = ({
+  messages,
+  isSending,
+  streamStatus = null,
+  isLoading = false,
+  messageFilter = 'all'
+}: ChatMessageListProps) => {
+  const filteredMessages = useMemo(() => {
+    if (messageFilter === 'all') return messages
+
+    return messages.filter((message) => {
+      const cvMessage = isCvMessage(message)
+      return messageFilter === 'cv' ? cvMessage : !cvMessage
+    })
+  }, [messages, messageFilter])
+
+  const bottomRef = useAutoScroll([filteredMessages, messageFilter])
 
   return (
     <div className='relative flex-1 overflow-y-auto'>
       <div className='space-y-4 p-4'>
-        {messages.map((msg) => (
+        {filteredMessages.map((msg) => (
           <ChatMessageBubble key={msg.id} message={msg} />
         ))}
 
-        {/* Typing indicator */}
+        {!filteredMessages.length && messages.length > 0 ? (
+          <div className='rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500'>
+            {messageFilter === 'cv'
+              ? 'Conversation nay hien chua co message CV.'
+              : messageFilter === 'jobs'
+                ? 'Conversation nay hien chua co message job.'
+                : 'Chua co message nao trong conversation nay.'}
+          </div>
+        ) : null}
+
         {isSending && (
           <div className='flex items-end gap-2'>
             <div className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-sm'>
@@ -49,6 +83,7 @@ const ChatMessageList = ({ messages, isSending, isLoading = false }: ChatMessage
                   style={{ animationDelay: '300ms' }}
                 />
               </div>
+              {streamStatus ? <p className='mt-2 text-xs text-slate-500'>{streamStatus}</p> : null}
             </div>
           </div>
         )}

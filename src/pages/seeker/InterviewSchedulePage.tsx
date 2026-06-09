@@ -134,8 +134,8 @@ const InterviewSchedulePage = () => {
 
         {!isLoading && !error && paginatedItems.length > 0
           ? paginatedItems.map((item) => (
-              <Card key={item.id} className='overflow-hidden rounded-[30px] border border-slate-200/80 bg-white p-6 shadow-[0_18px_56px_rgba(15,23,42,0.06)]'>
-                <div className='flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between'>
+              <Card key={item.id} className='overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_56px_rgba(15,23,42,0.06)] sm:p-6'>
+                <div className='flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between'>
                   <div className='min-w-0 flex-1'>
                     <div className='flex flex-wrap gap-2'>
                       <SeekerStatusBadge
@@ -143,15 +143,15 @@ const InterviewSchedulePage = () => {
                         value={item.status}
                         label={t(`seekerTracking.interviewStatus.${item.status}`, { defaultValue: item.status })}
                       />
-                      <span className='rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500'>
+                      <span className='inline-flex max-w-full items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500'>
                         {t(`seekerTracking.interviewType.${item.type}`, { defaultValue: item.type })}
                       </span>
                     </div>
 
-                    <h2 className='mt-3 text-2xl font-semibold tracking-[-0.04em] text-slate-950'>{item.job.title}</h2>
+                    <h2 className='mt-3 break-words text-xl font-semibold leading-tight text-slate-950 sm:text-2xl'>{item.job.title}</h2>
                     <p className='mt-1 text-sm font-medium text-sky-700'>{item.company.name}</p>
 
-                    <div className='mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
+                    <div className='mt-5 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3 sm:gap-4'>
                       <InfoCard label={t('seekerTracking.interviews.cards.schedule')} value={formatDateTime(item.schedule, locale)} icon={<CalendarClock className='h-4 w-4' />} />
                       <InfoCard
                         label={t('seekerTracking.interviews.cards.duration')}
@@ -203,7 +203,7 @@ const InterviewSchedulePage = () => {
                     ) : null}
                   </div>
 
-                  <div className='flex shrink-0 flex-wrap gap-3'>
+                  <div className='flex shrink-0 flex-wrap gap-3 xl:max-w-[280px] xl:justify-end'>
                     <a
                       href={buildGoogleCalendarUrl(item)}
                       target='_blank'
@@ -272,12 +272,12 @@ const MetricCard = ({ label, value }: { label: string; value: number }) => (
 )
 
 const InfoCard = ({ label, value, icon }: { label: string; value: string; icon: ReactNode }) => (
-  <div className='rounded-[22px] border border-slate-200 bg-slate-50/80 px-4 py-4'>
-    <div className='flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400'>
-      <span className='text-sky-600'>{icon}</span>
-      {label}
+  <div className='min-w-0 rounded-[20px] border border-slate-200 bg-slate-50/80 px-4 py-4'>
+    <div className='flex min-w-0 items-start gap-2 text-[11px] font-semibold uppercase leading-5 tracking-[0.08em] text-slate-400'>
+      <span className='mt-0.5 shrink-0 text-sky-600'>{icon}</span>
+      <span className='min-w-0 break-words'>{label}</span>
     </div>
-    <p className='mt-2 text-sm font-semibold text-slate-900'>{value}</p>
+    <p className='mt-2 break-words text-sm font-semibold leading-6 text-slate-900'>{value}</p>
   </div>
 )
 
@@ -286,7 +286,7 @@ const TrackerSkeleton = () => (
     {Array.from({ length: 3 }).map((_, index) => (
       <div key={index} className='animate-pulse rounded-[30px] border border-slate-200/80 bg-white p-6 shadow-[0_18px_56px_rgba(15,23,42,0.06)]'>
         <div className='h-6 w-52 rounded-full bg-slate-200' />
-        <div className='mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
+        <div className='mt-6 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3 sm:gap-4'>
           <div className='h-20 rounded-[24px] bg-slate-200' />
           <div className='h-20 rounded-[24px] bg-slate-200' />
           <div className='h-20 rounded-[24px] bg-slate-200' />

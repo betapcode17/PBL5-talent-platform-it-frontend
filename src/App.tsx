@@ -7,9 +7,11 @@ import { ScrollToTop } from './hooks/useScrollToTop'
 
 const ChatOverlay = () => {
   const { pathname } = useLocation()
-  // Ẩn widget khi đang ở trang chat full-screen
+  const hiddenPrefixes = ['/chatbot', '/admin', '/employer']
 
-  if (pathname === '/chatbot') return null
+  if (hiddenPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))) {
+    return null
+  }
 
   return (
     <>

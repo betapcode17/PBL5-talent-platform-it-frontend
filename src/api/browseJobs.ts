@@ -289,6 +289,7 @@ export const fetchBrowseJobs = async (
       q: params.searchQuery || undefined,
       location: params.selectedLocation || undefined,
       salaryMin: params.salaryMin || undefined,
+      excludeApplied: true,
       page: 1,
       limit: 100
     },

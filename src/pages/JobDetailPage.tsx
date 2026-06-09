@@ -21,7 +21,7 @@ import JobDetailState from '@/components/job-detail/JobDetailState'
 import JobDetailTabs from '@/components/job-detail/JobDetailTabs' 
 import SimilarJobsList from '@/components/job-detail/SimilarJobsList'
 
-import { createApplication } from '@/api/applications'
+import { createApplication, getMyApplicationsApi } from '@/api/applications'
 import { getMyCvApi, uploadCvFileApi } from '@/api/cv'
 
 import { OutlineButton, PrimaryButton } from '@/components/ui/Buttons'
@@ -211,6 +211,29 @@ const JobDetailPage = () => {
     setSelectedCvUrl(null)
     setCvUploadError(null)
   }, [id])
+
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== 'SEEKER' || !job?.id) {
+      setHasApplied(false)
+      return
+    }
+
+    let cancelled = false
+
+    getMyApplicationsApi({ page: 1, limit: 100 })
+      .then((response) => {
+        if (cancelled) return
+        setHasApplied(response.applications.some((application) => application.job.id === job.id))
+      })
+      .catch(() => {
+        if (cancelled) return
+        setHasApplied(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [isAuthenticated, job?.id, user?.role])
 
   useEffect(() => {
     if (availableSections.length === 0) {

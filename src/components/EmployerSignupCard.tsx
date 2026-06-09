@@ -28,7 +28,6 @@ type FormState = {
   company_name: string
   company_address: string
   company_website_url: string
-  company_id?: string
 }
 
 const initialState: FormState = {
@@ -39,8 +38,7 @@ const initialState: FormState = {
   joined_date: '',
   company_name: '',
   company_address: '',
-  company_website_url: '',
-  company_id: ''
+  company_website_url: ''
 }
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -125,13 +123,14 @@ export default function EmployerSignupCard() {
         joined_date: form.joined_date ? new Date(form.joined_date).toISOString() : undefined,
         company_name: form.company_name.trim(),
         company_address: form.company_address.trim(),
-        company_website_url: form.company_website_url.trim() || undefined,
-        company_id: form.company_id ? Number(form.company_id) : undefined
+        company_website_url: form.company_website_url.trim() || undefined
       })
 
       setForm(initialState)
       setTouched({})
-      setSubmitSuccess(t('employerSignup.success', { companyName: response.company_name }))
+      setSubmitSuccess(
+        response.message || 'Yeu cau dang ky nha tuyen dung da duoc gui den admin de cho phe duyet.'
+      )
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string | string[] }>
       const message = axiosError.response?.data?.message
@@ -212,15 +211,15 @@ export default function EmployerSignupCard() {
                     <ul className='mt-3 space-y-2 text-sm text-white/78'>
                       <li className='flex items-center gap-2'>
                         <CheckCircle2 className='h-4 w-4 text-emerald-300' />
-                        {t('employerSignup.whatHappens.items.accountCreated')}
+                        Gui yeu cau dang ky vao bang duyet cua admin
                       </li>
                       <li className='flex items-center gap-2'>
                         <CheckCircle2 className='h-4 w-4 text-emerald-300' />
-                        {t('employerSignup.whatHappens.items.credentialsSent')}
+                        Neu duoc phe duyet, he thong tao moi cong ty va tai khoan employee
                       </li>
                       <li className='flex items-center gap-2'>
                         <CheckCircle2 className='h-4 w-4 text-emerald-300' />
-                        {t('employerSignup.whatHappens.items.companyLinked')}
+                        Email dang nhap va mat khau random se duoc gui ve email dang ky
                       </li>
                     </ul>
                   </div>
@@ -430,13 +429,12 @@ export default function EmployerSignupCard() {
                     </div>
                   ))}
                 </div>
-
-                <input type='hidden' value={form.company_id} />
-
                 <div className='flex flex-col gap-4 rounded-[28px] border border-slate-100 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between'>
                   <div>
-                    <p className='text-base font-semibold text-slate-950'>{t('employerSignup.activation.title')}</p>
-                    <p className='mt-1 text-sm text-slate-500'>{t('employerSignup.activation.description')}</p>
+                    <p className='text-base font-semibold text-slate-950'>Gui yeu cau dang ky nha tuyen dung</p>
+                    <p className='mt-1 text-sm text-slate-500'>
+                      Sau khi admin phe duyet, he thong se tao moi cong ty va tai khoan dang nhap cho nha tuyen dung.
+                    </p>
                   </div>
 
                   <div className='flex flex-col gap-3 sm:flex-row'>

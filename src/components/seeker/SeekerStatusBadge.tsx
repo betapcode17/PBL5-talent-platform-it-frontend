@@ -26,7 +26,7 @@ export const SeekerStatusBadge = ({ kind, value, label, className }: SeekerStatu
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em]',
+        'inline-flex max-w-full items-center rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase leading-5 tracking-[0.08em]',
         toneClassName,
         className
       )}

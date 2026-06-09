@@ -9,18 +9,15 @@ export type RegisterEmployerRequest = {
   company_name: string
   company_address: string
   company_website_url?: string
-  company_id?: number
 }
 
 export type RegisterEmployerResponse = {
   message: string
-  user_id: number
-  employee_id: number
-  company_id: number
-  company_name: string
+  request_id: number
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
 }
 
 export const registerEmployerApi = async (data: RegisterEmployerRequest): Promise<RegisterEmployerResponse> => {
-  const response = await axiosInstance.post<RegisterEmployerResponse>('/employees', data)
+  const response = await axiosInstance.post<RegisterEmployerResponse>('/auth/employee-company-register', data)
   return response.data
 }

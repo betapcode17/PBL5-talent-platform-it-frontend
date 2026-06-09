@@ -140,3 +140,36 @@ export interface AdminPaginatedResponse {
   limit: number
   totalPages: number
 }
+
+export interface AdminEmployerRegistrationRequestListItem {
+  id: number
+  fullName: string
+  email: string
+  phone: string
+  role: string
+  joinedDate?: string | null
+  companyName: string
+  companyAddress: string
+  companyWebsiteUrl?: string | null
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  reviewNote?: string | null
+  generatedLoginEmail?: string | null
+  approvedAt?: string | null
+  rejectedAt?: string | null
+  createdDate: string
+  updatedDate: string
+  companyId?: number | null
+  createdUserId?: number | null
+}
+
+export interface AdminEmployerRegistrationStatusCounts {
+  total: number
+  pending: number
+  approved: number
+  rejected: number
+}
+
+export interface AdminEmployerRegistrationRoleCount {
+  role: string
+  count: number
+}

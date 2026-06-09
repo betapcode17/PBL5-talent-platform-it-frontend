@@ -2,7 +2,7 @@ import type { ChatMessage } from '@/@types/chatbot'
 import { cn } from '@/lib/utils'
 import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
-import { ChevronRight, FileText, MapPin, Search, Wallet } from 'lucide-react'
+import { Briefcase, ChevronRight, FileText, GraduationCap, MapPin, Search, Sparkles, Wallet } from 'lucide-react'
 
 interface ChatMessageBubbleProps {
   message: ChatMessage
@@ -55,6 +55,12 @@ const sanitizeField = (value?: string | null) => {
   return normalized
 }
 
+const isCvAnalysisMessage = (message: ChatMessage) =>
+  message.messageType === 'cv_analysis' || message.detectedIntent === 'cv_analysis' || !!message.cvAnalysis
+
+const isCvJdMatchMessage = (message: ChatMessage) =>
+  message.messageType === 'cv_jd_match' || message.detectedIntent === 'cv_jd_match' || !!message.cvJdMatch
+
 const stripSearchSummaryHeading = (content: string) => {
   const normalized = String(content || '').trim()
   if (!normalized) return normalized
@@ -63,7 +69,7 @@ const stripSearchSummaryHeading = (content: string) => {
   if (!lines.length) return normalized
 
   const [firstLine, ...rest] = lines
-  if (/^Tim thay\s+\d+\s+cong viec phu hop\./i.test(firstLine.trim())) {
+  if (/^(Tim thay|Toi tim duoc)\s+\d+\s+cong viec phu hop\./i.test(firstLine.trim())) {
     return rest.join('\n').trim()
   }
 
@@ -72,26 +78,7 @@ const stripSearchSummaryHeading = (content: string) => {
 
 const compactAssistantContent = (content: string, hasJobResults: boolean) => {
   if (!hasJobResults) return content
-
-  const normalized = stripSearchSummaryHeading(content)
-  const lines = normalized
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-
-  const compactLines = lines.filter(
-    (line) =>
-      line.startsWith('- **Tom tat:**') ||
-      line.startsWith('- **Buoc tiep theo:**') ||
-      (!line.startsWith('- **Ky nang:**') &&
-        !line.startsWith('- **Muc luong:**') &&
-        !line.startsWith('- **Dia diem:**') &&
-        !line.startsWith('- **Yeu cau noi bat:**') &&
-        !line.startsWith('- **Buoc tiep theo:**') &&
-        !line.startsWith('- **Tom tat:**'))
-  )
-
-  return compactLines.join('\n\n').trim()
+  return ''
 }
 
 const getJobDetailHref = (jobId?: string | number | null, url?: string | null) => {
@@ -112,9 +99,14 @@ const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
   const isUser = message.role === 'user'
   const rawAssistantContent = !isUser ? formatAssistantContent(message.content) : ''
   const jobResults = !isUser && Array.isArray(message.jobResults) ? message.jobResults : []
+  const cvAnalysis = !isUser ? message.cvAnalysis : null
+  const cvJdMatch = !isUser ? message.cvJdMatch : null
+  const hasCvAnalysis = !isUser && isCvAnalysisMessage(message) && !!cvAnalysis
+  const hasCvJdMatch = !isUser && isCvJdMatchMessage(message) && !!cvJdMatch
   const hasJobResults = jobResults.length > 0
   const totalJobsFound = !isUser ? Math.max(Number(message.jobResultsTotal || 0), jobResults.length) : 0
-  const assistantContent = !isUser ? compactAssistantContent(rawAssistantContent, hasJobResults) : ''
+  const jobResultsSummary = !isUser ? String(message.jobResultsSummary || '').trim() : ''
+  const assistantContent = !isUser ? compactAssistantContent(rawAssistantContent, hasJobResults || hasCvAnalysis || hasCvJdMatch) : ''
   const visibleJobs = hasJobResults ? jobResults.slice(0, 8) : []
   const hiddenJobsCount = hasJobResults ? Math.max(totalJobsFound - visibleJobs.length, 0) : 0
 
@@ -155,36 +147,250 @@ const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
             <span className='whitespace-pre-wrap break-words'>{message.content}</span>
           ) : (
             <>
-              <ReactMarkdown
-                components={{
-                  p: ({ children }) => <p className='mb-2 last:mb-0 break-words'>{children}</p>,
-                  strong: ({ children }) => <strong className='font-semibold'>{children}</strong>,
-                  ol: ({ children }) => <ol className='mb-2 list-decimal pl-4 space-y-1'>{children}</ol>,
-                  ul: ({ children }) => <ul className='mb-2 list-disc pl-4 space-y-1'>{children}</ul>,
-                  li: ({ children }) => <li className='break-words'>{children}</li>,
-                  h1: ({ children }) => <h1 className='mb-2 text-base font-semibold'>{children}</h1>,
-                  h2: ({ children }) => <h2 className='mb-2 text-sm font-semibold'>{children}</h2>,
-                  a: ({ href, children }) => (
-                    <a
-                      href={href}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='break-all text-indigo-600 underline hover:text-indigo-800'
-                    >
-                      {children}
-                    </a>
-                  )
-                }}
-              >
-                {assistantContent}
-              </ReactMarkdown>
+              {assistantContent ? (
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p className='mb-2 last:mb-0 break-words'>{children}</p>,
+                    strong: ({ children }) => <strong className='font-semibold'>{children}</strong>,
+                    ol: ({ children }) => <ol className='mb-2 list-decimal pl-4 space-y-1'>{children}</ol>,
+                    ul: ({ children }) => <ul className='mb-2 list-disc pl-4 space-y-1'>{children}</ul>,
+                    li: ({ children }) => <li className='break-words'>{children}</li>,
+                    h1: ({ children }) => <h1 className='mb-2 text-base font-semibold'>{children}</h1>,
+                    h2: ({ children }) => <h2 className='mb-2 text-sm font-semibold'>{children}</h2>,
+                    a: ({ href, children }) => (
+                      <a
+                        href={href}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='break-all text-indigo-600 underline hover:text-indigo-800'
+                      >
+                        {children}
+                      </a>
+                    )
+                  }}
+                >
+                  {assistantContent}
+                </ReactMarkdown>
+              ) : null}
+
+              {hasCvAnalysis && cvAnalysis ? (
+                <div className='mt-3 space-y-3 border-t border-slate-200 pt-3'>
+                  <div className='rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 via-white to-teal-50 p-3'>
+                    <div className='flex items-start justify-between gap-3'>
+                      <div>
+                        <p className='text-sm font-semibold text-slate-900'>{cvAnalysis.filename || 'CV analysis'}</p>
+                        <p className='mt-1 text-xs text-slate-600'>
+                          Diem chat luong {Number(cvAnalysis.insights?.quality_score || 0).toFixed(1)}/10
+                        </p>
+                      </div>
+                      <div className='inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700'>
+                        <Sparkles className='h-3.5 w-3.5' />
+                        CV Analysis
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className='grid gap-2 md:grid-cols-2'>
+                    <div className='rounded-2xl border border-slate-200 bg-white p-3'>
+                      <div className='mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <GraduationCap className='h-4 w-4 text-emerald-600' />
+                        Diem manh
+                      </div>
+                      <ul className='space-y-1 text-xs text-slate-600'>
+                        {(cvAnalysis.insights?.strengths || []).slice(0, 4).map((item, index) => (
+                          <li key={`strength-${index}`} className='rounded-lg bg-slate-50 px-2 py-1.5'>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className='rounded-2xl border border-slate-200 bg-white p-3'>
+                      <div className='mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <Sparkles className='h-4 w-4 text-amber-600' />
+                        Can cai thien
+                      </div>
+                      <ul className='space-y-1 text-xs text-slate-600'>
+                        {(cvAnalysis.insights?.weaknesses || []).slice(0, 4).map((item, index) => (
+                          <li key={`weakness-${index}`} className='rounded-lg bg-slate-50 px-2 py-1.5'>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {Array.isArray(cvAnalysis.matched_jobs) && cvAnalysis.matched_jobs.length > 0 ? (
+                    <div className='space-y-2'>
+                      <div className='inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <Briefcase className='h-4 w-4 text-indigo-600' />
+                        Job phu hop
+                      </div>
+                      {cvAnalysis.matched_jobs.slice(0, 3).map((job, index) => (
+                        <div
+                          key={`${job.job_id || index}-${job.job_title}`}
+                          className='rounded-2xl border border-slate-200 bg-white p-3 shadow-sm'
+                        >
+                          <div className='flex items-start justify-between gap-3'>
+                            <div className='min-w-0'>
+                              <p className='line-clamp-2 text-sm font-semibold text-slate-900'>{job.job_title}</p>
+                              <p className='mt-1 text-xs text-slate-500'>{job.company_name}</p>
+                            </div>
+                            <span className='shrink-0 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700'>
+                              {Math.round(Number(job.match_score || 0) * 100)}%
+                            </span>
+                          </div>
+                          <div className='mt-2 flex flex-wrap gap-2 text-xs text-slate-600'>
+                            <span className='inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1'>
+                              <MapPin className='h-3.5 w-3.5' />
+                              {sanitizeField(job.work_location)}
+                            </span>
+                            <span className='inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1'>
+                              <Wallet className='h-3.5 w-3.5' />
+                              {sanitizeField(job.salary)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {Array.isArray(cvAnalysis.learning_suggestions) && cvAnalysis.learning_suggestions.length > 0 ? (
+                    <div className='rounded-2xl border border-slate-200 bg-white p-3'>
+                      <div className='mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <Sparkles className='h-4 w-4 text-violet-600' />
+                        Nen hoc tiep theo
+                      </div>
+                      <div className='flex flex-wrap gap-2'>
+                        {cvAnalysis.learning_suggestions.slice(0, 6).map((item, index) => (
+                          <span
+                            key={`${item.skill}-${index}`}
+                            className='rounded-full bg-violet-50 px-2.5 py-1 text-xs font-medium text-violet-700'
+                          >
+                            {item.skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {hasCvJdMatch && cvJdMatch ? (
+                <div className='mt-3 space-y-3 border-t border-slate-200 pt-3'>
+                  <div className='rounded-2xl border border-sky-100 bg-gradient-to-r from-sky-50 via-white to-indigo-50 p-3'>
+                    <div className='flex items-start justify-between gap-3'>
+                      <div>
+                        <p className='text-sm font-semibold text-slate-900'>
+                          {cvJdMatch.job_title || 'Danh gia CV voi job description'}
+                        </p>
+                        <p className='mt-1 text-xs text-slate-600'>{cvJdMatch.summary}</p>
+                      </div>
+                      <div className='rounded-full bg-sky-100 px-2.5 py-1 text-xs font-semibold text-sky-700'>
+                        {cvJdMatch.overall_score}% - {cvJdMatch.match_level}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className='grid gap-2 md:grid-cols-2 xl:grid-cols-3'>
+                    {[
+                      { label: 'Ky nang', value: cvJdMatch.score_details.skills_score },
+                      { label: 'Kinh nghiem', value: cvJdMatch.score_details.experience_score },
+                      { label: 'Cong nghe', value: cvJdMatch.score_details.technology_score },
+                      { label: 'Hoc van', value: cvJdMatch.score_details.education_score },
+                      { label: 'Trach nhiem', value: cvJdMatch.score_details.responsibility_score }
+                    ].map((item) => (
+                      <div key={item.label} className='rounded-2xl border border-slate-200 bg-white p-3'>
+                        <p className='text-xs font-medium text-slate-500'>{item.label}</p>
+                        <p className='mt-1 text-lg font-semibold text-slate-900'>{item.value}/100</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className='grid gap-2 md:grid-cols-2'>
+                    <div className='rounded-2xl border border-slate-200 bg-white p-3'>
+                      <div className='mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <Sparkles className='h-4 w-4 text-emerald-600' />
+                        Diem hop
+                      </div>
+                      <div className='flex flex-wrap gap-2'>
+                        {(cvJdMatch.matched_keywords || []).slice(0, 10).map((item, index) => (
+                          <span key={`${item}-${index}`} className='rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700'>
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className='rounded-2xl border border-slate-200 bg-white p-3'>
+                      <div className='mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <Sparkles className='h-4 w-4 text-amber-600' />
+                        Can bo sung
+                      </div>
+                      <div className='flex flex-wrap gap-2'>
+                        {(cvJdMatch.missing_keywords || []).slice(0, 10).map((item, index) => (
+                          <span key={`${item}-${index}`} className='rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700'>
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className='grid gap-2 md:grid-cols-2'>
+                    <div className='rounded-2xl border border-slate-200 bg-white p-3'>
+                      <div className='mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <GraduationCap className='h-4 w-4 text-emerald-600' />
+                        Diem manh
+                      </div>
+                      <ul className='space-y-1 text-xs text-slate-600'>
+                        {(cvJdMatch.strengths || []).slice(0, 4).map((item, index) => (
+                          <li key={`cv-jd-strength-${index}`} className='rounded-lg bg-slate-50 px-2 py-1.5'>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className='rounded-2xl border border-slate-200 bg-white p-3'>
+                      <div className='mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <Sparkles className='h-4 w-4 text-rose-600' />
+                        Diem yeu
+                      </div>
+                      <ul className='space-y-1 text-xs text-slate-600'>
+                        {(cvJdMatch.weaknesses || []).slice(0, 4).map((item, index) => (
+                          <li key={`cv-jd-weakness-${index}`} className='rounded-lg bg-slate-50 px-2 py-1.5'>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {Array.isArray(cvJdMatch.recommendations) && cvJdMatch.recommendations.length > 0 ? (
+                    <div className='rounded-2xl border border-slate-200 bg-white p-3'>
+                      <div className='mb-2 inline-flex items-center gap-2 text-sm font-semibold text-slate-800'>
+                        <Sparkles className='h-4 w-4 text-violet-600' />
+                        Can cai thien
+                      </div>
+                      <ul className='space-y-1 text-xs text-slate-600'>
+                        {cvJdMatch.recommendations.slice(0, 5).map((item, index) => (
+                          <li key={`cv-jd-rec-${index}`} className='rounded-lg bg-slate-50 px-2 py-1.5'>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
 
               {hasJobResults && (
                 <div className='mt-3 space-y-2 border-t border-slate-200 pt-3'>
                   <div className='flex items-center gap-2 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-sky-50 px-3 py-2.5 text-sm font-medium text-indigo-700'>
                     <Search className='h-4 w-4' />
                     <span>
-                      Tim thay <strong>{totalJobsFound}</strong> cong viec phu hop
+                      {jobResultsSummary || `Toi tim duoc ${totalJobsFound} cong viec phu hop.`}
                     </span>
                   </div>
 

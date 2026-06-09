@@ -1,21 +1,42 @@
-import { aiAxiosInstance } from './axiosInstance'
+import { aiApiBaseUrl, aiAxiosInstance } from './axiosInstance'
 
 import type {
   ChatMessage,
   Conversation,
   SendMessageRequest,
   CVFileAnalysisResponse,
+  CVJDMatchResponse,
   SendMessageResponse,
-  ChatbotJobResult
+  ChatbotJobResult,
+  ChatStreamHandlers
 } from '@/@types/chatbot'
+
+const isActiveFlag = (value: unknown) => {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'number') return value !== 0
+  const normalized = String(value ?? '').trim().toLowerCase()
+  if (!normalized) return true
+  if (['true', '1', 'yes', 'active'].includes(normalized)) return true
+  if (['false', '0', 'no', 'inactive', 'banned', 'disabled', 'blocked'].includes(normalized)) return false
+  return true
+}
+
+const isDisplayableJobResult = (job: ChatbotJobResult | null | undefined) => {
+  if (!job) return false
+  const jobActive = isActiveFlag(job.isActive ?? job.is_active ?? job.status)
+  const companyActive = isActiveFlag(job.companyIsActive ?? job.company_is_active ?? job.companyStatus)
+  return jobActive && companyActive
+}
 
 const normalizeJobResults = (jobs: ChatbotJobResult[] | undefined | null): ChatbotJobResult[] => {
   if (!Array.isArray(jobs)) return []
 
-  return jobs.filter(Boolean).map((job) => ({
-    ...job,
-    skills: Array.isArray(job.skills) ? job.skills.filter(Boolean) : []
-  }))
+  return jobs
+    .filter(isDisplayableJobResult)
+    .map((job) => ({
+      ...job,
+      skills: Array.isArray(job.skills) ? job.skills.filter(Boolean) : []
+    }))
 }
 
 const buildJobResultsFromSources = (message: Pick<ChatMessage, 'sources' | 'detectedIntent'>): ChatbotJobResult[] => {
@@ -23,7 +44,13 @@ const buildJobResultsFromSources = (message: Pick<ChatMessage, 'sources' | 'dete
   if (message.detectedIntent && !String(message.detectedIntent).includes('job')) return []
 
   return message.sources
-    .filter((source) => source && (!source.entityType || source.entityType === 'job'))
+    .filter(
+      (source) =>
+        source &&
+        (!source.entityType || source.entityType === 'job') &&
+        isActiveFlag(source.isActive ?? source.is_active) &&
+        isActiveFlag(source.companyIsActive ?? source.company_is_active)
+    )
     .map((source) => ({
       id: source.sourceId ?? null,
       title: source.title ?? null,
@@ -74,6 +101,12 @@ const normalizeConversationMessage = (message: ChatMessage): ChatMessage => {
   const directJobResults = normalizeJobResults(message.jobResults)
   const sourceJobResults = buildJobResultsFromSources(message)
   const jobResults = directJobResults.length ? directJobResults : sourceJobResults
+  const normalizedSummary =
+    typeof message.jobResultsSummary === 'string' && message.jobResultsSummary.trim()
+      ? message.jobResultsSummary.trim()
+      : inferJobResultsTotalFromContent(String(message?.content || ''), jobResults.length) > 0
+        ? `Toi tim duoc ${inferJobResultsTotalFromContent(String(message?.content || ''), jobResults.length)} cong viec phu hop.`
+        : null
   const normalizedContent =
     typeof message?.content === 'string' && message.content.trim()
       ? message.content
@@ -85,6 +118,7 @@ const normalizeConversationMessage = (message: ChatMessage): ChatMessage => {
     createdAt: message?.createdAt || new Date().toISOString(),
     sources: Array.isArray(message?.sources) ? message.sources : [],
     jobResults,
+    jobResultsSummary: normalizedSummary,
     jobResultsTotal:
       typeof message.jobResultsTotal === 'number'
         ? message.jobResultsTotal
@@ -98,6 +132,10 @@ const normalizeSendMessageResponse = (payload: SendMessageResponse): SendMessage
   const jobResults = structuredJobs.length ? structuredJobs : dataJobs
   const jobResultsTotal =
     payload.structured?.total ?? payload.data?.totalJobsFound ?? payload.data?.total ?? jobResults.length
+  const jobResultsSummary =
+    payload.structured?.summary ??
+    payload.data?.jobSearch?.summary ??
+    (jobResultsTotal > 0 ? `Toi tim duoc ${jobResultsTotal} cong viec phu hop.` : null)
 
   const normalizedMessage: ChatMessage = {
     ...payload.message,
@@ -110,6 +148,7 @@ const normalizeSendMessageResponse = (payload: SendMessageResponse): SendMessage
     detectedIntent: payload.message?.detectedIntent ?? payload.data?.intent ?? null,
     jobResults,
     jobResultsTotal,
+    jobResultsSummary,
     retrieval: payload.retrieval ?? null,
     meta: payload.meta ?? null,
     responseMode: payload.responseMode ?? null
@@ -134,6 +173,87 @@ export const sendMessageApi = async (data: SendMessageRequest): Promise<SendMess
   return normalizeSendMessageResponse(res.data)
 }
 
+export const streamMessageApi = async (
+  data: SendMessageRequest,
+  handlers: ChatStreamHandlers = {}
+): Promise<SendMessageResponse> => {
+  const payload: Record<string, string> = { message: data.message }
+
+  if (data.conversationId !== undefined && data.conversationId !== null && String(data.conversationId).trim()) {
+    payload.conversationId = String(data.conversationId)
+  }
+
+  const response = await fetch(`${aiApiBaseUrl}/chatbot/message/stream`, {
+    method: 'POST',
+    headers: {
+      Accept: 'text/event-stream',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+
+  if (!response.ok || !response.body) {
+    throw new Error(`Streaming request failed: ${response.status}`)
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder('utf-8')
+  let buffer = ''
+  let finalPayload: SendMessageResponse | null = null
+
+  const processEventBlock = (block: string) => {
+    const lines = block.split('\n').map((line) => line.trim()).filter(Boolean)
+    if (!lines.length) return
+
+    const eventLine = lines.find((line) => line.startsWith('event:'))
+    const dataLine = lines.find((line) => line.startsWith('data:'))
+    if (!eventLine || !dataLine) return
+
+    const eventName = eventLine.slice('event:'.length).trim()
+    const rawData = dataLine.slice('data:'.length).trim()
+    const parsed = rawData ? JSON.parse(rawData) : null
+
+    if (eventName === 'conversation' && parsed?.conversationId !== undefined) {
+      handlers.onConversation?.(parsed.conversationId)
+      return
+    }
+    if (eventName === 'status') {
+      handlers.onStatus?.(parsed || {})
+      return
+    }
+    if (eventName === 'chunk' && typeof parsed?.delta === 'string') {
+      handlers.onChunk?.(parsed.delta)
+      return
+    }
+    if (eventName === 'error') {
+      throw new Error(parsed?.message || 'Streaming response failed')
+    }
+    if (eventName === 'final' && parsed) {
+      finalPayload = normalizeSendMessageResponse(parsed as SendMessageResponse)
+    }
+  }
+
+  while (true) {
+    const { value, done } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+
+    let boundaryIndex = buffer.indexOf('\n\n')
+    while (boundaryIndex >= 0) {
+      const block = buffer.slice(0, boundaryIndex)
+      buffer = buffer.slice(boundaryIndex + 2)
+      processEventBlock(block)
+      boundaryIndex = buffer.indexOf('\n\n')
+    }
+  }
+
+  if (!finalPayload) {
+    throw new Error('Stream finished without final payload')
+  }
+
+  return finalPayload
+}
+
 export const getConversationsApi = async (): Promise<Conversation[]> => {
   const res = await aiAxiosInstance.get('/chatbot/conversation')
   return res.data
@@ -156,15 +276,47 @@ export const renameConversationApi = async (conversationId: string, newTitle: st
   return res.data
 }
 
-export const createConversationApi = async (): Promise<Conversation> => {
-  const res = await aiAxiosInstance.post('/chatbot/conversation')
+export const createConversationApi = async (kind?: 'job_chat' | 'cv_analysis'): Promise<Conversation> => {
+  const res = await aiAxiosInstance.post('/chatbot/conversation', null, {
+    params: kind ? { kind } : undefined
+  })
   return res.data
 }
 
-export const analyzeCvApi = async (file: File, topK = 5): Promise<CVFileAnalysisResponse> => {
+export const analyzeCvApi = async (
+  file: File,
+  topK = 5,
+  conversationId?: string | number
+): Promise<CVFileAnalysisResponse> => {
   const formData = new FormData()
   formData.append('file', file)
+  if (conversationId !== undefined && conversationId !== null && String(conversationId).trim()) {
+    formData.append('conversation_id', String(conversationId))
+  }
 
   const res = await aiAxiosInstance.post(`/cv/analyze?top_k=${topK}`, formData)
+  return res.data
+}
+
+export const matchCvWithJdApi = async (params: {
+  jdText: string
+  file?: File
+  cvId?: number
+  conversationId?: string | number
+}): Promise<CVJDMatchResponse> => {
+  const formData = new FormData()
+  formData.append('jd_text', params.jdText)
+
+  if (params.file) {
+    formData.append('file', params.file)
+  }
+  if (params.cvId !== undefined && params.cvId !== null) {
+    formData.append('cv_id', String(params.cvId))
+  }
+  if (params.conversationId !== undefined && params.conversationId !== null && String(params.conversationId).trim()) {
+    formData.append('conversation_id', String(params.conversationId))
+  }
+
+  const res = await aiAxiosInstance.post<CVJDMatchResponse>('/cv/match-jd', formData)
   return res.data
 }

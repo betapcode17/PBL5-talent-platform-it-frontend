@@ -18,6 +18,7 @@ import EmployerCompanyInfoPage from '@/pages/employer/CompanyInfoPage'
 import CreateJobPage from '@/pages/employer/CreateJobPage'
 import CreateInterviewPage from '@/pages/employer/CreateInterviewPage'
 import ResourcesPage from '@/pages/ResourcesPage'
+import CvPdfExportPage from '@/pages/seeker/CvPdfExportPage'
 import ProfilePage from '@/pages/seeker/ProfilePage'
 import AppliedCompaniesPage from '@/pages/seeker/AppliedCompaniesPage'
 import SavedCompaniesPage from '@/pages/seeker/SavedCompaniesPage'
@@ -109,6 +110,14 @@ export function AppRoutes() {
         </Route>
 
         {/* Admin Routes - outside MainLayout */}
+        <Route
+          path='/seeker/profile/export'
+          element={
+            <ProtectedRoute allowedRoles={['SEEKER']}>
+              <CvPdfExportPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path='/admin'
           element={

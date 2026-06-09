@@ -12,6 +12,7 @@ import {
   Users
 } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import ApplyWithCvModal from '@/components/job-detail/ApplyWithCvModal'
 import JobActionsCard from '@/components/job-detail/JobActionsCard'
 import JobCompanyCard from '@/components/job-detail/JobCompanyCard'
 import JobDetailHeader from '@/components/job-detail/JobDetailHeader'
@@ -21,6 +22,7 @@ import JobDetailTabs from '@/components/job-detail/JobDetailTabs'
 import SimilarJobsList from '@/components/job-detail/SimilarJobsList'
 
 import { createApplication } from '@/api/applications'
+import { getMyCvApi, uploadCvFileApi } from '@/api/cv'
 
 import { OutlineButton, PrimaryButton } from '@/components/ui/Buttons'
 import Container from '@/components/ui/Container'
@@ -69,6 +71,12 @@ const JobDetailPage = () => {
   const [actionNotice, setActionNotice] = useState<string | null>(null)
   const [isApplying, setIsApplying] = useState(false)
   const [hasApplied, setHasApplied] = useState(false)
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false)
+  const [isLoadingCv, setIsLoadingCv] = useState(false)
+  const [isUploadingCv, setIsUploadingCv] = useState(false)
+  const [currentCvUrl, setCurrentCvUrl] = useState<string | null>(null)
+  const [selectedCvUrl, setSelectedCvUrl] = useState<string | null>(null)
+  const [cvUploadError, setCvUploadError] = useState<string | null>(null)
   const sectionRefs = useRef<Partial<Record<JobDetailSectionId, HTMLElement | null>>>({})
   const isManualSectionScrollRef = useRef(false)
   const manualSectionScrollTimeoutRef = useRef<number | null>(null)
@@ -196,6 +204,12 @@ const JobDetailPage = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setActionNotice(null)
     setHasApplied(false)
+    setIsApplyModalOpen(false)
+    setIsLoadingCv(false)
+    setIsUploadingCv(false)
+    setCurrentCvUrl(null)
+    setSelectedCvUrl(null)
+    setCvUploadError(null)
   }, [id])
 
   useEffect(() => {
@@ -332,6 +346,85 @@ const JobDetailPage = () => {
     )
   }
 
+  const loadCurrentCv = async () => {
+    if (!user?.id) return
+
+    try {
+      setIsLoadingCv(true)
+      setCvUploadError(null)
+      const response = await getMyCvApi(user.id)
+      const cvUrl = response.cvUrl || null
+      setCurrentCvUrl(cvUrl)
+      setSelectedCvUrl(cvUrl)
+    } catch (error) {
+      const message =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+      setCurrentCvUrl(null)
+      setSelectedCvUrl(null)
+      setCvUploadError(message || 'Khong the tai CV hien tai. Ban co the upload CV moi de tiep tuc.')
+    } finally {
+      setIsLoadingCv(false)
+    }
+  }
+
+  const handleCvFileChange = async (file: File) => {
+    try {
+      setIsUploadingCv(true)
+      setCvUploadError(null)
+      const response = await uploadCvFileApi(file)
+      setCurrentCvUrl(response.cvUrl)
+      setSelectedCvUrl(response.cvUrl)
+    } catch (error) {
+      const message =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+      setCvUploadError(message || 'Khong the upload CV moi. Vui long thu lai.')
+    } finally {
+      setIsUploadingCv(false)
+    }
+  }
+
+  const handleSubmitApplication = async () => {
+    setActionNotice(null)
+
+    if (!job?.id || !selectedCvUrl) {
+      setCvUploadError('Ban phai chon CV hoac upload CV moi truoc khi ung tuyen.')
+      return
+    }
+
+    setIsApplying(true)
+
+    try {
+      await createApplication({ jobId: job.id, cvUrl: selectedCvUrl })
+      setHasApplied(true)
+      setIsApplyModalOpen(false)
+      setActionNotice('Application submitted successfully. The employer can now review your CV.')
+    } catch (error) {
+      const message =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+      const status =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { status?: number } }).response?.status
+          : null
+
+      if (status === 409) {
+        setHasApplied(true)
+        setIsApplyModalOpen(false)
+        setActionNotice('Bạn đã ứng tuyển vị trí này.')
+        return
+      }
+
+      setCvUploadError(message || 'We could not submit your application right now. Please try again in a moment.')
+    } finally {
+      setIsApplying(false)
+    }
+  }
+
   const handleApply = async () => {
     setActionNotice(null)
 
@@ -358,30 +451,9 @@ const JobDetailPage = () => {
       return
     }
 
-    setIsApplying(true)
-
-    try {
-      await createApplication({ jobId: job.id })
-      setHasApplied(true)
-      setActionNotice('Application submitted successfully. The employer can now review your profile.')
-    } catch (error) {
-      const message = error && typeof error === 'object' && 'response' in error
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
-        : null
-      const status = error && typeof error === 'object' && 'response' in error
-        ? (error as { response?: { status?: number } }).response?.status
-        : null
-
-      if (status === 409) {
-        setHasApplied(true)
-        setActionNotice('Bạn đã ứng tuyển vị trí này.')
-        return
-      }
-
-      setActionNotice(message || 'We could not submit your application right now. Please try again in a moment.')
-    } finally {
-      setIsApplying(false)
-    }
+    setCvUploadError(null)
+    setIsApplyModalOpen(true)
+    await loadCurrentCv()
   }
 
   const handleCopyLink = async () => {
@@ -726,6 +798,22 @@ const JobDetailPage = () => {
           </PrimaryButton>
         </div>
       </div>
+
+      <ApplyWithCvModal
+        open={isApplyModalOpen}
+        currentCvUrl={currentCvUrl}
+        selectedCvUrl={selectedCvUrl}
+        isLoadingCv={isLoadingCv}
+        isUploadingCv={isUploadingCv}
+        isSubmitting={isApplying}
+        uploadError={cvUploadError}
+        onClose={() => {
+          if (isApplying || isUploadingCv) return
+          setIsApplyModalOpen(false)
+        }}
+        onSubmit={() => void handleSubmitApplication()}
+        onFileChange={(file) => void handleCvFileChange(file)}
+      />
     </div>
   )
 }

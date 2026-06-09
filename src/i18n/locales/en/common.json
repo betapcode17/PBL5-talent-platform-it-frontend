@@ -144,7 +144,30 @@
     "hiringCompany": "Hiring company",
     "sections": "Job detail sections",
     "tryAgain": "Try Again",
-    "backToJobs": "Back to Jobs"
+    "backToJobs": "Back to Jobs",
+    "applyWithCv": {
+      "closeModal": "Close modal",
+      "eyebrow": "Apply with CV",
+      "title": "Choose a CV to send to the employer",
+      "description": "You must choose your current CV or upload a new CV before applying so the employer can review your profile.",
+      "selectedCv": "Selected CV",
+      "noSelectedCv": "No CV selected yet.",
+      "viewCv": "View CV",
+      "currentDefaultCv": "Current default CV",
+      "loadingCv": "Loading CV information...",
+      "keepOrReplace": "You can keep this CV or upload a new one to replace it.",
+      "noDefaultCv": "This seeker account does not have a default CV yet. You need to upload a new CV before applying.",
+      "createOrUpdate": "Create or update CV",
+      "uploadDescription": "Upload a new CV here to use it immediately for this application.",
+      "uploading": "Uploading CV...",
+      "uploadNew": "Upload new CV",
+      "noCvYet": "Do not have a CV yet?",
+      "noCvHint": "You can upload a CV directly in this popup or open your seeker profile to add more detailed information.",
+      "openSeekerProfile": "Open seeker profile",
+      "cancel": "Cancel",
+      "submitting": "Submitting application...",
+      "confirm": "Confirm application"
+    }
   },
   "employerSignup": {
     "badge": "Employer onboarding",

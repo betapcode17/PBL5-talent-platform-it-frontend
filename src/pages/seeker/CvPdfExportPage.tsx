@@ -4,16 +4,13 @@ import { useQuery } from '@tanstack/react-query'
 import { toPng } from 'html-to-image'
 import jsPDF from 'jspdf'
 import { CalendarDays, Download, Mail, MapPin, Phone, Printer, UserRound } from 'lucide-react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { getCvDetailApi } from '@/api/cv'
 import { useAuthStore } from '@/store/authStore'
 
 const CvPdfExportPage = () => {
   const user = useAuthStore((state) => state.user)
-  const [searchParams] = useSearchParams()
-  const shouldAutoPrint = searchParams.get('print') === '1'
-  const didPrint = useRef(false)
   const exportContentRef = useRef<HTMLDivElement | null>(null)
   const [isExportingPdf, setIsExportingPdf] = useState(false)
 
@@ -32,17 +29,6 @@ const CvPdfExportPage = () => {
     setCustomSubtitle(defaultSubtitle)
   }, [defaultSubtitle, customSubtitle])
 
-  useEffect(() => {
-    if (!cvDetail || !shouldAutoPrint || didPrint.current) return
-
-    didPrint.current = true
-    const timer = window.setTimeout(() => {
-      void handleExportPdf()
-    }, 300)
-
-    return () => window.clearTimeout(timer)
-  }, [cvDetail, shouldAutoPrint])
-
   const handleExportPdf = async () => {
     if (!exportContentRef.current || isExportingPdf) return
 
@@ -53,11 +39,15 @@ const CvPdfExportPage = () => {
       const imageData = await toPng(node, {
         cacheBust: true,
         pixelRatio: 2,
-        backgroundColor: '#efefef',
+        backgroundColor: '#ffffff',
         canvasWidth: node.scrollWidth * 2,
         canvasHeight: node.scrollHeight * 2,
         width: node.scrollWidth,
-        height: node.scrollHeight
+        height: node.scrollHeight,
+        style: {
+          background: '#ffffff',
+          margin: '0'
+        }
       })
 
       const pdf = new jsPDF({
@@ -92,7 +82,7 @@ const CvPdfExportPage = () => {
       pdf.save(`${safeName || 'CV'} - IT JOB VN.pdf`)
     } catch (error) {
       console.error('Export PDF failed', error)
-      window.alert('Khong the xuat PDF luc nay. Vui long thu lai.')
+      window.alert('Không thể xuất PDF lúc này. Vui lòng thử lại.')
     } finally {
       setIsExportingPdf(false)
     }
@@ -102,9 +92,9 @@ const CvPdfExportPage = () => {
     return (
       <div className='min-h-screen bg-[#f5f5f5] px-4 py-10'>
         <div className='mx-auto max-w-3xl rounded-sm border border-slate-200 bg-white p-8 text-center'>
-          <p className='text-lg font-semibold text-slate-900'>Khong tim thay thong tin seeker de xuat CV.</p>
+          <p className='text-lg font-semibold text-slate-900'>Không tìm thấy thông tin seeker để xuất CV.</p>
           <Link to='/login' className='mt-4 inline-flex rounded-sm bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white'>
-            Dang nhap lai
+            Đăng nhập lại
           </Link>
         </div>
       </div>
@@ -159,17 +149,30 @@ const CvPdfExportPage = () => {
             page-break-inside: avoid;
           }
         }
+
+        .export-clean {
+          width: 210mm !important;
+          max-width: 210mm !important;
+          padding: 0 !important;
+          background: #ffffff !important;
+        }
+
+        .export-clean .cv-page {
+          box-shadow: none !important;
+          margin: 0 !important;
+          background: #ffffff !important;
+        }
       `}</style>
 
       <div className='print-hidden border-b border-slate-200 bg-white'>
         <div className='mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4'>
           <div>
             <p className='text-xs font-semibold uppercase tracking-[0.2em] text-slate-500'>CV Export</p>
-            <h1 className='mt-1 text-xl font-semibold text-slate-950'>Mau CV theo bo cuc ho so chuyen nghiep</h1>
+            <h1 className='mt-1 text-xl font-semibold text-slate-950'>Mẫu CV theo bố cục hồ sơ chuyên nghiệp</h1>
           </div>
           <div className='flex flex-wrap gap-3'>
             <Link to='/seeker/profile' className='inline-flex h-11 items-center rounded-sm border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700'>
-              Quay lai ho so
+              Quay lại hồ sơ
             </Link>
             <button
               type='button'
@@ -178,11 +181,11 @@ const CvPdfExportPage = () => {
               className='inline-flex h-11 items-center gap-2 rounded-sm bg-slate-900 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60'
             >
               <Download className='h-4 w-4' />
-              {isExportingPdf ? 'Dang xuat PDF...' : 'Xuat PDF'}
+              {isExportingPdf ? 'Đang xuất PDF...' : 'Xuất PDF'}
             </button>
             <button type='button' onClick={() => window.print()} className='inline-flex h-11 items-center gap-2 rounded-sm border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700'>
               <Printer className='h-4 w-4' />
-              In thu
+              In thử
             </button>
           </div>
         </div>
@@ -190,21 +193,21 @@ const CvPdfExportPage = () => {
 
       <main className='cv-shell mx-auto max-w-5xl px-4 py-8'>
         <div className='print-hidden mx-auto mb-6 w-full max-w-[210mm] rounded-sm border border-slate-200 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]'>
-          <p className='text-sm font-semibold text-slate-900'>Kiem tra truoc khi xuat PDF</p>
-          <p className='mt-1 text-sm leading-6 text-slate-600'>Ban co the nhap them 1 dong phu duoi ten, vi du: Software Engineer. Dong nay chi ap dung cho ban PDF dang xuat.</p>
+          <p className='text-sm font-semibold text-slate-900'>Kiểm tra trước khi xuất PDF</p>
+          <p className='mt-1 text-sm leading-6 text-slate-600'>Bạn có thể nhập thêm 1 dòng phụ dưới tên, ví dụ: Software Engineer. Dòng này chỉ áp dụng cho bản PDF đang xuất.</p>
           <label className='mt-4 block'>
-            <span className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>Dong phu duoi ten</span>
+            <span className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>Dòng phụ dưới tên</span>
             <input
               type='text'
               value={customSubtitle}
               onChange={(event) => setCustomSubtitle(event.target.value)}
-              placeholder='Vi du: Software Engineer'
+              placeholder='Ví dụ: Software Engineer'
               className='mt-2 h-11 w-full rounded-sm border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-slate-500'
             />
           </label>
         </div>
 
-        <div ref={exportContentRef} className='mx-auto w-full max-w-[210mm] space-y-3'>
+        <div ref={exportContentRef} className={`mx-auto w-full max-w-[210mm] space-y-3 ${isExportingPdf ? 'export-clean' : ''}`}>
           <section className='cv-page overflow-hidden bg-white p-[8mm] shadow-[0_24px_70px_rgba(15,23,42,0.08)]'>
             <header className='avoid-break'>
               <div className='grid gap-5 md:grid-cols-[150px_minmax(0,1fr)] md:items-center'>
@@ -227,15 +230,15 @@ const CvPdfExportPage = () => {
             </header>
 
             <section className='avoid-break mt-5 grid gap-4 md:grid-cols-3'>
-              <TopBox title='Thong tin ca nhan'>
-                <InfoLine icon={<CalendarDays className='h-4 w-4' />} text={formatDate(user.registration_date) || 'Chua cap nhat ngay tham gia'} />
-                <InfoLine icon={<Mail className='h-4 w-4' />} text={user.email || cvDetail?.seeker.email || 'Chua cap nhat email'} />
-                <InfoLine icon={<Phone className='h-4 w-4' />} text={user.phone || 'Chua cap nhat so dien thoai'} />
-                <InfoLine icon={<UserRound className='h-4 w-4' />} text={user.gender || 'Chua cap nhat gioi tinh'} />
+              <TopBox title='Thông tin cá nhân'>
+                <InfoLine icon={<CalendarDays className='h-4 w-4' />} text={formatDate(user.registration_date) || 'Chưa cập nhật ngày tham gia'} />
+                <InfoLine icon={<Mail className='h-4 w-4' />} text={user.email || cvDetail?.seeker.email || 'Chưa cập nhật email'} />
+                <InfoLine icon={<Phone className='h-4 w-4' />} text={user.phone || 'Chưa cập nhật số điện thoại'} />
+                <InfoLine icon={<UserRound className='h-4 w-4' />} text={user.gender || 'Chưa cập nhật giới tính'} />
                 <InfoLine icon={<MapPin className='h-4 w-4' />} text={`Seeker ID: SEEKER-${user.id}`} />
               </TopBox>
 
-              <TopBox title='Hoc van'>
+              <TopBox title='Học vấn'>
                 <CompactList
                   items={
                     cvDetail?.educations?.map((item) => ({
@@ -245,61 +248,61 @@ const CvPdfExportPage = () => {
                       detail: item.description || undefined
                     })) ?? []
                   }
-                  emptyText='Chua co du lieu hoc van.'
+                  emptyText='Chưa có dữ liệu học vấn.'
                 />
               </TopBox>
 
-              <TopBox title='Chung chi'>
+              <TopBox title='Chứng chỉ'>
                 <CompactList
                   items={
                     cvDetail?.certificates?.map((item) => ({
-                      title: item.issuedDate ? formatDate(item.issuedDate) : 'Chua cap nhat ngay',
+                      title: item.issuedDate ? formatDate(item.issuedDate) : 'Chưa cập nhật ngày',
                       subtitle: item.title,
                       detail: item.issuer || undefined
                     })) ?? []
                   }
-                  emptyText='Chua co du lieu chung chi.'
+                  emptyText='Chưa có dữ liệu chứng chỉ.'
                 />
               </TopBox>
             </section>
 
-            <MainSection title='Kinh nghiem lam viec' className='mt-6'>
+            <MainSection title='Kinh nghiệm làm việc' className='mt-6'>
               <TimelineList
                 items={
                   cvDetail?.experiences?.map((item) => ({
                     leftTop: formatRange(item.startDate, item.endDate),
                     leftBottom: item.company,
                     rightTitle: item.position,
-                    rightDescription: item.description || 'Chua co mo ta kinh nghiem.'
+                    rightDescription: item.description || 'Chưa có mô tả kinh nghiệm.'
                   })) ?? []
                 }
-                emptyText='Chua co du lieu kinh nghiem lam viec.'
+                emptyText='Chưa có dữ liệu kinh nghiệm làm việc.'
               />
             </MainSection>
           </section>
 
           <section className='cv-page overflow-hidden bg-white p-[8mm] shadow-[0_24px_70px_rgba(15,23,42,0.08)]'>
             <section className='grid gap-5 md:grid-cols-2'>
-              <MainSection title='Ky nang'>
+              <MainSection title='Kỹ năng'>
                 <SkillNarrativeList skills={cvDetail?.skills ?? []} />
               </MainSection>
 
               <div className='space-y-8'>
-                <MainSection title='Du an'>
+                <MainSection title='Dự án'>
                   <CompactList
                     items={
                       cvDetail?.projects?.map((item) => ({
-                        title: formatRange(item.startDate, item.endDate) || 'Du an',
+                        title: formatRange(item.startDate, item.endDate) || 'Dự án',
                         subtitle: item.name,
                         meta: [item.role, item.link].filter(Boolean).join(' | ') || undefined,
                         detail: item.description || undefined
                       })) ?? []
                     }
-                    emptyText='Chua co du lieu du an.'
+                    emptyText='Chưa có dữ liệu dự án.'
                   />
                 </MainSection>
 
-                <MainSection title='Mo ta bo sung'>
+                <MainSection title='Mô tả bổ sung'>
                   <CompactList
                     items={
                       cvDetail?.personalities?.map((item) => ({
@@ -307,7 +310,7 @@ const CvPdfExportPage = () => {
                         detail: item.description || undefined
                       })) ?? []
                     }
-                    emptyText='Chua co du lieu mo ta bo sung.'
+                    emptyText='Chưa có dữ liệu mô tả bổ sung.'
                   />
                 </MainSection>
               </div>
@@ -323,13 +326,13 @@ const CvPdfExportPage = () => {
             className='inline-flex h-11 items-center gap-2 rounded-sm bg-slate-900 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60'
           >
             <Download className='h-4 w-4' />
-            {isExportingPdf ? 'Dang xuat PDF...' : 'Tai PDF'}
+            {isExportingPdf ? 'Đang xuất PDF...' : 'Tải PDF'}
           </button>
         </div>
 
         {isLoading ? (
           <div className='print-hidden mx-auto mt-4 max-w-[210mm] rounded-sm border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600'>
-            Dang tai du lieu CV...
+            Đang tải dữ liệu CV...
           </div>
         ) : null}
       </main>
@@ -445,7 +448,7 @@ const SkillNarrativeList = ({
   }>
 }) => {
   if (skills.length === 0) {
-    return <p className='text-[14px] leading-6 text-slate-500'>Chua co du lieu ky nang.</p>
+    return <p className='text-[14px] leading-6 text-slate-500'>Chưa có dữ liệu kỹ năng.</p>
   }
 
   const grouped = groupSkillsByCategory(skills)
@@ -460,9 +463,9 @@ const SkillNarrativeList = ({
               <div key={`${group.category}-${skill.name}`} className='text-[14px] leading-7 text-slate-800'>
                 <p className='font-semibold'>{skill.name}</p>
                 <p>
-                  {[skill.experienceMonths !== null && skill.experienceMonths !== undefined ? `${skill.experienceMonths} thang kinh nghiem` : undefined, skill.isStrong ? 'Ky nang manh' : undefined]
+                  {[skill.experienceMonths !== null && skill.experienceMonths !== undefined ? `${skill.experienceMonths} tháng kinh nghiệm` : undefined, skill.isStrong ? 'Kỹ năng mạnh' : undefined]
                     .filter(Boolean)
-                    .join(' | ') || 'Da duoc them vao ho so ky nang.'}
+                    .join(' | ') || 'Đã được thêm vào hồ sơ kỹ năng.'}
                 </p>
               </div>
             ))}
@@ -473,7 +476,7 @@ const SkillNarrativeList = ({
   )
 }
 
-const inferHeadline = (position?: string | null) => position || 'Ung vien cong nghe thong tin'
+const inferHeadline = (position?: string | null) => position || 'Ứng viên công nghệ thông tin'
 
 const formatDate = (date?: string | null) => {
   if (!date) return ''
@@ -487,24 +490,24 @@ const formatDate = (date?: string | null) => {
 const formatRange = (start?: string | null, end?: string | null) => {
   if (!start && !end) return ''
 
-  return `${formatDate(start) || 'Chua cap nhat'} - ${formatDate(end) || 'Hien tai'}`
+  return `${formatDate(start) || 'Chưa cập nhật'} - ${formatDate(end) || 'Hiện tại'}`
 }
 
 const groupSkillsByCategory = (skills: Array<{ name: string; category?: string | null; experienceMonths?: number | null; isStrong?: boolean }>) => {
   const labels: Record<string, string> = {
-    programming_language: 'Ngon ngu lap trinh',
+    programming_language: 'Ngôn ngữ lập trình',
     framework: 'Framework',
-    os: 'He dieu hanh',
-    database: 'Co so du lieu',
-    version_control: 'Quan ly phien ban',
-    development_tool: 'Cong cu phat trien',
-    platform: 'Nen tang'
+    os: 'Hệ điều hành',
+    database: 'Cơ sở dữ liệu',
+    version_control: 'Quản lý phiên bản',
+    development_tool: 'Công cụ phát triển',
+    platform: 'Nền tảng'
   }
 
   const grouped = new Map<string, typeof skills>()
 
   skills.forEach((skill) => {
-    const key = labels[skill.category ?? ''] ?? 'Ky nang khac'
+    const key = labels[skill.category ?? ''] ?? 'Kỹ năng khác'
     grouped.set(key, [...(grouped.get(key) ?? []), skill])
   })
 

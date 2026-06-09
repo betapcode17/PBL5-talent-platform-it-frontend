@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  Award,
   BellRing,
   BriefcaseBusiness,
   CalendarClock,
@@ -11,7 +10,6 @@ import {
   Copy,
   ExternalLink,
   FileBadge2,
-  FileText,
   FileUp,
   GraduationCap,
   Languages,
@@ -337,19 +335,10 @@ const ProfilePage = () => {
       { id: 'basic-info', label: t('seekerProfile.sections.basicInfo') },
       { id: 'education', label: t('seekerProfile.sections.education') },
       { id: 'certifications', label: t('seekerProfile.sections.certifications') },
-      { id: 'awards', label: t('seekerProfile.sections.awards') },
       { id: 'skills', label: t('seekerProfile.sections.skills') },
       { id: 'projects', label: t('seekerProfile.sections.projects') },
       { id: 'experience', label: t('seekerProfile.sections.experience') },
       { id: 'about', label: t('seekerProfile.sections.about') }
-    ],
-    [t]
-  )
-
-  const awards = useMemo(
-    () => [
-      { title: t('seekerProfile.awards.hackathon.title'), date: t('seekerProfile.awards.hackathon.date') },
-      { title: t('seekerProfile.awards.semester.title'), date: t('seekerProfile.awards.semester.date') }
     ],
     [t]
   )
@@ -397,7 +386,7 @@ const ProfilePage = () => {
   }
 
   const handleExportCvPdf = () => {
-    const exportUrl = '/seeker/profile/export?print=1'
+    const exportUrl = '/seeker/profile/export'
     const exportWindow = window.open(exportUrl, '_blank', 'noopener,noreferrer')
 
     if (!exportWindow) {
@@ -530,7 +519,6 @@ const ProfilePage = () => {
             <p className='text-xs font-semibold uppercase tracking-[0.22em] text-slate-400'>{t('seekerProfile.quickActions.title')}</p>
             <div className='mt-4 grid gap-3'>
               <ActionTile title={t('seekerProfile.quickActions.editProfile.title')} description={t('seekerProfile.quickActions.editProfile.description')} icon={<Pencil className='h-4 w-4' />} />
-              <ActionTile title={t('seekerProfile.quickActions.uploadCv.title')} description={t('seekerProfile.quickActions.uploadCv.description')} icon={<FileText className='h-4 w-4' />} />
               <ActionTile title={t('seekerProfile.quickActions.reviewProfile.title')} description={t('seekerProfile.quickActions.reviewProfile.description')} icon={<Sparkles className='h-4 w-4' />} />
               <button
                 type='button'
@@ -853,14 +841,6 @@ const ProfilePage = () => {
                     <CvFormActions isEditing={editing?.section === 'certificate'} isPending={certificateMutation.isPending} onCancel={clearEdit} onSave={() => certificateMutation.mutate()} />
                   </div>
                 ) : null}
-              </SectionCard>
-
-              <SectionCard id='awards' title={t('seekerProfile.sections.awards')} icon={<Award className='h-5 w-5' />} editLabel={t('seekerProfile.common.edit')}>
-                <div className='space-y-3'>
-                  {awards.map((item) => (
-                    <TimelineRow key={item.title} title={item.title} meta={item.date} />
-                  ))}
-                </div>
               </SectionCard>
 
               <SectionCard
@@ -1446,16 +1426,6 @@ const LinkItem = ({ label, value }: { label: string; value: string }) => (
       <span className='truncate'>{value}</span>
       <ExternalLink className='h-4 w-4 shrink-0' />
     </a>
-  </div>
-)
-
-const TimelineRow = ({ title, meta }: { title: string; meta: string }) => (
-  <div className='flex items-start gap-4 rounded-[22px] border border-slate-200 bg-slate-50/70 px-4 py-4'>
-    <div className='mt-1 h-3 w-3 shrink-0 rounded-full bg-sky-500' />
-    <div className='min-w-0 flex-1'>
-      <p className='text-sm font-semibold text-slate-900'>{title}</p>
-      <p className='mt-1 text-sm text-slate-500'>{meta}</p>
-    </div>
   </div>
 )
 

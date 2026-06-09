@@ -1,5 +1,15 @@
 import axiosInstance from '@/api/axiosInstance'
 
+export type MyCvResponse = {
+  id: number
+  userId: number
+  cvUrl?: string | null
+}
+
+export type UploadCvFileResponse = {
+  cvUrl: string
+}
+
 export type CvEducation = {
   id: string
   school: string
@@ -76,6 +86,7 @@ export type CvEducationPayload = {
   endDate?: string | null
   description?: string | null
 }
+
 export type CvExperiencePayload = {
   company: string | null
   position: string | null
@@ -83,22 +94,26 @@ export type CvExperiencePayload = {
   endDate?: string | null
   description?: string | null
 }
+
 export type CvSkillPayload = {
   name: string
   category?: string | null
   experienceMonths?: number | null
   isStrong?: boolean
 }
+
 export type CvPersonalityPayload = {
   type: string | null
   description?: string | null
 }
+
 export type CvCertificatePayload = {
   title: string | null
   issuer: string | null
   issuedDate?: string | null
   fileUrl?: string | null
 }
+
 export type CvProjectPayload = {
   name: string | null
   description?: string | null
@@ -108,9 +123,13 @@ export type CvProjectPayload = {
   endDate?: string | null
 }
 
+export const getMyCvApi = async (userId: number) => {
+  const response = await axiosInstance.get<MyCvResponse>(`/cv/${userId}`)
+  return response.data
+}
+
 export const getCvDetailApi = async (userId: number) => {
   const response = await axiosInstance.get<CvDetail>(`/cv/${userId}`)
-
   return response.data
 }
 
@@ -118,8 +137,7 @@ export const uploadCvFileApi = async (file: File) => {
   const formData = new FormData()
   formData.append('file', file)
 
-  const response = await axiosInstance.put<{ cvUrl: string }>('/cv/file', formData)
-
+  const response = await axiosInstance.put<UploadCvFileResponse>('/cv/file', formData)
   return response.data
 }
 

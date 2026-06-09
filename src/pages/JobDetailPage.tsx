@@ -23,7 +23,7 @@ import JobDetailState from '@/components/job-detail/JobDetailState'
 import JobDetailTabs from '@/components/job-detail/JobDetailTabs' 
 import SimilarJobsList from '@/components/job-detail/SimilarJobsList'
 
-import { createApplication, uploadApplicationCvApi } from '@/api/applications'
+import { createApplication, getMyApplicationsApi, uploadApplicationCvApi } from '@/api/applications'
 import { getCvDetailApi } from '@/api/cv'
 
 import { OutlineButton, PrimaryButton } from '@/components/ui/Buttons'
@@ -82,6 +82,8 @@ const JobDetailPage = () => {
   const [isLoadingCvOptions, setIsLoadingCvOptions] = useState(false)
   const [isUploadingApplyCv, setIsUploadingApplyCv] = useState(false)
   const [applyModalNotice, setApplyModalNotice] = useState<string | null>(null)
+  const selectedCvUrl = defaultCvUrl
+  const setCvUploadError = setApplyModalNotice
   const sectionRefs = useRef<Partial<Record<JobDetailSectionId, HTMLElement | null>>>({})
   const isManualSectionScrollRef = useRef(false)
   const manualSectionScrollTimeoutRef = useRef<number | null>(null)
@@ -213,8 +215,33 @@ const JobDetailPage = () => {
     setSelectedCvOption('default')
     setSelectedCvFile(null)
     setDefaultCvUrl(null)
+    setIsLoadingCvOptions(false)
+    setIsUploadingApplyCv(false)
     setApplyModalNotice(null)
   }, [id])
+
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== 'SEEKER' || !job?.id) {
+      setHasApplied(false)
+      return
+    }
+
+    let cancelled = false
+
+    getMyApplicationsApi({ page: 1, limit: 100 })
+      .then((response) => {
+        if (cancelled) return
+        setHasApplied(response.applications.some((application) => application.job.id === job.id))
+      })
+      .catch(() => {
+        if (cancelled) return
+        setHasApplied(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [isAuthenticated, job?.id, user?.role])
 
   useEffect(() => {
     if (availableSections.length === 0) {
@@ -390,6 +417,45 @@ const JobDetailPage = () => {
     setSelectedCvFile(null)
     setApplyModalNotice(null)
   }
+
+  const handleSubmitApplicationLegacy = async () => {
+    setActionNotice(null)
+
+    if (!job?.id || !selectedCvUrl) {
+      setCvUploadError('Ban phai chon CV hoac upload CV moi truoc khi ung tuyen.')
+      return
+    }
+
+    setIsApplying(true)
+
+    try {
+      await createApplication({ jobId: job.id, cvUrl: selectedCvUrl })
+      setHasApplied(true)
+      setIsApplyModalOpen(false)
+      setActionNotice('Application submitted successfully. The employer can now review your CV.')
+    } catch (error) {
+      const message =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+      const status =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { status?: number } }).response?.status
+          : null
+
+      if (status === 409) {
+        setHasApplied(true)
+        setIsApplyModalOpen(false)
+        setActionNotice('Bạn đã ứng tuyển vị trí này.')
+        return
+      }
+
+      setCvUploadError(message || 'We could not submit your application right now. Please try again in a moment.')
+    } finally {
+      setIsApplying(false)
+    }
+  }
+  void handleSubmitApplicationLegacy
 
   const handleApply = async () => {
     setActionNotice(null)

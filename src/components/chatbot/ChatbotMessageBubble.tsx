@@ -61,21 +61,6 @@ const isCvAnalysisMessage = (message: ChatMessage) =>
 const isCvJdMatchMessage = (message: ChatMessage) =>
   message.messageType === 'cv_jd_match' || message.detectedIntent === 'cv_jd_match' || !!message.cvJdMatch
 
-const stripSearchSummaryHeading = (content: string) => {
-  const normalized = String(content || '').trim()
-  if (!normalized) return normalized
-
-  const lines = normalized.split('\n')
-  if (!lines.length) return normalized
-
-  const [firstLine, ...rest] = lines
-  if (/^(Tim thay|Toi tim duoc)\s+\d+\s+cong viec phu hop\./i.test(firstLine.trim())) {
-    return rest.join('\n').trim()
-  }
-
-  return normalized
-}
-
 const compactAssistantContent = (content: string, hasJobResults: boolean) => {
   if (!hasJobResults) return content
   return ''

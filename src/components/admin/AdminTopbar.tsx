@@ -1,7 +1,8 @@
-import { Bell, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import LanguageSwitcher from '@/components/i18n/LanguageSwitcher'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { Input } from '@/components/ui/input'
 
 type AdminTopbarProps = {
@@ -37,16 +38,7 @@ export function AdminTopbar({ adminName = 'Super Admin', title, subtitle }: Admi
           className='rounded-full dark:border-white/8 dark:bg-[#121423]/90 dark:text-slate-200 dark:hover:text-white'
         />
 
-        <button
-          type='button'
-          className='relative flex size-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-[0_12px_34px_rgba(15,23,42,0.05)] transition hover:text-slate-950 dark:border-white/8 dark:bg-[#121423]/90 dark:text-slate-300 dark:hover:text-white'
-          aria-label={t('admin.notifications')}
-        >
-          <Bell className='size-5' />
-          <span className='absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white'>
-            3
-          </span>
-        </button>
+        <NotificationBell buttonClassName='relative flex size-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-[0_12px_34px_rgba(15,23,42,0.05)] transition hover:text-slate-950 dark:border-white/8 dark:bg-[#121423]/90 dark:text-slate-300 dark:hover:text-white' />
 
         <div className='relative flex size-11 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-600 dark:bg-slate-700 dark:text-white'>
           SA

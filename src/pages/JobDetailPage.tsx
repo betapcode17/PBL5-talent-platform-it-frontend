@@ -5,10 +5,13 @@ import {
   ChevronRight,
   CircleCheckBig,
   Clock3,
+  FileText,
   GraduationCap,
   Layers3,
+  LoaderCircle,
   type LucideIcon,
   Sparkles,
+  Upload,
   Users
 } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -20,7 +23,8 @@ import JobDetailState from '@/components/job-detail/JobDetailState'
 import JobDetailTabs from '@/components/job-detail/JobDetailTabs' 
 import SimilarJobsList from '@/components/job-detail/SimilarJobsList'
 
-import { createApplication } from '@/api/applications'
+import { createApplication, uploadApplicationCvApi } from '@/api/applications'
+import { getCvDetailApi } from '@/api/cv'
 
 import { OutlineButton, PrimaryButton } from '@/components/ui/Buttons'
 import Container from '@/components/ui/Container'
@@ -57,6 +61,8 @@ type PageSection = {
   label: string
 }
 
+type ApplyCvOption = 'default' | 'upload'
+
 const isDefined = <T,>(value: T | null | undefined): value is T => value !== null && value !== undefined
 
 const JobDetailPage = () => {
@@ -69,6 +75,13 @@ const JobDetailPage = () => {
   const [actionNotice, setActionNotice] = useState<string | null>(null)
   const [isApplying, setIsApplying] = useState(false)
   const [hasApplied, setHasApplied] = useState(false)
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false)
+  const [selectedCvOption, setSelectedCvOption] = useState<ApplyCvOption>('default')
+  const [selectedCvFile, setSelectedCvFile] = useState<File | null>(null)
+  const [defaultCvUrl, setDefaultCvUrl] = useState<string | null>(null)
+  const [isLoadingCvOptions, setIsLoadingCvOptions] = useState(false)
+  const [isUploadingApplyCv, setIsUploadingApplyCv] = useState(false)
+  const [applyModalNotice, setApplyModalNotice] = useState<string | null>(null)
   const sectionRefs = useRef<Partial<Record<JobDetailSectionId, HTMLElement | null>>>({})
   const isManualSectionScrollRef = useRef(false)
   const manualSectionScrollTimeoutRef = useRef<number | null>(null)
@@ -196,6 +209,11 @@ const JobDetailPage = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setActionNotice(null)
     setHasApplied(false)
+    setIsApplyModalOpen(false)
+    setSelectedCvOption('default')
+    setSelectedCvFile(null)
+    setDefaultCvUrl(null)
+    setApplyModalNotice(null)
   }, [id])
 
   useEffect(() => {
@@ -332,6 +350,47 @@ const JobDetailPage = () => {
     )
   }
 
+  const openApplyModal = async () => {
+    if (!user?.id) {
+      return
+    }
+
+    setIsLoadingCvOptions(true)
+    setApplyModalNotice(null)
+    setSelectedCvFile(null)
+
+    try {
+      const cvDetail = await getCvDetailApi(user.id)
+      const existingCvUrl = cvDetail.cvUrl ?? null
+
+      setDefaultCvUrl(existingCvUrl)
+      setSelectedCvOption(existingCvUrl ? 'default' : 'upload')
+      setIsApplyModalOpen(true)
+
+      if (!existingCvUrl) {
+        setApplyModalNotice('Bạn chưa có CV mặc định. Hãy tải lên một CV để hoàn tất ứng tuyển.')
+      }
+    } catch (error) {
+      const message = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+        : null
+
+      setActionNotice(message || 'Không thể tải thông tin CV lúc này. Vui lòng thử lại sau ít phút.')
+    } finally {
+      setIsLoadingCvOptions(false)
+    }
+  }
+
+  const closeApplyModal = () => {
+    if (isApplying || isUploadingApplyCv) {
+      return
+    }
+
+    setIsApplyModalOpen(false)
+    setSelectedCvFile(null)
+    setApplyModalNotice(null)
+  }
+
   const handleApply = async () => {
     setActionNotice(null)
 
@@ -358,12 +417,52 @@ const JobDetailPage = () => {
       return
     }
 
+    await openApplyModal()
+  }
+
+  const submitApplication = async () => {
+    if (!job?.id) {
+      return
+    }
+
+    let cvUrl = defaultCvUrl
+
+    if (selectedCvOption === 'upload') {
+      if (!selectedCvFile) {
+        setApplyModalNotice('Vui lòng chọn file CV trước khi ứng tuyển.')
+        return
+      }
+
+      setIsUploadingApplyCv(true)
+
+      try {
+        const uploadResult = await uploadApplicationCvApi(selectedCvFile)
+        cvUrl = uploadResult.cvUrl
+      } catch (error) {
+        const message = error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+
+        setApplyModalNotice(message || 'Không thể tải CV lên lúc này. Vui lòng thử lại sau.')
+        return
+      } finally {
+        setIsUploadingApplyCv(false)
+      }
+    }
+
+    if (!cvUrl) {
+      setApplyModalNotice('Vui lòng chọn CV mặc định hoặc tải lên một CV khác để ứng tuyển.')
+      return
+    }
+
     setIsApplying(true)
 
     try {
-      await createApplication({ jobId: job.id })
+      await createApplication({ jobId: job.id, cvUrl })
       setHasApplied(true)
-      setActionNotice('Application submitted successfully. The employer can now review your profile.')
+      setIsApplyModalOpen(false)
+      setSelectedCvFile(null)
+      setActionNotice('Ứng tuyển thành công. Nhà tuyển dụng đã có thể xem hồ sơ của bạn.')
     } catch (error) {
       const message = error && typeof error === 'object' && 'response' in error
         ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
@@ -374,11 +473,12 @@ const JobDetailPage = () => {
 
       if (status === 409) {
         setHasApplied(true)
+        setIsApplyModalOpen(false)
         setActionNotice('Bạn đã ứng tuyển vị trí này.')
         return
       }
 
-      setActionNotice(message || 'We could not submit your application right now. Please try again in a moment.')
+      setApplyModalNotice(message || 'Không thể gửi hồ sơ lúc này. Vui lòng thử lại sau ít phút.')
     } finally {
       setIsApplying(false)
     }
@@ -670,7 +770,7 @@ const JobDetailPage = () => {
               <JobActionsCard
                 isBookmarked={isBookmarked}
                 isBookmarkLoading={isBookmarkLoading}
-                isApplying={isApplying}
+                isApplying={isApplying || isLoadingCvOptions}
                 hasApplied={hasApplied}
                 onApply={handleApply}
                 onToggleBookmark={handleBookmark}
@@ -716,16 +816,150 @@ const JobDetailPage = () => {
           </OutlineButton>
           <PrimaryButton
             onClick={handleApply}
-            disabled={isApplying || hasApplied}
+            disabled={isApplying || isLoadingCvOptions || hasApplied}
             className={cn(
               'h-12 flex-[1.3] rounded-2xl disabled:cursor-not-allowed disabled:opacity-70',
               hasApplied && 'bg-emerald-600 shadow-[0_14px_32px_rgba(16,185,129,0.22)] hover:bg-emerald-600'
             )}
           >
-            {isApplying ? 'Applying...' : hasApplied ? 'Applied' : 'Apply Now'}
+            {isApplying || isLoadingCvOptions ? 'Đang chuẩn bị...' : hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
           </PrimaryButton>
         </div>
       </div>
+
+      {isApplyModalOpen ? (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm'>
+          <div className='w-full max-w-2xl overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]'>
+            <div className='border-b border-slate-200 bg-slate-50 px-6 py-5'>
+              <div className='flex items-start justify-between gap-4'>
+                <div>
+                  <h2 className='text-xl font-semibold text-slate-950'>Chọn CV để ứng tuyển</h2>
+                  <p className='mt-1 text-sm leading-6 text-slate-600'>
+                    Bạn có thể dùng CV mặc định hiện có hoặc tải lên một CV khác chỉ cho lần ứng tuyển này.
+                  </p>
+                </div>
+                <button
+                  type='button'
+                  onClick={closeApplyModal}
+                  disabled={isApplying || isUploadingApplyCv}
+                  className='rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-500 transition hover:border-slate-300 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-60'
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+
+            <div className='space-y-4 px-6 py-6'>
+              <label
+                className={cn(
+                  'flex cursor-pointer items-start gap-4 rounded-[24px] border p-5 transition',
+                  selectedCvOption === 'default'
+                    ? 'border-violet-300 bg-violet-50/70'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                )}
+              >
+                <input
+                  type='radio'
+                  name='apply-cv-option'
+                  value='default'
+                  checked={selectedCvOption === 'default'}
+                  onChange={() => setSelectedCvOption('default')}
+                  disabled={!defaultCvUrl || isApplying || isUploadingApplyCv}
+                  className='mt-1 h-4 w-4 accent-violet-600'
+                />
+                <div className='flex-1'>
+                  <div className='flex items-center gap-2 text-base font-semibold text-slate-900'>
+                    <FileText className='h-5 w-5 text-violet-600' />
+                    CV mặc định
+                  </div>
+                  <p className='mt-1 text-sm leading-6 text-slate-600'>
+                    {defaultCvUrl
+                      ? 'Dùng file CV hiện đang lưu trong hồ sơ seeker của bạn.'
+                      : 'Hiện bạn chưa có CV mặc định trong hồ sơ.'}
+                  </p>
+                  {defaultCvUrl ? (
+                    <a
+                      href={defaultCvUrl}
+                      target='_blank'
+                      rel='noreferrer'
+                      className='mt-3 inline-flex items-center gap-2 text-sm font-semibold text-violet-700 hover:text-violet-800'
+                    >
+                      Xem CV hiện tại
+                    </a>
+                  ) : null}
+                </div>
+              </label>
+
+              <label
+                className={cn(
+                  'flex cursor-pointer items-start gap-4 rounded-[24px] border p-5 transition',
+                  selectedCvOption === 'upload'
+                    ? 'border-sky-300 bg-sky-50/70'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                )}
+              >
+                <input
+                  type='radio'
+                  name='apply-cv-option'
+                  value='upload'
+                  checked={selectedCvOption === 'upload'}
+                  onChange={() => setSelectedCvOption('upload')}
+                  disabled={isApplying || isUploadingApplyCv}
+                  className='mt-1 h-4 w-4 accent-sky-600'
+                />
+                <div className='flex-1'>
+                  <div className='flex items-center gap-2 text-base font-semibold text-slate-900'>
+                    <Upload className='h-5 w-5 text-sky-600' />
+                    Tải lên CV khác
+                  </div>
+                  <p className='mt-1 text-sm leading-6 text-slate-600'>
+                    File này chỉ dùng cho lần ứng tuyển hiện tại, không ghi đè CV mặc định của bạn.
+                  </p>
+                  <input
+                    type='file'
+                    accept='.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    onChange={(event) => {
+                      setSelectedCvOption('upload')
+                      setSelectedCvFile(event.target.files?.[0] ?? null)
+                      setApplyModalNotice(null)
+                    }}
+                    disabled={isApplying || isUploadingApplyCv}
+                    className='mt-4 block w-full rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm text-slate-600 file:mr-4 file:rounded-xl file:border-0 file:bg-sky-100 file:px-4 file:py-2 file:font-semibold file:text-sky-700 hover:border-sky-300'
+                  />
+                  {selectedCvFile ? (
+                    <p className='mt-3 text-sm font-medium text-slate-700'>{selectedCvFile.name}</p>
+                  ) : null}
+                </div>
+              </label>
+
+              {applyModalNotice ? (
+                <div className='rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700'>
+                  {applyModalNotice}
+                </div>
+              ) : null}
+            </div>
+
+            <div className='flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-6 py-5 sm:flex-row sm:justify-end'>
+              <OutlineButton
+                onClick={closeApplyModal}
+                disabled={isApplying || isUploadingApplyCv}
+                className='rounded-2xl border-slate-200 text-slate-700'
+              >
+                Hủy
+              </OutlineButton>
+              <PrimaryButton
+                onClick={submitApplication}
+                disabled={isApplying || isUploadingApplyCv}
+                className='rounded-2xl'
+              >
+                {isUploadingApplyCv ? <LoaderCircle className='mr-2 h-4 w-4 animate-spin' /> : null}
+                {isApplying ? <LoaderCircle className='mr-2 h-4 w-4 animate-spin' /> : null}
+                {isUploadingApplyCv ? 'Đang tải CV...' : isApplying ? 'Đang ứng tuyển...' : 'Xác nhận ứng tuyển'}
+              </PrimaryButton>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

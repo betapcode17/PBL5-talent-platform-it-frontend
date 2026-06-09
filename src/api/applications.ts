@@ -2,6 +2,7 @@ import axiosInstance from '@/api/axiosInstance'
 
 export type CreateApplicationRequest = {
   jobId: number
+  cvUrl?: string
   coverLetter?: string
 }
 
@@ -58,6 +59,15 @@ export type GetMyApplicationsResponse = {
 
 export const createApplication = async (data: CreateApplicationRequest) => {
   const response = await axiosInstance.post<CreateApplicationResponse>('/applications', data)
+
+  return response.data
+}
+
+export const uploadApplicationCvApi = async (file: File) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const response = await axiosInstance.post<{ cvUrl: string }>('/applications/upload-cv', formData)
 
   return response.data
 }

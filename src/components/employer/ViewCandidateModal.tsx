@@ -1,7 +1,8 @@
-import { Mail, Phone, X } from 'lucide-react'
+import { ExternalLink, FileBadge2, Mail, Phone, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { acceptEmployerApplicationApi, rejectEmployerApplicationApi } from '@/api/employer'
 import type { EmployerCandidateItem } from '@/@types/employer'
 import { Button } from '@/components/ui/button'
@@ -120,25 +121,58 @@ const ViewCandidateModal = ({ candidate, isOpen, onClose }: ViewCandidateModalPr
 
         <div className='flex-1 overflow-y-auto p-4 sm:p-6'>
           <div className='space-y-6'>
-            <div className='space-y-3'>
-              <h3 className='text-lg font-semibold text-slate-950'>{t('employer.candidates.modal.contactInformation')}</h3>
-              <div className='space-y-2'>
-                <div className='flex items-center gap-3 rounded-lg bg-slate-50 p-3'>
-                  <Mail className='h-5 w-5 text-blue-600' />
-                  <div>
-                    <p className='text-xs font-medium text-slate-600'>{t('employer.candidates.table.email')}</p>
-                    <p className='text-sm font-semibold text-slate-950'>{candidate.seeker.email || '-'}</p>
-                  </div>
-                </div>
-                {candidate.seeker.phone && (
+            <div className='grid gap-6 lg:grid-cols-[minmax(0,1fr)_260px]'>
+              <div className='space-y-3'>
+                <h3 className='text-lg font-semibold text-slate-950'>{t('employer.candidates.modal.contactInformation')}</h3>
+                <div className='space-y-2'>
                   <div className='flex items-center gap-3 rounded-lg bg-slate-50 p-3'>
-                    <Phone className='h-5 w-5 text-green-600' />
+                    <Mail className='h-5 w-5 text-blue-600' />
                     <div>
-                      <p className='text-xs font-medium text-slate-600'>{t('employer.candidates.modal.phone')}</p>
-                      <p className='text-sm font-semibold text-slate-950'>{candidate.seeker.phone}</p>
+                      <p className='text-xs font-medium text-slate-600'>{t('employer.candidates.table.email')}</p>
+                      <p className='text-sm font-semibold text-slate-950'>{candidate.seeker.email || '-'}</p>
                     </div>
                   </div>
-                )}
+                  {candidate.seeker.phone && (
+                    <div className='flex items-center gap-3 rounded-lg bg-slate-50 p-3'>
+                      <Phone className='h-5 w-5 text-green-600' />
+                      <div>
+                        <p className='text-xs font-medium text-slate-600'>{t('employer.candidates.modal.phone')}</p>
+                        <p className='text-sm font-semibold text-slate-950'>{candidate.seeker.phone}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className='space-y-3'>
+                <h3 className='text-lg font-semibold text-slate-950'>CV & hồ sơ</h3>
+                <div className='space-y-3'>
+                  {candidate.seeker.cvUrl ? (
+                    <a
+                      href={candidate.seeker.cvUrl}
+                      target='_blank'
+                      rel='noreferrer'
+                      className='flex aspect-square w-full max-w-[180px] items-center justify-center rounded-[28px] border border-slate-200 bg-slate-50 text-slate-700 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700'
+                    >
+                      <div className='text-center'>
+                        <FileBadge2 className='mx-auto h-12 w-12' />
+                        <p className='mt-3 text-sm font-semibold'>Xem file CV</p>
+                      </div>
+                    </a>
+                  ) : (
+                    <div className='rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-sm text-slate-500'>
+                      Ứng viên chưa có CV mặc định.
+                    </div>
+                  )}
+
+                  <Link
+                    to={`/employer/candidates/${candidate.seeker.id}/profile`}
+                    className='inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900'
+                  >
+                    <ExternalLink className='h-4 w-4' />
+                    Xem trang CV cá nhân
+                  </Link>
+                </div>
               </div>
             </div>
 

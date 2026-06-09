@@ -77,18 +77,119 @@ type SkillDraft = {
 
 const skillCategoryLabels: Record<string, string> = {
   programming_language: 'Ngôn ngữ lập trình',
-  framework: 'Framework',
-  os: 'OS',
-  database: 'DB',
+  framework: 'Framework / Frameworks',
+  os: 'Hệ điều hành / Operating Systems',
+  database: 'Cơ sở dữ liệu / Databases',
   version_control: 'Hệ thống quản lý phiên bản',
   development_tool: 'Công cụ quản lý phát triển',
   platform: 'Nền tảng'
 }
+void skillCategoryLabels
 
-const skillCategoryOptions = Object.entries(skillCategoryLabels).map(([value, label]) => ({
-  value,
-  label
-}))
+const skillCategoryOptions = [
+  { value: 'programming_language', label: 'Ngôn ngữ lập trình / Programming Languages' },
+  { value: 'framework', label: 'Framework / Frameworks' },
+  { value: 'os', label: 'Hệ điều hành / Operating Systems' },
+  { value: 'database', label: 'Cơ sở dữ liệu / Databases' },
+  { value: 'version_control', label: 'Hệ thống quản lý phiên bản / Version Control' },
+  { value: 'development_tool', label: 'Công cụ quản lý phát triển / Development Tools' },
+  { value: 'platform', label: 'Nền tảng / Platforms' }
+]
+
+const skillNameOptionsByCategory: Record<string, string[]> = {
+  programming_language: [
+    'Assembly',
+    'Bash',
+    'C',
+    'C#',
+    'C++',
+    'Clojure',
+    'Dart',
+    'Elixir',
+    'Erlang',
+    'F#',
+    'Fortran',
+    'Go',
+    'Groovy',
+    'Haskell',
+    'Java',
+    'JavaScript',
+    'Julia',
+    'Kotlin',
+    'Lua',
+    'MATLAB',
+    'Objective-C',
+    'Perl',
+    'PHP',
+    'PowerShell',
+    'Prolog',
+    'Python',
+    'R',
+    'Ruby',
+    'Rust',
+    'Scala',
+    'Solidity',
+    'SQL',
+    'Swift',
+    'TypeScript',
+    'Visual Basic',
+    'Zig'
+  ],
+  framework: [
+    'Angular',
+    'ASP.NET Core',
+    'Bootstrap',
+    'CakePHP',
+    'CodeIgniter',
+    'Django',
+    'Echo',
+    'Ember.js',
+    'Express.js',
+    'FastAPI',
+    'Flask',
+    'Flutter',
+    'Gatsby',
+    'Gin',
+    'Hibernate',
+    'Ionic',
+    'Keras',
+    'Laravel',
+    'Meteor',
+    'NestJS',
+    'Next.js',
+    'Nuxt.js',
+    'Phoenix',
+    'Play Framework',
+    'PyTorch',
+    'React',
+    'React Native',
+    'Ruby on Rails',
+    'Spring Boot',
+    'Svelte',
+    'Symfony',
+    'Tailwind CSS',
+    'TensorFlow',
+    'Vue.js',
+    'Xamarin',
+    'Zend Framework'
+  ],
+  os: ['Alpine Linux', 'Android', 'CentOS', 'Debian', 'iOS', 'Linux Mint', 'macOS', 'Red Hat Enterprise Linux', 'Ubuntu', 'Windows'],
+  database: ['Cassandra', 'ClickHouse', 'CouchDB', 'DynamoDB', 'Elasticsearch', 'Firebase', 'MariaDB', 'MongoDB', 'MySQL', 'Neo4j', 'Oracle', 'PostgreSQL', 'Redis', 'SQLite', 'SQL Server'],
+  version_control: [
+    'Apache Subversion (SVN)',
+    'AWS CodeCommit',
+    'Bazaar',
+    'Bitbucket',
+    'Concurrent Versions System (CVS)',
+    'Git',
+    'GitHub',
+    'GitLab',
+    'Mercurial',
+    'Perforce (Helix Core)'
+  ],
+  development_tool: ['Asana', 'Azure DevOps', 'Bitbucket', 'ClickUp', 'Confluence', 'Docker', 'Git', 'GitHub', 'GitLab', 'Jenkins', 'Jira', 'Kubernetes', 'Linear', 'Slack', 'Trello'],
+  platform: []
+}
 
 const emptySkillDraft: SkillDraft = {
   name: '',
@@ -148,6 +249,23 @@ const certificateCategoryOptions: Array<{ value: CertificateCategory; label: str
   { value: 'other', label: 'Chứng chỉ khác' }
 ]
 
+const educationDegreeOptions = [
+  { value: 'Trung bình', label: 'Trung bình' },
+  { value: 'Khá', label: 'Khá' },
+  { value: 'Giỏi', label: 'Giỏi' },
+  { value: 'Xuất sắc', label: 'Xuất sắc' }
+]
+
+const educationMajorOptions = [
+  { value: 'Công nghệ phần mềm', label: 'Công nghệ phần mềm' },
+  { value: 'Khoa học máy tính', label: 'Khoa học máy tính' },
+  { value: 'Trí tuệ nhân tạo', label: 'Trí tuệ nhân tạo' },
+  { value: 'Mạng máy tính & truyền thông dữ liệu', label: 'Mạng máy tính & truyền thông dữ liệu' },
+  { value: 'An toàn thông tin', label: 'An toàn thông tin' },
+  { value: 'Big Data', label: 'Big Data' },
+  { value: 'IoT', label: 'IoT' }
+]
+
 const emptyProjectForm = {
   name: '',
   description: '',
@@ -202,10 +320,18 @@ const ProfilePage = () => {
   })
 
   const educationMutation = useMutation({
-    mutationFn: async () =>
-      editing?.section === 'education'
+    mutationFn: async () => {
+      const validationMessage = validateEducationForm(educationForm)
+
+      if (validationMessage) {
+        setToastMessage(validationMessage)
+        throw new Error(validationMessage)
+      }
+
+      return editing?.section === 'education'
         ? updateCvEducationApi(editing.id, normalizeOptionalFields(educationForm))
-        : createCvEducationApi(normalizeOptionalFields(educationForm)),
+        : createCvEducationApi(normalizeOptionalFields(educationForm))
+    },
     onSuccess: () => {
       setEditing(null)
       setEducationForm(emptyEducationForm)
@@ -214,10 +340,18 @@ const ProfilePage = () => {
   })
 
   const experienceMutation = useMutation({
-    mutationFn: async () =>
-      editing?.section === 'experience'
+    mutationFn: async () => {
+      const validationMessage = validateExperienceForm(experienceForm)
+
+      if (validationMessage) {
+        setToastMessage(validationMessage)
+        throw new Error(validationMessage)
+      }
+
+      return editing?.section === 'experience'
         ? updateCvExperienceApi(editing.id, normalizeOptionalFields(experienceForm))
-        : createCvExperienceApi(normalizeOptionalFields(experienceForm)),
+        : createCvExperienceApi(normalizeOptionalFields(experienceForm))
+    },
     onSuccess: () => {
       setEditing(null)
       setExperienceForm(emptyExperienceForm)
@@ -235,6 +369,13 @@ const ProfilePage = () => {
           experienceMonths: Number(skill.experienceMonths) || 0
         }))
         .filter((skill) => skill.name)
+
+      const validationMessage = validateSkillDrafts(normalizedDrafts)
+
+      if (validationMessage) {
+        setToastMessage(validationMessage)
+        throw new Error(validationMessage)
+      }
 
       const existingDrafts = normalizedDrafts.filter((skill) => skill.id)
       const newDrafts = normalizedDrafts.filter((skill) => !skill.id)
@@ -262,8 +403,7 @@ const ProfilePage = () => {
       }
     },
     onSuccess: () => {
-      setEditing(null)
-      setSkillDrafts(ensureCategoryDrafts([]))
+      setSkillDrafts((drafts) => ensureCategoryDrafts(drafts))
       void refreshCv('Đã lưu kỹ năng.')
     }
   })
@@ -275,6 +415,28 @@ const ProfilePage = () => {
       if (validationMessage) {
         setToastMessage(validationMessage)
         throw new Error(validationMessage)
+      }
+
+      if (certificateForm.category === 'english') {
+        const score = Number(certificateForm.score)
+
+        if (certificateForm.englishType === 'IELTS' && score < 1) {
+          const message = 'Band IELTS phải lớn hơn hoặc bằng 1.0.'
+          setToastMessage(message)
+          throw new Error(message)
+        }
+
+        if (certificateForm.englishType === 'TOEIC' && score < 10) {
+          const message = 'Điểm TOEIC phải lớn hơn hoặc bằng 10.'
+          setToastMessage(message)
+          throw new Error(message)
+        }
+
+        if (certificateForm.englishType === 'VSTEP' && score < 0.5) {
+          const message = 'Điểm VSTEP phải lớn hơn hoặc bằng 0.5.'
+          setToastMessage(message)
+          throw new Error(message)
+        }
       }
 
       const payload = buildCertificatePayload(certificateForm)
@@ -291,10 +453,18 @@ const ProfilePage = () => {
   })
 
   const projectMutation = useMutation({
-    mutationFn: async () =>
-      editing?.section === 'project'
+    mutationFn: async () => {
+      const validationMessage = validateProjectForm(projectForm)
+
+      if (validationMessage) {
+        setToastMessage(validationMessage)
+        throw new Error(validationMessage)
+      }
+
+      return editing?.section === 'project'
         ? updateCvProjectApi(editing.id, normalizeOptionalFields(projectForm))
-        : createCvProjectApi(normalizeOptionalFields(projectForm)),
+        : createCvProjectApi(normalizeOptionalFields(projectForm))
+    },
     onSuccess: () => {
       setEditing(null)
       setProjectForm(emptyProjectForm)
@@ -304,6 +474,13 @@ const ProfilePage = () => {
 
   const personalityMutation = useMutation({
     mutationFn: async () => {
+      const validationMessage = validatePersonalityForm(personalityForm)
+
+      if (validationMessage) {
+        setToastMessage(validationMessage)
+        throw new Error(validationMessage)
+      }
+
       const payload = normalizeOptionalFields(personalityForm) as CvPersonalityPayload
 
       return editing?.section === 'personality'
@@ -819,10 +996,10 @@ const ProfilePage = () => {
                               inputMode='decimal'
                               pattern={
                                 certificateForm.englishType === 'IELTS'
-                                  ? '^(0|0\\.5|[1-8](\\.0|\\.5)?|9(\\.0)?)$'
+                                  ? '^([1-8](\\.0|\\.5)?|9(\\.0)?)$'
                                   : certificateForm.englishType === 'TOEIC'
-                                    ? '^(0|[1-9]\\d{0,2})$'
-                                    : '^(0|[1-9]\\d*)(\\.\\d+)?$'
+                                    ? '^([1-9]\\d{1,2})$'
+                                    : '^(0\\.5|[1-9]\\d*(\\.\\d+)?)$'
                               }
                               onChange={(value) => setCertificateForm((form) => ({ ...form, score: value }))}
                             />
@@ -867,11 +1044,11 @@ const ProfilePage = () => {
                       }}
                       onAddDraft={(category) => setSkillDrafts((drafts) => [...drafts, createEmptySkillDraft(category)])}
                     />
-                    <div className='flex justify-center gap-3 border-t border-slate-200 bg-slate-50/90 px-5 py-4'>
+                    <div className='flex justify-center border-t border-slate-200 bg-slate-50/90 px-5 py-4'>
                       <button
                         type='button'
                         onClick={clearEdit}
-                        className='inline-flex h-11 items-center justify-center rounded-2xl border border-sky-300 bg-white px-8 text-sm font-semibold text-sky-600'
+                        className='hidden'
                       >
                         Hủy
                       </button>
@@ -961,11 +1138,11 @@ const ProfilePage = () => {
                 {expandedSection === 'about' ? (
                   <div className='mt-5 rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
                     <CvFormGrid>
-                      <TextField label='Type' value={personalityForm.type} onChange={(value) => setPersonalityForm((form) => ({ ...form, type: value }))} />
+                      <TextField label='Phân loại' value={personalityForm.type} onChange={(value) => setPersonalityForm((form) => ({ ...form, type: value }))} />
                     </CvFormGrid>
                     <div className='mt-4'>
                       <TextAreaField
-                        label='Description'
+                        label='Mô tả'
                         value={personalityForm.description}
                         onChange={(value) => setPersonalityForm((form) => ({ ...form, description: value }))}
                       />
@@ -1123,22 +1300,45 @@ const TextField = ({
   step?: number | string
   pattern?: string
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']
-}) => (
-  <label className='block'>
-    <span className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>{label}</span>
-    <input
-      type={type}
-      value={value}
-      placeholder={placeholder}
-      min={min}
-      step={step}
-      pattern={pattern}
-      inputMode={inputMode}
-      onChange={(event) => onChange(event.target.value)}
-      className='mt-2 h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
-    />
-  </label>
-)
+}) => {
+  const selectOptions =
+    label === 'Báº±ng cáº¥p'
+      ? [{ value: '', label: 'Chá»n báº±ng cáº¥p' }, ...educationDegreeOptions]
+      : label === 'ChuyÃªn ngÃ nh'
+        ? [{ value: '', label: 'Chá»n chuyÃªn ngÃ nh' }, ...educationMajorOptions]
+        : null
+
+  return (
+    <label className='block'>
+      <span className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>{label}</span>
+      {selectOptions ? (
+        <select
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className='mt-2 h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
+        >
+          {selectOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          min={min}
+          step={step}
+          pattern={pattern}
+          inputMode={inputMode}
+          onChange={(event) => onChange(event.target.value)}
+          className='mt-2 h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
+        />
+      )}
+    </label>
+  )
+}
 
 const SelectField = ({
   label,
@@ -1303,7 +1503,7 @@ const SkillCategoryDrafts = ({
       return (
         <div key={category.value} className='space-y-3'>
           {categoryDrafts.map(({ draft, index }) => (
-            <SkillDraftRow
+            <SkillDraftEditorRow
               key={`${draft.id ?? category.value}-${index}`}
               draft={draft}
               onChange={(nextDraft) => onChangeDraft(index, nextDraft)}
@@ -1353,7 +1553,7 @@ const SkillDraftRow = ({
       <span className='whitespace-nowrap'>Kinh nghiệm</span>
       <input
         type='number'
-        min={0}
+        min={1}
         max={600}
         value={draft.experienceMonths}
         onChange={(event) => onChange({ ...draft, experienceMonths: Number(event.target.value) })}
@@ -1375,6 +1575,70 @@ const SkillDraftRow = ({
     </button>
   </div>
 )
+void SkillDraftRow
+
+const SkillDraftEditorRow = ({
+  draft,
+  onChange,
+  onDelete
+}: {
+  draft: SkillDraft
+  onChange: (draft: SkillDraft) => void
+  onDelete: () => void
+}) => {
+  const skillOptions = skillNameOptionsByCategory[draft.category] ?? []
+
+  return (
+    <div className='grid gap-3 lg:grid-cols-[minmax(280px,1fr)_minmax(220px,auto)_minmax(140px,auto)_44px] lg:items-center'>
+      {draft.category === 'platform' ? (
+        <input
+          type='text'
+          value={draft.name}
+          placeholder='Nhập nền tảng'
+          onChange={(event) => onChange({ ...draft, name: event.target.value })}
+          className='h-12 rounded-md border border-indigo-200 bg-white px-4 text-sm font-medium text-indigo-950 outline-none focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
+        />
+      ) : (
+        <select
+          value={draft.name}
+          onChange={(event) => onChange({ ...draft, name: event.target.value })}
+          className='h-12 rounded-md border border-indigo-200 bg-white px-4 text-sm font-medium text-indigo-950 outline-none focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
+        >
+          <option value=''>Chọn kỹ năng</option>
+          {skillOptions.map((skillName) => (
+            <option key={skillName} value={skillName}>
+              {skillName}
+            </option>
+          ))}
+        </select>
+      )}
+      <div className='flex items-center gap-3 text-sm font-medium text-indigo-950'>
+        <span className='whitespace-nowrap'>Kinh nghiệm</span>
+        <input
+          type='number'
+          min={1}
+          max={600}
+          value={draft.experienceMonths}
+          onChange={(event) => onChange({ ...draft, experienceMonths: Number(event.target.value) })}
+          className='h-12 w-20 rounded-md border border-indigo-200 bg-white px-3 text-center text-sm font-semibold text-indigo-950 outline-none focus:border-sky-300 focus:ring-4 focus:ring-sky-100'
+        />
+        <span className='whitespace-nowrap'>tháng</span>
+      </div>
+      <label className='inline-flex items-center gap-2 whitespace-nowrap text-sm font-semibold text-indigo-950'>
+        <input
+          type='checkbox'
+          checked={draft.isStrong}
+          onChange={(event) => onChange({ ...draft, isStrong: event.target.checked })}
+          className='h-4 w-4 rounded border-indigo-300 text-sky-500'
+        />
+        Thành thạo
+      </label>
+      <button type='button' onClick={onDelete} className='inline-flex h-10 w-10 items-center justify-center rounded-xl text-rose-500 transition hover:bg-rose-50'>
+        <Trash2 className='h-5 w-5' />
+      </button>
+    </div>
+  )
+}
 
 const CvListRow = ({
   title,
@@ -1428,6 +1692,72 @@ const LinkItem = ({ label, value }: { label: string; value: string }) => (
     </a>
   </div>
 )
+
+const isValidDateRange = (startDate: string, endDate: string) => {
+  if (!startDate.trim() || !endDate.trim()) return true
+
+  return new Date(startDate).getTime() < new Date(endDate).getTime()
+}
+
+const validateEducationForm = (form: typeof emptyEducationForm) => {
+  if (!form.school.trim() || !form.degree.trim() || !form.major.trim() || !form.startDate.trim() || !form.endDate.trim() || !form.description.trim()) {
+    return 'Vui lòng nhập đầy đủ thông tin học vấn.'
+  }
+
+  if (!isValidDateRange(form.startDate, form.endDate)) {
+    return 'Ngày bắt đầu học vấn phải bé hơn ngày kết thúc.'
+  }
+
+  return null
+}
+
+const validateExperienceForm = (form: typeof emptyExperienceForm) => {
+  if (!form.company.trim() || !form.position.trim() || !form.startDate.trim() || !form.endDate.trim() || !form.description.trim()) {
+    return 'Vui lòng nhập đầy đủ thông tin kinh nghiệm làm việc.'
+  }
+
+  if (!isValidDateRange(form.startDate, form.endDate)) {
+    return 'Ngày bắt đầu kinh nghiệm phải bé hơn ngày kết thúc.'
+  }
+
+  return null
+}
+
+const validateSkillDrafts = (drafts: SkillDraft[]) => {
+  if (drafts.length === 0) {
+    return 'Vui lòng thêm ít nhất một kỹ năng chuyên môn.'
+  }
+
+  for (const draft of drafts) {
+    if (!draft.name.trim()) continue
+
+    if ((draft.experienceMonths ?? 0) < 1) {
+      return `Kỹ năng "${draft.name}" phải có ít nhất 1 tháng kinh nghiệm.`
+    }
+  }
+
+  return null
+}
+
+const validateProjectForm = (form: typeof emptyProjectForm) => {
+  if (!form.name.trim() || !form.role.trim() || !form.startDate.trim() || !form.endDate.trim()) {
+    return 'Vui lòng nhập đầy đủ thông tin dự án nổi bật.'
+  }
+
+  if (!isValidDateRange(form.startDate, form.endDate)) {
+    return 'Ngày bắt đầu dự án phải bé hơn ngày kết thúc.'
+  }
+
+  return null
+}
+
+const validatePersonalityForm = (form: typeof emptyPersonalityForm) => {
+  if (!form.type.trim() || !form.description.trim()) {
+    return 'Vui lòng nhập đầy đủ type và description.'
+  }
+
+  return null
+}
 
 const parseEnglishCertificate = (title: string) => {
   const match = title.trim().match(/^(TOEIC|IELTS|VSTEP)(?:\s*[-:]?\s*(.*))?$/i)

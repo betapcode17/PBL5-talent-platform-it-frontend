@@ -2,11 +2,18 @@ import { io, type Socket } from 'socket.io-client'
 
 class NotificationWebSocketService {
   private socket: Socket | null = null
+  private currentToken: string | null = null
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   private listeners: Map<string, Set<Function>> = new Map()
 
   connect(serverUrl: string, token: string) {
-    if (this.socket?.connected) return
+    if (this.socket?.connected && this.currentToken === token) return
+
+    if (this.socket) {
+      this.socket.removeAllListeners()
+      this.socket.disconnect()
+      this.socket = null
+    }
 
     this.socket = io(`${serverUrl}/notifications`, {
       auth: { token },
@@ -15,6 +22,7 @@ class NotificationWebSocketService {
       reconnectionDelay: 2000,
       transports: ['websocket', 'polling']
     })
+    this.currentToken = token
 
     this.socket.on('connect', () => this.emit('connect', null))
     this.socket.on('disconnect', () => this.emit('disconnect', null))
@@ -50,6 +58,7 @@ class NotificationWebSocketService {
   disconnect() {
     this.socket?.disconnect()
     this.socket = null
+    this.currentToken = null
     this.listeners.clear()
   }
 

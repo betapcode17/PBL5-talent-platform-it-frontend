@@ -12,7 +12,11 @@ export const CompanyInfo = ({ company }: { company: CompanyDetail }) => {
 
       <div className='space-y-3'>
         <Info icon={<Rocket className='h-4 w-4' />} label='Loại hình' value={company.company_type} />
-        <Info icon={<CalendarDays className='h-4 w-4' />} label='Thành lập' value={company.establishment_date?.slice(0, 10)} />
+        <Info
+          icon={<CalendarDays className='h-4 w-4' />}
+          label='Thành lập'
+          value={company.establishment_date?.slice(0, 10)}
+        />
         <Info icon={<BriefcaseBusiness className='h-4 w-4' />} label='Ngày làm việc' value={company.working_days} />
         <Info icon={<Clock3 className='h-4 w-4' />} label='Giờ làm việc' value={company.working_time} />
         <Info icon={<TimerReset className='h-4 w-4' />} label='Chính sách OT' value={company.overtime_policy} />

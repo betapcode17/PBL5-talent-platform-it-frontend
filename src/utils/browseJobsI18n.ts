@@ -13,6 +13,7 @@ const browseValueKeys: Record<string, string> = {
   'Part-time': 'browseJobs.values.partTime',
   'All levels': 'browseJobs.values.allLevels',
   'Location flexible': 'browseJobs.values.locationFlexible',
+  Company: 'browseJobs.values.companyFallback',
   'Salary negotiable': 'browseJobs.values.salaryNegotiable',
   'Recently posted': 'browseJobs.values.recentlyPosted',
   'Just now': 'browseJobs.values.justNow',
@@ -34,6 +35,16 @@ export const translateBrowseValue = (t: TFunction, value?: string | null) => {
   const daysAgo = value.match(/^(\d+)\s+days?\s+ago$/i)
   if (daysAgo) {
     return t('browseJobs.values.daysAgo', { count: Number(daysAgo[1]) })
+  }
+
+  const salaryFrom = value.match(/^From\s+(.+)$/i)
+  if (salaryFrom) {
+    return t('browseJobs.values.salaryFrom', { value: salaryFrom[1] })
+  }
+
+  const salaryUpTo = value.match(/^Up to\s+(.+)$/i)
+  if (salaryUpTo) {
+    return t('browseJobs.values.salaryUpTo', { value: salaryUpTo[1] })
   }
 
   return value

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
-import EmployerPageHeader from '@/components/employer/EmployerPageHeader'
 import EmployerSectionCard from '@/components/employer/EmployerSectionCard'
 import EmployerJobList from '@/components/employer/EmployerJobList'
 import EmployerEmptyState from '@/components/employer/EmployerEmptyState'
@@ -13,6 +12,7 @@ const JobsPage = () => {
   const { i18n, t } = useTranslation()
   const { data, isLoading, error } = useEmployerJobs()
   const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
+  const formattedTotal = data ? new Intl.NumberFormat(locale).format(data.total) : null
 
   const handleExport = () => {
     if (!data?.jobs) return
@@ -68,15 +68,17 @@ const JobsPage = () => {
 
   return (
     <div className='min-w-0 space-y-6'>
-      <EmployerPageHeader
-        eyebrow={t('employer.jobs.page.eyebrow')}
-        title={t('employer.jobs.page.title')}
-        description={t('employer.jobs.page.description')}
-      />
-
       <EmployerSectionCard
-        title={`${t('employer.jobs.page.sectionTitle')}${data ? ` - ${data.total}` : ''}`}
-        description={t('employer.jobs.page.sectionDescription')}
+        title={
+          <span className='flex flex-wrap items-center gap-3'>
+            <span>{t('employer.jobs.page.sectionTitle')}</span>
+            {formattedTotal ? (
+              <span className='inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-violet-50 px-3 text-sm font-bold text-violet-700 ring-1 ring-violet-100 dark:bg-violet-400/12 dark:text-violet-100 dark:ring-violet-300/18'>
+                {formattedTotal}
+              </span>
+            ) : null}
+          </span>
+        }
         action={actionButtons}
         contentClassName='space-y-4'
       >

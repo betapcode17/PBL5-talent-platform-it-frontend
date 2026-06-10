@@ -39,7 +39,7 @@ export interface EmployerPipelineSummary {
 }
 
 export interface EmployerJobItem {
-  requirements?: string | null
+  requirements?: string[] | string | null
   description?: string | null
   numberOfPositions?: number | null
   experienceRequired?: string | null
@@ -93,6 +93,62 @@ export interface EmployerCandidateItem {
     interview_type?: string | null
     status: string
   } | null
+}
+
+export interface EmployerJobApplicationItem {
+  id: number
+  status: string
+  coverLetter?: string | null
+  cvUrl?: string | null
+  currentStage?: string | null
+  rejectionReason?: string | null
+  appliedDate: string
+  updatedDate: string
+  aiScore?: number | null
+  aiRecommendation?: string | null
+  aiSummary?: string | null
+  aiStrengths?: string[]
+  aiConcerns?: string[]
+  aiScreenedAt?: string | null
+  aiScreenedById?: number | null
+  aiModel?: string | null
+  ruleScore?: number | null
+  llmScore?: number | null
+  finalScore?: number | null
+  screeningMode?: 'fast' | 'deep' | null
+  judgeTopN?: number | null
+  llmJudgeStatus?: 'success' | 'failed' | 'skipped_fast_mode' | 'skipped_not_top_n' | null
+  weights?: Record<string, number>
+  weightReasoning?: Record<string, string>
+  scoreBreakdown?: Record<
+    string,
+    {
+      score?: number | null
+      scorePercent?: number | null
+      weight?: number | null
+      contribution?: number | null
+      weightedScore?: number | null
+      candidateValue?: unknown
+      requiredValue?: unknown
+      maxFit?: unknown
+      flags?: string[]
+      [key: string]: unknown
+    }
+  >
+  flags?: string[]
+  riskFlags?: string[]
+  aiRawResult?: Record<string, unknown> | null
+  candidate: {
+    id: number
+    fullName?: string | null
+    email?: string | null
+    phone?: string | null
+    userImage?: string | null
+    githubUrl?: string | null
+    linkedinUrl?: string | null
+    portfolioUrl?: string | null
+    defaultCvUrl?: string | null
+  }
 }
 
 export interface EmployerInterviewItem {
@@ -153,6 +209,47 @@ export interface EmployerJobsResponse {
 export interface EmployerCandidatesResponse {
   total: number
   candidates: EmployerCandidateItem[]
+}
+
+export interface EmployerJobApplicationsResponse {
+  applications: EmployerJobApplicationItem[]
+  total: number
+  job: {
+    id: number
+    title: string
+  }
+}
+
+export interface RunAiScreeningInput {
+  applicationId?: number
+  limit?: number
+  force?: boolean
+  mode?: 'fast' | 'deep'
+  judgeTopN?: number
+}
+
+export interface AiScreeningQueuedResponse {
+  runId: number
+  status: 'PENDING'
+  message: string
+}
+
+export interface AiScreeningRunResponse {
+  runId: number
+  jobId: number | null
+  applicationId: number | null
+  mode: 'fast' | 'deep' | null
+  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+  totalCount: number
+  processedCount: number
+  successCount: number
+  failedCount: number
+  progressPercent: number
+  startedAt: string | null
+  completedAt: string | null
+  errorMessage: string | null
+  processingRatePerMinute: number
+  estimatedRemainingSeconds: number | null
 }
 
 export interface EmployerInterviewsResponse {

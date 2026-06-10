@@ -18,6 +18,7 @@ import EmployerCompanyInfoPage from '@/pages/employer/CompanyInfoPage'
 import EmployerCandidateCvProfilePage from '@/pages/employer/CandidateCvProfilePage'
 import CreateJobPage from '@/pages/employer/CreateJobPage'
 import CreateInterviewPage from '@/pages/employer/CreateInterviewPage'
+import ResumeFilterPage from '@/pages/employer/ResumeFilterPage'
 import ResourcesPage from '@/pages/ResourcesPage'
 import CvPdfExportPage from '@/pages/seeker/CvPdfExportPage'
 import ProfilePage from '@/pages/seeker/ProfilePage'
@@ -103,6 +104,7 @@ export function AppRoutes() {
             <Route index element={<EmployerOverviewPage />} />
             <Route path='jobs' element={<EmployerJobsPage />} />
             <Route path='jobs/create' element={<CreateJobPage />} />
+            <Route path='resume-filter' element={<ResumeFilterPage />} />
             <Route path='candidates' element={<EmployerCandidatesPage />} />
             <Route path='candidates/:seekerId/profile' element={<EmployerCandidateCvProfilePage />} />
             <Route path='interviews' element={<EmployerInterviewsPage />} />

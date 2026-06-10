@@ -21,6 +21,7 @@ const EMPTY_RESULTS: BrowseJobsResponse = {
     locations: []
   }
 }
+const EMPTY_SAVED_JOB_IDS: string[] = []
 
 export const useBrowseJobs = () => {
   const searchQuery = useBrowseJobsStore((state) => state.searchQuery)
@@ -32,6 +33,11 @@ export const useBrowseJobs = () => {
   const selectedPostedWithin = useBrowseJobsStore((state) => state.selectedPostedWithin)
   const salaryMin = useBrowseJobsStore((state) => state.salaryMin)
   const salaryMax = useBrowseJobsStore((state) => state.salaryMax)
+  const quickView = useBrowseJobsStore((state) => state.quickView)
+  const sortBy = useBrowseJobsStore((state) => state.sortBy)
+  const savedJobIdsFilter = useBrowseJobsStore((state) =>
+    state.quickView === 'saved' ? state.savedJobIds : EMPTY_SAVED_JOB_IDS
+  )
   const currentPage = useBrowseJobsStore((state) => state.currentPage)
   const pageSize = useBrowseJobsStore((state) => state.pageSize)
 
@@ -48,6 +54,9 @@ export const useBrowseJobs = () => {
       selectedPostedWithin,
       salaryMin,
       salaryMax,
+      quickView,
+      sortBy,
+      savedJobIds: savedJobIdsFilter,
       currentPage,
       pageSize
     }),
@@ -55,6 +64,8 @@ export const useBrowseJobs = () => {
       currentPage,
       debouncedSearchQuery,
       pageSize,
+      quickView,
+      savedJobIdsFilter,
       selectedLocation,
       salaryMax,
       salaryMin,
@@ -62,7 +73,8 @@ export const useBrowseJobs = () => {
       selectedJobTypes,
       selectedLanguages,
       selectedPostedWithin,
-      selectedWorkTypes
+      selectedWorkTypes,
+      sortBy
     ]
   )
 

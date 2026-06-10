@@ -5,25 +5,25 @@ export const categories: Category[] = [
   {
     id: 'frontend',
     title: 'Frontend',
-    openRoles: '120+ Open Positions',
+    openRolesCount: 120,
     icon: Code2
   },
   {
     id: 'backend',
     title: 'Backend',
-    openRoles: '250+ Open Positions',
+    openRolesCount: 250,
     icon: Database
   },
   {
     id: 'ai-ml',
     title: 'AI & ML',
-    openRoles: '85+ Open Positions',
+    openRolesCount: 85,
     icon: BrainCircuit
   },
   {
     id: 'mobile',
     title: 'Mobile Dev',
-    openRoles: '110+ Open Positions',
+    openRolesCount: 110,
     icon: Smartphone
   }
 ]

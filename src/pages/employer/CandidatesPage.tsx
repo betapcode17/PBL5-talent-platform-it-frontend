@@ -1,19 +1,31 @@
 import { Download } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
-import EmployerPageHeader from '@/components/employer/EmployerPageHeader'
 import EmployerSectionCard from '@/components/employer/EmployerSectionCard'
 import EmployerCandidateList from '@/components/employer/EmployerCandidateList'
 import EmployerEmptyState from '@/components/employer/EmployerEmptyState'
 import { useEmployerCandidates } from '@/hooks/useEmployerData'
-import { useAuthStore } from '@/store/authStore'
 
 const CandidatesPage = () => {
   const { i18n, t } = useTranslation()
-  const { data, isLoading, error } = useEmployerCandidates()
-  const companyId = useAuthStore((state) => state.user?.employee?.company.company_id)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { data, isLoading, error } = useEmployerCandidates(1, 100)
   const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
+  const applicationIdParam = searchParams.get('applicationId')
+  const selectedApplicationId = applicationIdParam ? Number(applicationIdParam) : null
+
+  const handleSelectedCandidateClose = () => {
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current)
+        next.delete('applicationId')
+        return next
+      },
+      { replace: true }
+    )
+  }
 
   const handleExport = () => {
     if (!data?.candidates) return
@@ -61,12 +73,6 @@ const CandidatesPage = () => {
 
   return (
     <div className='min-w-0 space-y-6'>
-      <EmployerPageHeader
-        eyebrow={t('employer.candidates.page.eyebrow')}
-        title={t('employer.candidates.page.title')}
-        description={t('employer.candidates.page.description')}
-      />
-
       <EmployerSectionCard
         title={`${t('employer.candidates.page.sectionTitle')}${data ? ` - ${data.total}` : ''}`}
         description={t('employer.candidates.page.sectionDescription')}
@@ -80,7 +86,13 @@ const CandidatesPage = () => {
           />
         ) : null}
         {error ? <EmployerEmptyState title={t('employer.candidates.page.failedTitle')} description={error} /> : null}
-        {data ? <EmployerCandidateList candidates={data.candidates} companyId={companyId} /> : null}
+        {data ? (
+          <EmployerCandidateList
+            candidates={data.candidates}
+            selectedApplicationId={Number.isFinite(selectedApplicationId) ? selectedApplicationId : null}
+            onSelectedCandidateClose={handleSelectedCandidateClose}
+          />
+        ) : null}
       </EmployerSectionCard>
     </div>
   )

@@ -1,7 +1,10 @@
 import { PrimaryButton } from '@/components/ui/Buttons'
 import Container from '@/components/ui/Container'
+import { useTranslation } from 'react-i18next'
 
 const NewsletterSection = () => {
+  const { t } = useTranslation()
+
   return (
     <section className='bg-[#f7f4fb] py-12 sm:py-16'>
       <Container>
@@ -12,20 +15,22 @@ const NewsletterSection = () => {
 
           <div className='relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center'>
             <div className='space-y-3 text-white'>
-              <h2 className='text-3xl font-semibold tracking-[-0.04em] sm:text-[2.2rem]'>Never miss a job opportunity.</h2>
+              <h2 className='text-3xl font-semibold tracking-[-0.04em] sm:text-[2.2rem]'>
+                {t('home.newsletter.title')}
+              </h2>
               <p className='max-w-xl text-sm text-white/82 sm:text-base'>
-                Get the latest tech jobs delivered to your inbox every morning.
+                {t('home.newsletter.description')}
               </p>
             </div>
 
             <form className='grid gap-3 md:grid-cols-[1fr_auto]'>
               <input
                 type='email'
-                placeholder='Enter your email'
+                placeholder={t('home.newsletter.placeholder')}
                 className='h-14 rounded-2xl border border-white/30 bg-white px-5 text-sm text-slate-700 outline-none ring-0 placeholder:text-slate-400'
               />
               <PrimaryButton className='h-14 rounded-2xl bg-white px-6 text-violet-700 shadow-none hover:bg-violet-50 hover:text-violet-800'>
-                Subscribe Now
+                {t('home.newsletter.submit')}
               </PrimaryButton>
             </form>
           </div>

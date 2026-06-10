@@ -7,24 +7,23 @@ type EmployerPageHeaderProps = {
   actions?: ReactNode
 }
 
-const EmployerPageHeader = ({ eyebrow, title, description, actions }: EmployerPageHeaderProps) => {
+const EmployerPageHeader = ({ title, description, actions }: EmployerPageHeaderProps) => {
   return (
-    <section className='min-w-0 overflow-hidden rounded-[32px] border border-white/85 bg-[linear-gradient(135deg,#0f172a_0%,#312e81_44%,#155e75_100%)] p-6 text-white shadow-[0_28px_80px_rgba(15,23,42,0.18)] sm:p-8 xl:p-10 dark:border-white/8 dark:shadow-[0_30px_90px_rgba(0,0,0,0.32)]'>
-      <div className='flex min-w-0 flex-col gap-6 xl:flex-row xl:items-end xl:justify-between'>
-        <div className='min-w-0 max-w-4xl'>
-          {eyebrow ? (
-            <div className='inline-flex rounded-full border border-white/12 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-white/75'>
-              {eyebrow}
-            </div>
-          ) : null}
-          <h2 className='mt-4 max-w-4xl break-words text-3xl font-semibold tracking-tight text-white sm:text-4xl xl:text-5xl xl:leading-[1.08]'>
+    <section className='relative min-w-0 overflow-hidden rounded-[20px] border border-white/85 bg-[linear-gradient(135deg,#1e293b_0%,#334155_42%,#0f766e_100%)] p-6 text-white shadow-[0_28px_80px_rgba(15,23,42,0.16)] transition-colors duration-500 sm:p-8 xl:p-10 dark:border-slate-200/16 dark:bg-[linear-gradient(135deg,#242b38_0%,#354057_44%,#1e6f75_100%)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.08)]'>
+      <div className='pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent' />
+      <div className='flex min-w-0 flex-col gap-6 2xl:flex-row 2xl:items-end 2xl:justify-between'>
+        <div className='min-w-0 max-w-5xl'>
+
+          <h2 className='mt-4 max-w-5xl break-words text-3xl font-semibold tracking-tight text-white sm:text-4xl xl:text-5xl xl:leading-[1.08]'>
             {title}
           </h2>
-          <p className='mt-4 max-w-3xl break-words text-sm leading-7 text-white/80 sm:text-base'>{description}</p>
+          <p className='mt-4 max-w-3xl break-words text-sm leading-7 text-slate-100 sm:text-base'>{description}</p>
         </div>
 
         {actions ? (
-          <div className='grid w-full min-w-0 gap-3 sm:grid-cols-2 xl:w-auto xl:min-w-[22rem]'>{actions}</div>
+          <div className='flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap 2xl:w-auto 2xl:max-w-[38rem] 2xl:justify-end'>
+            {actions}
+          </div>
         ) : null}
       </div>
     </section>

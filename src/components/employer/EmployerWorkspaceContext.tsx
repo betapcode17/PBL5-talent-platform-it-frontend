@@ -1,6 +1,18 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
-import type { EmployerCandidateItem, EmployerInterviewItem, EmployerJobItem } from '@/@types/employer'
+import type {
+  AiScreeningRunResponse,
+  EmployerCandidateItem,
+  EmployerInterviewItem,
+  EmployerJobItem,
+  RunAiScreeningInput
+} from '@/@types/employer'
+import {
+  getEmployerActiveAiScreeningRunApi,
+  getEmployerAiScreeningRunApi,
+  runEmployerAiScreeningApi
+} from '@/api/employer'
+import { pollAiScreeningRun, resumeActiveAiScreeningRun } from './ai-screening-polling'
 
 type CreateJobInput = {
   title: string
@@ -25,11 +37,46 @@ type EmployerWorkspaceContextValue = {
   mockJobs: EmployerJobItem[]
   mockCandidates: EmployerCandidateItem[]
   mockInterviews: EmployerInterviewItem[]
+  aiScreeningTask: AiScreeningTask
   createMockJob: (input: CreateJobInput) => void
   scheduleMockInterview: (input: ScheduleInterviewInput) => void
+  runAiScreeningTask: (jobId: number, input: RunAiScreeningInput) => Promise<AiScreeningRunResponse>
+  resumeAiScreeningTask: (jobId?: number) => Promise<AiScreeningRunResponse | null>
+  cancelAiScreeningPolling: () => void
 }
 
 const EmployerWorkspaceContext = createContext<EmployerWorkspaceContextValue | null>(null)
+
+type AiScreeningTask = {
+  status: 'idle' | 'running' | 'success' | 'error'
+  jobId: number | null
+  applicationId: number | null
+  result: AiScreeningRunResponse | null
+  error: string | null
+  startedAt: string | null
+  completedAt: string | null
+}
+
+const initialAiScreeningTask: AiScreeningTask = {
+  status: 'idle',
+  jobId: null,
+  applicationId: null,
+  result: null,
+  error: null,
+  startedAt: null,
+  completedAt: null
+}
+
+const getAiScreeningErrorMessage = (error: unknown) => {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const response = (error as { response?: { data?: { message?: string | string[] } } }).response
+    const message = response?.data?.message
+    if (Array.isArray(message)) return message.join(', ')
+    if (message) return message
+  }
+
+  return error instanceof Error ? error.message : 'Không chạy được AI Screening.'
+}
 
 const now = new Date()
 
@@ -347,6 +394,168 @@ export const EmployerWorkspaceProvider = ({ children }: { children: ReactNode })
   const [mockJobs, setMockJobs] = useState<EmployerJobItem[]>(initialMockJobs)
   const [mockCandidates, setMockCandidates] = useState<EmployerCandidateItem[]>(initialMockCandidates)
   const [mockInterviews, setMockInterviews] = useState<EmployerInterviewItem[]>(initialMockInterviews)
+  const [aiScreeningTask, setAiScreeningTask] = useState<AiScreeningTask>(initialAiScreeningTask)
+  const activeAiScreeningPromiseRef = useRef<Promise<AiScreeningRunResponse | null> | null>(null)
+  const activeAiScreeningJobIdRef = useRef<number | null>(null)
+  const activeAiScreeningAbortRef = useRef<AbortController | null>(null)
+
+  useEffect(
+    () => () => {
+      activeAiScreeningAbortRef.current?.abort()
+    },
+    []
+  )
+
+  const cancelAiScreeningPolling = useCallback(() => {
+    activeAiScreeningAbortRef.current?.abort()
+    activeAiScreeningAbortRef.current = null
+    activeAiScreeningPromiseRef.current = null
+    activeAiScreeningJobIdRef.current = null
+    setAiScreeningTask((current) =>
+      current.status === 'running'
+        ? {
+            ...current,
+            status: 'idle',
+            error: null
+          }
+        : current
+    )
+  }, [])
+
+  const runAiScreeningTask = useCallback(async (jobId: number, input: RunAiScreeningInput) => {
+    if (activeAiScreeningPromiseRef.current) {
+      if (activeAiScreeningJobIdRef.current === jobId) {
+        const activeResult = await activeAiScreeningPromiseRef.current
+        if (activeResult) return activeResult
+      } else {
+        throw new Error('AI Screening đang chạy cho một tin tuyển dụng khác.')
+      }
+    }
+
+    const controller = new AbortController()
+    activeAiScreeningAbortRef.current = controller
+    const promise = (async () => {
+      const queued = await runEmployerAiScreeningApi(jobId, input)
+
+      return pollAiScreeningRun({
+        runId: queued.runId,
+        getRun: getEmployerAiScreeningRunApi,
+        signal: controller.signal,
+        onProgress: (run) => setAiScreeningTask((current) => ({ ...current, result: run }))
+      })
+    })()
+    activeAiScreeningPromiseRef.current = promise
+    activeAiScreeningJobIdRef.current = jobId
+    setAiScreeningTask({
+      status: 'running',
+      jobId,
+      applicationId: input.applicationId ?? null,
+      result: null,
+      error: null,
+      startedAt: new Date().toISOString(),
+      completedAt: null
+    })
+
+    try {
+      const result = await promise
+      setAiScreeningTask((current) => ({
+        ...current,
+        status: 'success',
+        result,
+        error: null,
+        completedAt: new Date().toISOString()
+      }))
+      return result
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw error
+      }
+      setAiScreeningTask((current) => ({
+        ...current,
+        status: 'error',
+        error: getAiScreeningErrorMessage(error),
+        completedAt: new Date().toISOString()
+      }))
+      throw error
+    } finally {
+      activeAiScreeningPromiseRef.current = null
+      activeAiScreeningJobIdRef.current = null
+      if (activeAiScreeningAbortRef.current === controller) {
+        activeAiScreeningAbortRef.current = null
+      }
+    }
+  }, [])
+
+  const resumeAiScreeningTask = useCallback(async (jobId?: number) => {
+    if (activeAiScreeningPromiseRef.current) {
+      return activeAiScreeningJobIdRef.current === jobId ? activeAiScreeningPromiseRef.current : null
+    }
+
+    const controller = new AbortController()
+    let foundActiveRun = false
+    const promise = resumeActiveAiScreeningRun({
+      jobId,
+      getActiveRun: getEmployerActiveAiScreeningRunApi,
+      getRun: getEmployerAiScreeningRunApi,
+      signal: controller.signal,
+      onProgress: (run) => {
+        foundActiveRun = true
+        activeAiScreeningJobIdRef.current = run.jobId ?? jobId ?? null
+        setAiScreeningTask((current) => ({
+          status: 'running',
+          jobId: run.jobId ?? jobId ?? null,
+          applicationId: run.applicationId,
+          result: run,
+          error: null,
+          startedAt: run.startedAt ?? current.startedAt ?? new Date().toISOString(),
+          completedAt: null
+        }))
+      }
+    })
+
+    activeAiScreeningAbortRef.current = controller
+    activeAiScreeningPromiseRef.current = promise
+    activeAiScreeningJobIdRef.current = jobId ?? null
+
+    try {
+      const result = await promise
+      if (!result) return null
+
+      setAiScreeningTask((current) => ({
+        ...current,
+        status: 'success',
+        result,
+        error: null,
+        completedAt: result.completedAt ?? new Date().toISOString()
+      }))
+      return result
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw error
+      }
+      if (foundActiveRun) {
+        setAiScreeningTask((current) => ({
+          ...current,
+          status: 'error',
+          error: getAiScreeningErrorMessage(error),
+          completedAt: new Date().toISOString()
+        }))
+      }
+      throw error
+    } finally {
+      activeAiScreeningPromiseRef.current = null
+      activeAiScreeningJobIdRef.current = null
+      if (activeAiScreeningAbortRef.current === controller) {
+        activeAiScreeningAbortRef.current = null
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    void resumeAiScreeningTask().catch(() => {
+      // Recovery errors for a previously active run are exposed by the workspace task.
+    })
+  }, [resumeAiScreeningTask])
 
   const createMockJob = (input: CreateJobInput) => {
     const createdAt = new Date().toISOString()
@@ -441,10 +650,22 @@ export const EmployerWorkspaceProvider = ({ children }: { children: ReactNode })
       mockJobs,
       mockCandidates,
       mockInterviews,
+      aiScreeningTask,
       createMockJob,
-      scheduleMockInterview
+      scheduleMockInterview,
+      runAiScreeningTask,
+      resumeAiScreeningTask,
+      cancelAiScreeningPolling
     }),
-    [mockJobs, mockCandidates, mockInterviews]
+    [
+      aiScreeningTask,
+      cancelAiScreeningPolling,
+      mockJobs,
+      mockCandidates,
+      mockInterviews,
+      resumeAiScreeningTask,
+      runAiScreeningTask
+    ]
   )
 
   return <EmployerWorkspaceContext.Provider value={value}>{children}</EmployerWorkspaceContext.Provider>

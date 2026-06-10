@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronDown, Search, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { FilterOption } from '@/types/browse-jobs'
 import { cn } from '@/lib/utils'
 
@@ -17,15 +18,18 @@ const FilterSelectGroup = ({
   title,
   options,
   selected,
-  placeholder = 'Select option',
-  emptyText = 'No matching options',
+  placeholder,
+  emptyText,
   searchable = false,
   onToggle
 }: FilterSelectGroupProps) => {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const resolvedPlaceholder = placeholder || t('browseJobs.filters.selectOption')
+  const resolvedEmptyText = emptyText || t('browseJobs.filters.noMatches')
 
   const selectedLabels = useMemo(
     () => selected.map((value) => options.find((item) => item.value === value)?.label ?? value).filter(Boolean),
@@ -93,7 +97,7 @@ const FilterSelectGroup = ({
               ref={inputRef}
               type='text'
               value={searchQuery}
-              placeholder={selectedLabels.length > 0 ? selectedLabels.join(', ') : placeholder}
+              placeholder={selectedLabels.length > 0 ? selectedLabels.join(', ') : resolvedPlaceholder}
               onFocus={() => setIsOpen(true)}
               onChange={(event) => {
                 setSearchQuery(event.target.value)
@@ -104,7 +108,7 @@ const FilterSelectGroup = ({
             {searchQuery ? (
               <button
                 type='button'
-                aria-label='Clear search'
+                aria-label={t('browseJobs.filters.clearSearch')}
                 onClick={(event) => {
                   event.stopPropagation()
                   setSearchQuery('')
@@ -117,7 +121,7 @@ const FilterSelectGroup = ({
             ) : null}
             <button
               type='button'
-              aria-label={placeholder}
+              aria-label={resolvedPlaceholder}
               onClick={(event) => {
                 event.stopPropagation()
                 setIsOpen((current) => !current)
@@ -137,7 +141,9 @@ const FilterSelectGroup = ({
               isOpen ? 'border-violet-300 ring-2 ring-violet-100' : 'border-slate-200 hover:border-violet-200'
             )}
           >
-            <span className='truncate'>{selectedLabels.length > 0 ? selectedLabels.join(', ') : placeholder}</span>
+            <span className='truncate'>
+              {selectedLabels.length > 0 ? selectedLabels.join(', ') : resolvedPlaceholder}
+            </span>
             <ChevronDown
               className={cn('h-4 w-4 shrink-0 text-slate-400 transition-transform', isOpen ? 'rotate-180' : '')}
             />
@@ -178,7 +184,7 @@ const FilterSelectGroup = ({
                 )
               })}
               {filteredOptions.length === 0 ? (
-                <div className='px-3 py-3 text-sm text-slate-400'>{emptyText}</div>
+                <div className='px-3 py-3 text-sm text-slate-400'>{resolvedEmptyText}</div>
               ) : null}
             </div>
           </div>

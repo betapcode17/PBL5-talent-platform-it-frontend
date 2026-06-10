@@ -40,6 +40,9 @@ export type BrowseJobsFilters = {
   selectedPostedWithin: string[]
   salaryMin: string
   salaryMax: string
+  quickView: 'bestMatch' | 'latest' | 'saved'
+  sortBy: 'bestMatch' | 'newest' | 'salaryHigh' | 'salaryLow'
+  savedJobIds: string[]
   currentPage: number
   pageSize: number
 }

@@ -1,12 +1,10 @@
-import { ExternalLink, FileBadge2, Mail, Phone, X } from 'lucide-react'
+import { Mail, Phone, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import { acceptEmployerApplicationApi, rejectEmployerApplicationApi } from '@/api/employer'
 import type { EmployerCandidateItem } from '@/@types/employer'
 import { Button } from '@/components/ui/button'
-import CandidateLikeButton from '@/components/likes/CandidateLikeButton'
 
 type ViewCandidateModalProps = {
   candidate: EmployerCandidateItem
@@ -93,10 +91,15 @@ const ViewCandidateModal = ({ candidate, isOpen, onClose }: ViewCandidateModalPr
   }
 
   return createPortal(
-    <div className='fixed inset-0 z-[1000] flex items-start justify-center overflow-y-auto bg-black/55 p-3 pt-6 backdrop-blur-sm sm:p-6 lg:items-center lg:pt-6'>
-      <button type='button' aria-label={t('employer.candidates.modal.closeDetails')} className='absolute inset-0 cursor-default' onClick={onClose} />
-      <div className='relative mx-auto flex max-h-[calc(100dvh-3rem)] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5'>
-        <div className='flex flex-col gap-4 border-b border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-6'>
+    <div className='fixed inset-0 z-[1000] flex items-start justify-center overflow-y-auto bg-slate-950/58 p-3 pt-6 backdrop-blur-sm sm:p-6 lg:items-center lg:pt-6'>
+      <button
+        type='button'
+        aria-label={t('employer.candidates.modal.closeDetails')}
+        className='absolute inset-0 cursor-default'
+        onClick={onClose}
+      />
+      <div className='relative mx-auto flex max-h-[calc(100dvh-3rem)] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 transition-colors duration-500 dark:bg-[#1b202b] dark:ring-slate-300/14'>
+        <div className='flex flex-col gap-4 border-b border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-6 dark:border-slate-300/14 dark:bg-slate-200/8'>
           <div className='flex min-w-0 items-start gap-4'>
             {candidate.seeker.avatar ? (
               <img
@@ -110,84 +113,72 @@ const ViewCandidateModal = ({ candidate, isOpen, onClose }: ViewCandidateModalPr
               </div>
             )}
             <div className='min-w-0'>
-              <h2 className='text-xl font-bold text-slate-950 sm:text-2xl'>{candidate.seeker.fullName}</h2>
-              <p className='mt-1 text-sm text-slate-600'>{t('employer.candidates.modal.appliedFor', { job: candidate.job.title })}</p>
+              <h2 className='text-xl font-bold text-slate-950 sm:text-2xl dark:text-white'>
+                {candidate.seeker.fullName}
+              </h2>
+              <p className='mt-1 text-sm text-slate-600 dark:text-slate-300'>
+                {t('employer.candidates.modal.appliedFor', { job: candidate.job.title })}
+              </p>
             </div>
           </div>
-          <button onClick={onClose} className='self-end rounded-lg p-2 transition hover:bg-slate-200 sm:self-start'>
+          <button
+            onClick={onClose}
+            className='self-end rounded-lg p-2 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 sm:self-start dark:text-slate-300 dark:hover:bg-slate-200/12 dark:hover:text-white'
+          >
             <X className='h-5 w-5' />
           </button>
         </div>
 
         <div className='flex-1 overflow-y-auto p-4 sm:p-6'>
           <div className='space-y-6'>
-            <div className='grid gap-6 lg:grid-cols-[minmax(0,1fr)_260px]'>
-              <div className='space-y-3'>
-                <h3 className='text-lg font-semibold text-slate-950'>{t('employer.candidates.modal.contactInformation')}</h3>
-                <div className='space-y-2'>
-                  <div className='flex items-center gap-3 rounded-lg bg-slate-50 p-3'>
-                    <Mail className='h-5 w-5 text-blue-600' />
+            <div className='space-y-3'>
+              <h3 className='text-lg font-semibold text-slate-950 dark:text-white'>
+                {t('employer.candidates.modal.contactInformation')}
+              </h3>
+              <div className='space-y-2'>
+                <div className='flex items-center gap-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-200/7'>
+                  <Mail className='h-5 w-5 text-blue-600' />
+                  <div>
+                    <p className='text-xs font-medium text-slate-600 dark:text-slate-300'>
+                      {t('employer.candidates.table.email')}
+                    </p>
+                    <p className='text-sm font-semibold text-slate-950 dark:text-white'>
+                      {candidate.seeker.email || '-'}
+                    </p>
+                  </div>
+                </div>
+                {candidate.seeker.phone && (
+                  <div className='flex items-center gap-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-200/7'>
+                    <Phone className='h-5 w-5 text-green-600' />
                     <div>
-                      <p className='text-xs font-medium text-slate-600'>{t('employer.candidates.table.email')}</p>
-                      <p className='text-sm font-semibold text-slate-950'>{candidate.seeker.email || '-'}</p>
+                      <p className='text-xs font-medium text-slate-600 dark:text-slate-300'>
+                        {t('employer.candidates.modal.phone')}
+                      </p>
+                      <p className='text-sm font-semibold text-slate-950 dark:text-white'>{candidate.seeker.phone}</p>
                     </div>
                   </div>
-                  {candidate.seeker.phone && (
-                    <div className='flex items-center gap-3 rounded-lg bg-slate-50 p-3'>
-                      <Phone className='h-5 w-5 text-green-600' />
-                      <div>
-                        <p className='text-xs font-medium text-slate-600'>{t('employer.candidates.modal.phone')}</p>
-                        <p className='text-sm font-semibold text-slate-950'>{candidate.seeker.phone}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className='space-y-3'>
-                <h3 className='text-lg font-semibold text-slate-950'>CV & hồ sơ</h3>
-                <div className='space-y-3'>
-                  {candidate.seeker.cvUrl ? (
-                    <a
-                      href={candidate.seeker.cvUrl}
-                      target='_blank'
-                      rel='noreferrer'
-                      className='flex aspect-square w-full max-w-[180px] items-center justify-center rounded-[28px] border border-slate-200 bg-slate-50 text-slate-700 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700'
-                    >
-                      <div className='text-center'>
-                        <FileBadge2 className='mx-auto h-12 w-12' />
-                        <p className='mt-3 text-sm font-semibold'>Xem file CV</p>
-                      </div>
-                    </a>
-                  ) : (
-                    <div className='rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-sm text-slate-500'>
-                      Ứng viên chưa có CV mặc định.
-                    </div>
-                  )}
-
-                  <Link
-                    to={`/employer/candidates/${candidate.seeker.id}/profile`}
-                    className='inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900'
-                  >
-                    <ExternalLink className='h-4 w-4' />
-                    Xem trang CV cá nhân
-                  </Link>
-                </div>
+                )}
               </div>
             </div>
 
             <div className='space-y-3'>
-              <h3 className='text-lg font-semibold text-slate-950'>{t('employer.candidates.modal.applicationStatus')}</h3>
+              <h3 className='text-lg font-semibold text-slate-950 dark:text-white'>
+                {t('employer.candidates.modal.applicationStatus')}
+              </h3>
               <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-                <div className='rounded-lg bg-slate-50 p-4'>
-                  <p className='mb-1 text-xs font-medium text-slate-600'>{t('employer.candidates.table.stage')}</p>
-                  <span className='inline-block rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700'>
+                <div className='rounded-lg bg-slate-50 p-4 dark:bg-slate-200/7'>
+                  <p className='mb-1 text-xs font-medium text-slate-600 dark:text-slate-300'>
+                    {t('employer.candidates.table.stage')}
+                  </p>
+                  <span className='inline-block rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-400/14 dark:text-violet-100'>
                     {getStatusLabel(candidate.stage || status)}
                   </span>
                 </div>
-                <div className='rounded-lg bg-slate-50 p-4'>
-                  <p className='mb-1 text-xs font-medium text-slate-600'>{t('employer.candidates.table.appliedDate')}</p>
-                  <p className='text-sm font-semibold text-slate-950'>
+                <div className='rounded-lg bg-slate-50 p-4 dark:bg-slate-200/7'>
+                  <p className='mb-1 text-xs font-medium text-slate-600 dark:text-slate-300'>
+                    {t('employer.candidates.table.appliedDate')}
+                  </p>
+                  <p className='text-sm font-semibold text-slate-950 dark:text-white'>
                     {new Date(candidate.appliedAt).toLocaleDateString(locale, {
                       month: 'short',
                       day: 'numeric',
@@ -195,21 +186,25 @@ const ViewCandidateModal = ({ candidate, isOpen, onClose }: ViewCandidateModalPr
                     })}
                   </p>
                 </div>
-                <div className='rounded-lg bg-slate-50 p-4'>
-                  <p className='mb-1 text-xs font-medium text-slate-600'>{t('employer.candidates.modal.jobPosition')}</p>
-                  <p className='truncate text-sm font-semibold text-slate-950'>{candidate.job.title}</p>
+                <div className='rounded-lg bg-slate-50 p-4 dark:bg-slate-200/7'>
+                  <p className='mb-1 text-xs font-medium text-slate-600 dark:text-slate-300'>
+                    {t('employer.candidates.modal.jobPosition')}
+                  </p>
+                  <p className='truncate text-sm font-semibold text-slate-950 dark:text-white'>{candidate.job.title}</p>
                 </div>
               </div>
             </div>
 
             {candidate.seeker.skills && candidate.seeker.skills.length > 0 && (
               <div className='space-y-3'>
-                <h3 className='text-lg font-semibold text-slate-950'>{t('employer.candidates.table.skills')}</h3>
+                <h3 className='text-lg font-semibold text-slate-950 dark:text-white'>
+                  {t('employer.candidates.table.skills')}
+                </h3>
                 <div className='flex flex-wrap gap-2'>
                   {candidate.seeker.skills.map((skill) => (
                     <span
                       key={skill}
-                      className='inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700'
+                      className='inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 dark:border-sky-300/18 dark:bg-sky-400/12 dark:text-sky-100'
                     >
                       {skill}
                     </span>
@@ -220,12 +215,15 @@ const ViewCandidateModal = ({ candidate, isOpen, onClose }: ViewCandidateModalPr
           </div>
         </div>
 
-        <div className='flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-end sm:p-6'>
-          {actionMessage ? <p className='mr-auto rounded-lg bg-white px-3 py-2 text-sm text-slate-700'>{actionMessage}</p> : null}
+        <div className='flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-end sm:p-6 dark:border-slate-300/14 dark:bg-slate-200/8'>
+          {actionMessage ? (
+            <p className='mr-auto rounded-lg bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-200/10 dark:text-slate-100'>
+              {actionMessage}
+            </p>
+          ) : null}
           <Button variant='outline' onClick={onClose} className='w-full rounded-lg sm:w-auto'>
             {t('employer.candidates.modal.close')}
           </Button>
-          <CandidateLikeButton seekerId={candidate.seeker.id} />
           <Button
             type='button'
             variant='outline'

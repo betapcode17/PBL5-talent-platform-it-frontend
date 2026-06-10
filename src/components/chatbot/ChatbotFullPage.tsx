@@ -35,7 +35,7 @@ const ChatbotFullPage = () => {
   const selectedConversationId = pendingConversationId ?? activeConversationId
 
   return (
-    <div className='flex h-screen bg-white'>
+    <div className='flex h-screen bg-white transition-colors duration-500 dark:bg-[#11151d]'>
       {/* Sidebar */}
       <ChatSidebar
         conversations={conversations}

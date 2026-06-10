@@ -1,25 +1,28 @@
 import { ChevronDown, MapPin, Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PrimaryButton } from '@/components/ui/Buttons'
 import Container from '@/components/ui/Container'
 import Tag from '@/components/ui/Tag'
 import { popularTags } from '@/data/jobs'
 
 const HeroSection = () => {
+  const { t } = useTranslation()
+
   return (
-    <section className='relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.12),_transparent_30%),linear-gradient(180deg,#f7f4ff_0%,#f4f1fa_100%)] py-[72px] sm:py-24 lg:py-28'>
+    <section className='relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.12),_transparent_30%),linear-gradient(180deg,#f7f4ff_0%,#f4f1fa_100%)] py-[72px] sm:py-24 lg:py-28 [@media(max-height:700px)]:py-10'>
       <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/80 to-transparent' />
       <div className='absolute left-1/2 top-16 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-300/20 blur-3xl' />
       <Container className='relative'>
         <div className='mx-auto max-w-5xl text-center'>
           <div className='space-y-6'>
-            <h1 className='text-[2.75rem] font-semibold leading-[0.95] tracking-[-0.06em] text-slate-950 sm:text-6xl lg:text-[4.4rem]'>
-              <span className='block'>Connecting Vietnam&apos;s Top Tech Talent</span>
-              <span className='mt-2 block bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-500 bg-clip-text text-transparent'>
-                with Global Opportunities
+            <h1 className='mx-auto max-w-5xl text-[clamp(2.5rem,5.2vw,4.4rem)] font-semibold leading-[1.16] tracking-[-0.03em] text-slate-950 [text-wrap:balance] sm:tracking-[-0.045em] [@media(max-height:700px)]:text-[clamp(2rem,4vw,2.8rem)]'>
+              <span className='block'>{t('home.hero.title')}</span>
+              <span className='mt-2 block max-w-full overflow-visible break-words bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-500 bg-clip-text pb-2 text-transparent [text-wrap:balance]'>
+                {t('home.hero.highlight')}
               </span>
             </h1>
             <p className='mx-auto max-w-2xl text-base leading-8 text-slate-500 sm:text-lg'>
-              Find your next developer role in Ho Chi Minh City, Hanoi, or Da Nang, 1,500+ fresh tech openings today.
+              {t('home.hero.description')}
             </p>
           </div>
 
@@ -29,7 +32,7 @@ const HeroSection = () => {
                 <Search className='h-5 w-5 text-violet-600' />
                 <input
                   type='text'
-                  placeholder='Job title, skills...'
+                  placeholder={t('home.hero.searchPlaceholder')}
                   className='w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400'
                 />
               </label>
@@ -40,17 +43,17 @@ const HeroSection = () => {
               >
                 <span className='flex items-center gap-3'>
                   <MapPin className='h-5 w-5 text-violet-600' />
-                  <span className='text-sm text-slate-700'>All Locations</span>
+                  <span className='text-sm text-slate-700'>{t('home.hero.allLocations')}</span>
                 </span>
                 <ChevronDown className='h-4 w-4 text-slate-400' />
               </button>
 
-              <PrimaryButton className='h-16 rounded-[22px] px-7 text-sm'>Search Jobs</PrimaryButton>
+              <PrimaryButton className='h-16 rounded-[22px] px-7 text-sm'>{t('home.hero.searchButton')}</PrimaryButton>
             </div>
           </form>
 
           <div className='mt-5 flex flex-wrap items-center justify-center gap-2.5 text-sm text-slate-400'>
-            <span className='mr-1 text-xs font-medium text-slate-400'>Popular</span>
+            <span className='mr-1 text-xs font-medium text-slate-400'>{t('home.hero.popular')}</span>
             {popularTags.map((tag) => (
               <Tag key={tag.label} label={tag.label} className='bg-white/90' />
             ))}

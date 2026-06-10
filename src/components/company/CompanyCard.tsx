@@ -17,7 +17,7 @@ export const CompanyCard = ({ company }: Props) => {
   const { followerCount, isFollowed } = useFollow(company.company_id)
   const [jobs, setJobs] = useState<CompanyJobSummary[]>([])
   const [showMoreJobs, setShowMoreJobs] = useState(false)
-  const [isJobsLoading, setIsJobsLoading] = useState(true)
+  const [isJobsLoading, setIsJobsLoading] = useState(false)
   const visibleJobs = showMoreJobs ? jobs.slice(0, 4) : jobs.slice(0, 2)
 
   const skills = useMemo(
@@ -31,7 +31,13 @@ export const CompanyCard = ({ company }: Props) => {
   )
 
   useEffect(() => {
+    setShowMoreJobs(false)
+  }, [company.company_id])
+
+  useEffect(() => {
     const controller = new AbortController()
+
+    setIsJobsLoading(true)
 
     getCompanyJobs(
       company.company_id,
@@ -65,7 +71,7 @@ export const CompanyCard = ({ company }: Props) => {
   return (
     <Card
       onClick={() => navigate(`/companies/${company.company_id}`)}
-      className='group cursor-pointer overflow-hidden rounded-[30px] border border-slate-200/80 bg-white p-6 shadow-[0_18px_56px_rgba(15,23,42,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_20px_60px_rgba(124,58,237,0.12)]'
+      className='group overflow-hidden rounded-[30px] border border-slate-200/80 bg-white p-6 shadow-[0_18px_56px_rgba(15,23,42,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_20px_60px_rgba(124,58,237,0.12)]'
     >
       <div className='flex flex-col gap-6 lg:flex-row'>
         <div className='flex shrink-0 justify-center lg:block'>

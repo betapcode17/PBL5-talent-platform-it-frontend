@@ -1,17 +1,12 @@
 import Container from '@/components/ui/Container'
 import { employers } from '@/data/employers'
-import { useTranslation } from 'react-i18next'
 
 const EmployersSection = () => {
-  const { t } = useTranslation()
-
   return (
     <section className='bg-white py-[72px]'>
       <Container>
         <div className='space-y-10 text-center'>
-          <p className='text-xs font-semibold uppercase tracking-[0.35em] text-slate-400'>
-            {t('home.employers.eyebrow')}
-          </p>
+          <p className='text-xs font-semibold uppercase tracking-[0.35em] text-slate-400'>Top Tech Employers In Vietnam</p>
           <div className='flex flex-wrap items-center justify-center gap-6 lg:gap-10'>
             {employers.map((employer) => (
               <div

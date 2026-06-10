@@ -11,9 +11,7 @@ export const CompanyOverview = ({ company }: { company: CompanyDetail }) => {
 
         <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-5'>
           <h3 className='text-sm font-semibold uppercase tracking-[0.18em] text-slate-400'>Profile</h3>
-          <p className='mt-3 text-sm leading-7 text-slate-600'>
-            {company.profile_description || 'Chưa có mô tả công ty.'}
-          </p>
+          <p className='mt-3 text-sm leading-7 text-slate-600'>{company.profile_description || 'Chưa có mô tả công ty.'}</p>
         </div>
 
         <div className='rounded-[24px] border border-violet-100 bg-[linear-gradient(135deg,rgba(238,242,255,0.95),rgba(250,245,255,0.95))] p-5'>

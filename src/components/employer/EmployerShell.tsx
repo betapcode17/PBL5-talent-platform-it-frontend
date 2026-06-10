@@ -1,6 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { useEffect, useRef, useState } from 'react'
-import { flushSync } from 'react-dom'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import EmployeeHeader from './EmployeeHeader'
@@ -11,88 +10,32 @@ type EmployerShellProps = {
   children: ReactNode
 }
 
-type ViewTransitionDocument = Document & {
-  startViewTransition?: (callback: () => void) => { finished: Promise<void> }
-}
-
 const EmployerShell = ({ children }: EmployerShellProps) => {
   const { t } = useTranslation()
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window === 'undefined') return 'light'
     return (localStorage.getItem('employer-dashboard-theme') as 'light' | 'dark' | null) || 'light'
   })
-  const [isThemeWaveActive, setIsThemeWaveActive] = useState(false)
-  const waveTimeoutRef = useRef<number | null>(null)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
 
-  const desktopSidebarWidth = isSidebarCollapsed ? '5.25rem' : '15rem'
+  const desktopSidebarWidth = isSidebarCollapsed ? '6rem' : '18.75rem'
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
     localStorage.setItem('employer-dashboard-theme', theme)
   }, [theme])
 
-  useEffect(() => {
-    return () => {
-      if (waveTimeoutRef.current) {
-        window.clearTimeout(waveTimeoutRef.current)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    document.documentElement.classList.add('employer-dashboard-scrollbar-hidden')
-
-    return () => {
-      document.documentElement.classList.remove('employer-dashboard-scrollbar-hidden')
-    }
-  }, [])
-
-  const handleToggleTheme = () => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark'
-    const root = document.documentElement
-    const transitionDocument = document as ViewTransitionDocument
-
-    if (waveTimeoutRef.current) {
-      window.clearTimeout(waveTimeoutRef.current)
-    }
-
-    root.dataset.themeTransition = nextTheme === 'dark' ? 'to-dark' : 'to-light'
-    setIsThemeWaveActive(true)
-
-    const finishWave = () => {
-      delete root.dataset.themeTransition
-      waveTimeoutRef.current = window.setTimeout(() => setIsThemeWaveActive(false), 140)
-    }
-
-    const applyNextTheme = () => {
-      root.classList.toggle('dark', nextTheme === 'dark')
-      localStorage.setItem('employer-dashboard-theme', nextTheme)
-      flushSync(() => setTheme(nextTheme))
-    }
-
-    if (transitionDocument.startViewTransition) {
-      const transition = transitionDocument.startViewTransition(applyNextTheme)
-      transition.finished.finally(finishWave)
-      return
-    }
-
-    waveTimeoutRef.current = window.setTimeout(applyNextTheme, 280)
-    window.setTimeout(finishWave, 980)
-  }
-
   return (
     <EmployerWorkspaceProvider>
-      <div className='relative min-h-screen overflow-x-clip bg-[#f4f7fb] text-slate-950 transition-colors duration-500 dark:bg-[#11151d] dark:text-slate-50'>
-        <div className={isThemeWaveActive ? 'theme-wave theme-wave--active' : 'theme-wave'} />
+      <div className='relative min-h-screen overflow-x-clip bg-slate-100 text-slate-950 transition-colors duration-300 dark:bg-[#080a16] dark:text-white'>
         <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-          <div className='absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(255,255,255,0.94),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.88)_0%,rgba(241,245,249,0.82)_46%,rgba(226,232,240,0.72)_100%)] dark:bg-[radial-gradient(circle_at_18%_8%,rgba(226,232,240,0.1),transparent_24%),linear-gradient(180deg,rgba(226,232,240,0.08)_0%,rgba(148,163,184,0.035)_45%,rgba(15,18,25,0)_100%)]' />
-          <div className='absolute inset-0 opacity-45 bg-[linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(180deg,rgba(148,163,184,0.06)_1px,transparent_1px)] bg-[size:72px_72px] dark:opacity-100 dark:bg-[linear-gradient(90deg,rgba(226,232,240,0.035)_1px,transparent_1px),linear-gradient(180deg,rgba(226,232,240,0.025)_1px,transparent_1px)]' />
+          <div className='absolute left-[-10rem] top-[-8rem] h-72 w-72 rounded-full bg-sky-200/25 blur-3xl dark:bg-sky-500/10' />
+          <div className='absolute right-[-8rem] top-14 h-80 w-80 rounded-full bg-violet-200/30 blur-3xl dark:bg-violet-500/12' />
         </div>
 
         <div
-          className='fixed inset-y-0 left-0 z-30 hidden transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] xl:block'
+          className='fixed inset-y-0 left-0 z-30 hidden transition-[width] duration-300 xl:block'
           style={{ width: desktopSidebarWidth }}
         >
           <div className='h-screen'>
@@ -104,7 +47,7 @@ const EmployerShell = ({ children }: EmployerShellProps) => {
         </div>
 
         <div
-          className='relative min-h-screen transition-[padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] xl:pl-[var(--employer-sidebar-width)]'
+          className='relative min-h-screen transition-[padding] duration-300 xl:pl-[var(--employer-sidebar-width)]'
           style={{ '--employer-sidebar-width': desktopSidebarWidth } as CSSProperties}
         >
           {isMobileSidebarOpen ? (
@@ -130,11 +73,11 @@ const EmployerShell = ({ children }: EmployerShellProps) => {
             <EmployeeHeader
               theme={theme}
               isMobileSidebarOpen={isMobileSidebarOpen}
-              onToggleTheme={handleToggleTheme}
+              onToggleTheme={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
               onMobileMenuClick={() => setIsMobileSidebarOpen((current) => !current)}
             />
 
-            <main className='min-w-0 flex-1 px-3 pb-0 pt-3 sm:px-4 lg:px-6 lg:pt-4 xl:px-7'>
+            <main className='min-w-0 flex-1 px-3 pb-8 pt-4 sm:px-4 lg:px-6 lg:pb-10 lg:pt-5 xl:px-7'>
               <div className='mx-auto flex min-w-0 w-full max-w-[1600px] flex-col gap-6'>{children}</div>
             </main>
           </div>

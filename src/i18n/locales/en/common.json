@@ -26,87 +26,6 @@
     "mobileNavigation": "Mobile navigation",
     "primaryNavigation": "Primary navigation"
   },
-  "home": {
-    "hero": {
-      "title": "Connecting Vietnam's Top Tech Talent",
-      "highlight": "with Global Opportunities",
-      "description": "Find your next developer role in Ho Chi Minh City, Hanoi, or Da Nang, 1,500+ fresh tech openings today.",
-      "searchPlaceholder": "Job title, skills...",
-      "allLocations": "All Locations",
-      "searchButton": "Search Jobs",
-      "popular": "Popular"
-    },
-    "categories": {
-      "title": "Top Tech Categories",
-      "subtitle": "Explore roles in the most in-demand domains",
-      "viewAll": "View All",
-      "openPositions": "{{count}}+ Open Positions"
-    },
-    "featuredJobs": {
-      "title": "Featured Jobs",
-      "salary": "Salary",
-      "applyNow": "Apply Now",
-      "browseMore": "Browse More {{count}}+ Jobs",
-      "badges": {
-        "new": "New",
-        "featured": "Featured"
-      }
-    },
-    "employers": {
-      "eyebrow": "Top Tech Employers In Vietnam"
-    },
-    "newsletter": {
-      "title": "Never miss a job opportunity.",
-      "description": "Get the latest tech jobs delivered to your inbox every morning.",
-      "placeholder": "Enter your email",
-      "submit": "Subscribe Now"
-    }
-  },
-  "footer": {
-    "description": "The premium destination for IT professionals in Vietnam. We help developers find meaningful work at the best tech companies.",
-    "copyrightPrefix": "© 2024 ITJobVN Network. Made with",
-    "copyrightSuffix": "in Ho Chi Minh City.",
-    "jobsOnline": "{{count}} jobs online",
-    "language": {
-      "en": "English (EN)",
-      "vi": "Vietnamese (VI)"
-    },
-    "groups": {
-      "For Candidates": {
-        "title": "For Candidates",
-        "links": {
-          "Browse Jobs": "Browse Jobs",
-          "Remote Jobs": "Remote Jobs",
-          "CV Templates": "CV Templates",
-          "Salaries": "Salaries"
-        }
-      },
-      "For Employers": {
-        "title": "For Employers",
-        "links": {
-          "Post a Job": "Post a Job",
-          "Candidate Search": "Candidate Search",
-          "Pricing": "Pricing",
-          "Hiring Solutions": "Hiring Solutions"
-        }
-      },
-      "Support": {
-        "title": "Support",
-        "links": {
-          "Help Center": "Help Center",
-          "Contact Us": "Contact Us",
-          "Privacy Policy": "Privacy Policy",
-          "Terms of Service": "Terms of Service"
-        }
-      }
-    }
-  },
-  "categoriesPage": {
-    "eyebrow": "Categories",
-    "title": "Browse by skill category",
-    "description": "Start from a domain, then narrow results by language, experience, salary, and work style.",
-    "viewJobs": "View jobs"
-  },
   "browseJobs": {
     "search": {
       "placeholder": "Search by job title, skill or company...",
@@ -121,10 +40,8 @@
       "title": "Filters",
       "description": "Refine job results",
       "programmingLanguages": "Programming Languages",
-      "selectOption": "Select option",
       "chooseLanguage": "Choose language",
       "noMatches": "No matching options",
-      "clearSearch": "Clear search",
       "experienceLevel": "Experience Level",
       "workType": "Work Type",
       "jobType": "Job Type",
@@ -150,8 +67,6 @@
       "showingJobs": "Showing {{from}}-{{to}} of {{count}} jobs",
       "sortBy": "Sort by",
       "newestFirst": "Newest First",
-      "salaryHigh": "Salary: High to Low",
-      "salaryLow": "Salary: Low to High",
       "suggestedFilters": "Suggested filters",
       "clearAll": "Clear all"
     },
@@ -200,10 +115,7 @@
       "partTime": "Part-time",
       "allLevels": "All levels",
       "locationFlexible": "Location flexible",
-      "companyFallback": "Company",
       "salaryNegotiable": "Salary negotiable",
-      "salaryFrom": "From {{value}}",
-      "salaryUpTo": "Up to {{value}}",
       "recentlyPosted": "Recently posted",
       "justNow": "Just now",
       "today": "Today",
@@ -370,7 +282,7 @@
     "sidebar": {
       "overview": "Overview",
       "jobs": "Jobs",
-      "resumeFilter": "Resume filter",
+      "resumeFilter": "AI resume filter",
       "candidates": "Candidates",
       "interviews": "Interviews",
       "company": "Company info",
@@ -424,8 +336,8 @@
     },
     "overview": {
       "eyebrow": "Recruitment command center",
-      "welcomeTitle": "Welcome {{name}}",
-      "descriptionWithCompany": "You are managing recruitment activities for {{company}}.",
+      "welcomeTitle": "Welcome {{name}}, how is your pipeline looking today?",
+      "descriptionWithCompany": "You are managing recruitment activities for {{company}}. Data below is fetched directly from the current system backend.",
       "descriptionFallback": "Track recruitment performance, new candidates, and interview schedules in one place.",
       "createJob": "Create New Job Post",
       "viewCandidates": "View Candidate List",
@@ -515,17 +427,6 @@
         "notSpecified": "Not specified",
         "viewApplications": "View Applications"
       },
-      "applicationsModal": {
-        "eyebrow": "{{count}} applicants",
-        "title": "Applied candidates",
-        "close": "Close applied candidates",
-        "searchPlaceholder": "Search by candidate name, email, or skills...",
-        "loadingTitle": "Loading applied candidates",
-        "loadingDescription": "System is fetching applications for this job.",
-        "failedTitle": "Failed to load applied candidates",
-        "emptyTitle": "No applied candidates",
-        "emptyDescription": "Applications for this job will appear here."
-      },
       "create": {
         "back": "Back to Jobs",
         "eyebrow": "Create new posting",
@@ -603,20 +504,6 @@
         "candidateInformation": "Candidate Information",
         "notes": "Interview Notes",
         "reschedule": "Reschedule"
-      },
-      "reschedule": {
-        "date": "New date *",
-        "startTime": "New start time *",
-        "meetingLink": "Meeting link *",
-        "location": "Location / phone details",
-        "submit": "Update schedule",
-        "submitting": "Updating...",
-        "submitError": "Unable to reschedule this interview.",
-        "validation": {
-          "date": "Please select a new interview date",
-          "startTime": "Please enter a new start time",
-          "meetingLink": "Please provide a meeting link for online interview"
-        }
       },
       "scheduleForm": {
         "title": "Schedule Interview",
@@ -741,11 +628,7 @@
         "PASSED": "Passed",
         "ACCEPTED": "Accepted",
         "REJECTED": "Rejected",
-        "APPLICATION_SUBMITTED": "Application submitted",
-        "APPLICATION_ACCEPTED": "Application accepted",
-        "APPLICATION_REJECTED": "Application rejected",
         "INTERVIEW_SCHEDULED": "Interview scheduled",
-        "INTERVIEW_RESCHEDULED": "Interview rescheduled",
         "INTERVIEW_COMPLETED": "Interview completed",
         "INTERVIEW_CANCELLED": "Interview cancelled"
       }

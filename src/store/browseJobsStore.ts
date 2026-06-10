@@ -13,9 +13,6 @@ type BrowseJobsState = BrowseJobsFilters & {
   toggleWorkType: (value: string) => void
   toggleJobType: (value: string) => void
   togglePostedWithin: (value: string) => void
-  setQuickView: (value: BrowseJobsFilters['quickView']) => void
-  setSortBy: (value: BrowseJobsFilters['sortBy']) => void
-  toggleSavedJob: (jobId: string) => void
   removeFilter: (value: string) => void
   setSalaryMin: (value: string) => void
   setSalaryMax: (value: string) => void
@@ -34,17 +31,8 @@ const initialState: BrowseJobsFilters = {
   selectedPostedWithin: ['7d'],
   salaryMin: '',
   salaryMax: '',
-  quickView: 'bestMatch',
-  sortBy: 'bestMatch',
-  savedJobIds: [],
   currentPage: 1,
   pageSize: 3
-}
-
-const clearedFiltersState: BrowseJobsFilters = {
-  ...initialState,
-  selectedExperience: [],
-  selectedPostedWithin: []
 }
 
 const toggleSelection = (value: string, current: string[]) =>
@@ -82,19 +70,6 @@ export const useBrowseJobsStore = create<BrowseJobsState>()((set) => ({
       selectedPostedWithin: toggleSelection(value, state.selectedPostedWithin),
       currentPage: 1
     })),
-  setQuickView: (value) =>
-    set({
-      quickView: value,
-      sortBy: value === 'latest' ? 'newest' : value === 'bestMatch' ? 'bestMatch' : 'newest',
-      currentPage: 1
-    }),
-  setSortBy: (value) => set({ sortBy: value, quickView: value === 'bestMatch' ? 'bestMatch' : 'latest', currentPage: 1 }),
-  toggleSavedJob: (jobId) =>
-    set((state) => ({
-      savedJobIds: state.savedJobIds.includes(jobId)
-        ? state.savedJobIds.filter((savedJobId) => savedJobId !== jobId)
-        : [...state.savedJobIds, jobId]
-    })),
   removeFilter: (value) =>
     set((state) => ({
       selectedLocation: state.selectedLocation === value ? '' : state.selectedLocation,
@@ -114,9 +89,5 @@ export const useBrowseJobsStore = create<BrowseJobsState>()((set) => ({
       availableJobTypeOptions: filters.jobTypes.length > 0 ? filters.jobTypes : jobTypeOptions,
       availableLocationOptions: filters.locations
     }),
-  resetFilters: () =>
-    set((state) => ({
-      ...clearedFiltersState,
-      savedJobIds: state.savedJobIds
-    }))
+  resetFilters: () => set(initialState)
 }))

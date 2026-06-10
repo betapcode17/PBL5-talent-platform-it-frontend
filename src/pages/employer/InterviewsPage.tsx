@@ -1,9 +1,9 @@
 import { Plus, Download } from 'lucide-react'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
+import EmployerPageHeader from '@/components/employer/EmployerPageHeader'
 import EmployerSectionCard from '@/components/employer/EmployerSectionCard'
 import EmployerInterviewList from '@/components/employer/EmployerInterviewList'
 import EmployerEmptyState from '@/components/employer/EmployerEmptyState'
@@ -11,8 +11,7 @@ import { useEmployerInterviews } from '@/hooks/useEmployerData'
 
 const InterviewsPage = () => {
   const { i18n, t } = useTranslation()
-  const [refreshKey, setRefreshKey] = useState(0)
-  const { data, isLoading, error } = useEmployerInterviews(1, 10, refreshKey)
+  const { data, isLoading, error } = useEmployerInterviews()
   const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
 
   const getStatusLabel = (status?: string | null) => {
@@ -75,6 +74,12 @@ const InterviewsPage = () => {
 
   return (
     <div className='min-w-0 space-y-6'>
+      <EmployerPageHeader
+        eyebrow={t('employer.interviews.page.eyebrow')}
+        title={t('employer.interviews.page.title')}
+        description={t('employer.interviews.page.description')}
+      />
+
       <EmployerSectionCard
         title={`${t('employer.interviews.page.sectionTitle')}${data ? ` - ${data.total}` : ''}`}
         description={t('employer.interviews.page.sectionDescription')}
@@ -88,12 +93,7 @@ const InterviewsPage = () => {
           />
         ) : null}
         {error ? <EmployerEmptyState title={t('employer.interviews.page.failedTitle')} description={error} /> : null}
-        {data ? (
-          <EmployerInterviewList
-            interviews={data.interviews}
-            onInterviewUpdated={() => setRefreshKey((current) => current + 1)}
-          />
-        ) : null}
+        {data ? <EmployerInterviewList interviews={data.interviews} /> : null}
       </EmployerSectionCard>
     </div>
   )

@@ -37,7 +37,7 @@ const ChatMessageList = ({
   const bottomRef = useAutoScroll([filteredMessages, messageFilter])
 
   return (
-    <div className='relative flex-1 overflow-y-auto bg-slate-50/60 transition-colors duration-500 dark:bg-[#171c26]'>
+    <div className='relative flex-1 overflow-y-auto'>
       <div className='space-y-4 p-4'>
         {filteredMessages.map((msg) => (
           <ChatMessageBubble key={msg.id} message={msg} />
@@ -71,7 +71,7 @@ const ChatMessageList = ({
                 <circle cx='15' cy='14' r='1' fill='currentColor' />
               </svg>
             </div>
-            <div className='rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3 dark:bg-slate-200/10'>
+            <div className='rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3'>
               <div className='flex gap-1'>
                 <span className='h-2 w-2 animate-bounce rounded-full bg-slate-400' style={{ animationDelay: '0ms' }} />
                 <span
@@ -92,8 +92,8 @@ const ChatMessageList = ({
       </div>
 
       {isLoading && (
-        <div className='absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[1px] dark:bg-[#171c26]/72'>
-          <div className='flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm dark:border-slate-300/16 dark:bg-[#252b38]'>
+        <div className='absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[1px]'>
+          <div className='flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm'>
             <div className='h-6 w-6 animate-spin rounded-full border-2 border-violet-300 border-t-violet-600' />
           </div>
         </div>

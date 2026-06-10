@@ -1,4 +1,4 @@
- import { getCompanyJobs } from '@/api/jobs'
+import { getCompanyJobs } from '@/api/jobs'
 import type { CompanyJobSummary } from '@/types/job-detail'
 import axios from 'axios'
 import { ArrowUpRight, BriefcaseBusiness, Clock3 } from 'lucide-react'
@@ -11,6 +11,8 @@ export const CompanyJobs = ({ companyId }: { companyId: number }) => {
 
   useEffect(() => {
     const controller = new AbortController()
+
+    setIsLoading(true)
 
     getCompanyJobs(companyId, { page: 1, limit: 6, active: true }, controller.signal)
       .then((response) => {
@@ -54,9 +56,7 @@ export const CompanyJobs = ({ companyId }: { companyId: number }) => {
       ) : jobs.length === 0 ? (
         <div className='rounded-[22px] border border-dashed border-slate-300 bg-slate-50/70 px-5 py-8 text-center'>
           <p className='text-sm font-medium text-slate-700'>Công ty hiện chưa có vị trí active.</p>
-          <p className='mt-2 text-sm text-slate-500'>
-            Danh sách việc làm sẽ hiển thị tại đây ngay khi có tin tuyển dụng mới.
-          </p>
+          <p className='mt-2 text-sm text-slate-500'>Danh sách việc làm sẽ hiển thị tại đây ngay khi có tin tuyển dụng mới.</p>
         </div>
       ) : (
         <div className='space-y-3'>

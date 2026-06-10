@@ -1,5 +1,9 @@
+import axios, { AxiosError } from 'axios'
 import axiosInstance from '@/api/axiosInstance'
+import { getMyApplicationsApi } from '@/api/applications'
+import { useAuthStore } from '@/store/authStore'
 import type { BrowseJob, BrowseJobsFilterOptions, BrowseJobsQueryParams, BrowseJobsResponse } from '@/types/browse-jobs'
+import { formatSalaryDisplay } from '@/utils/salary'
 
 type SearchJobsApiItem = {
   id: number
@@ -16,10 +20,12 @@ type SearchJobsApiItem = {
   level?: string | null
   skills?: string[]
   createdDate?: string | null
+  isActive?: boolean
   company?: {
     company_id: number
     company_name: string
     city?: string | null
+    is_active?: boolean
   } | null
   category?: {
     category_id: number
@@ -82,22 +88,22 @@ const getCompanyInitials = (name: string) =>
 
 const formatSalary = (job: SearchJobsApiItem) => {
   if (job.salary?.trim()) {
-    return job.salary
+    return formatSalaryDisplay(job.salary) ?? job.salary
   }
 
   const min = job.salaryRange?.min
   const max = job.salaryRange?.max
 
   if (typeof min === 'number' && typeof max === 'number') {
-    return `$${min.toLocaleString()} - $${max.toLocaleString()}`
+    return formatSalaryDisplay(`${min}-${max}`) ?? `${min.toLocaleString()} - ${max.toLocaleString()} VND`
   }
 
   if (typeof min === 'number') {
-    return `From $${min.toLocaleString()}`
+    return formatSalaryDisplay(String(min)) ?? `From ${min.toLocaleString()} VND`
   }
 
   if (typeof max === 'number') {
-    return `Up to $${max.toLocaleString()}`
+    return formatSalaryDisplay(String(max)) ?? `Up to ${max.toLocaleString()} VND`
   }
 
   return 'Salary negotiable'
@@ -142,16 +148,6 @@ const parseSalaryRange = (job: SearchJobsApiItem) => {
     min: min ?? max ?? null,
     max: max ?? min ?? null
   }
-}
-
-const getSalarySortValue = (job: SearchJobsApiItem) => {
-  const range = parseSalaryRange(job)
-  return range.max ?? range.min ?? 0
-}
-
-const getCreatedTimestamp = (job: SearchJobsApiItem) => {
-  const timestamp = job.createdDate ? new Date(job.createdDate).getTime() : 0
-  return Number.isNaN(timestamp) ? 0 : timestamp
 }
 
 const getSkills = (job: SearchJobsApiItem) => {
@@ -266,6 +262,11 @@ const applyClientFilters = (jobs: SearchJobsApiItem[], params: BrowseJobsQueryPa
   const normalizedMax = rawMax !== null && Number.isFinite(rawMax) ? rawMax : null
 
   return jobs.filter((job) => {
+    const isVisible = job.isActive !== false && job.company?.is_active !== false
+    if (!isVisible) {
+      return false
+    }
+
     const mapped = toBrowseJob(job, 0)
     const salaryRange = parseSalaryRange(job)
     const matchesLanguage =
@@ -278,47 +279,68 @@ const applyClientFilters = (jobs: SearchJobsApiItem[], params: BrowseJobsQueryPa
       params.selectedJobTypes.length === 0 || params.selectedJobTypes.includes(mapped.employmentType)
     const matchesSalaryMax = normalizedMax === null || salaryRange.min === null || salaryRange.min <= normalizedMax
 
-    const matchesSaved = params.quickView !== 'saved' || params.savedJobIds.includes(String(job.id))
-
-    return matchesLanguage && matchesExperience && matchesWorkType && matchesJobType && matchesSalaryMax && matchesSaved
+    return matchesLanguage && matchesExperience && matchesWorkType && matchesJobType && matchesSalaryMax
   })
 }
 
-const sortJobs = (jobs: SearchJobsApiItem[], params: BrowseJobsQueryParams) => {
-  if (params.sortBy === 'newest') {
-    return [...jobs].sort((a, b) => getCreatedTimestamp(b) - getCreatedTimestamp(a))
-  }
+const fetchSearchJobsApi = async (
+  params: BrowseJobsQueryParams,
+  signal?: AbortSignal,
+  excludeApplied?: boolean
+) => {
+  const response = await axiosInstance.get<SearchJobsApiResponse>('/jobs/search', {
+    params: {
+      q: params.searchQuery || undefined,
+      location: params.selectedLocation || undefined,
+      salaryMin: params.salaryMin || undefined,
+      excludeApplied: excludeApplied ? true : undefined,
+      page: 1,
+      limit: 100
+    },
+    signal,
+    skipErrorLog: excludeApplied === true
+  })
 
-  if (params.sortBy === 'salaryHigh') {
-    return [...jobs].sort((a, b) => getSalarySortValue(b) - getSalarySortValue(a))
-  }
+  return response.data
+}
 
-  if (params.sortBy === 'salaryLow') {
-    return [...jobs].sort((a, b) => getSalarySortValue(a) - getSalarySortValue(b))
-  }
-
-  return jobs
+const shouldUseExcludeApplied = () => {
+  const { isAuthenticated, user } = useAuthStore.getState()
+  return isAuthenticated && user?.role === 'SEEKER'
 }
 
 export const fetchBrowseJobs = async (
   params: BrowseJobsQueryParams,
   signal?: AbortSignal
 ): Promise<BrowseJobsResponse> => {
-  const response = await axiosInstance.get<SearchJobsApiResponse>('/jobs/search', {
-    params: {
-      q: params.searchQuery || undefined,
-      location: params.selectedLocation || undefined,
-      salaryMin: params.salaryMin || undefined,
-      page: 1,
-      limit: 100
-    },
-    signal
-  })
+  const useExcludeApplied = shouldUseExcludeApplied()
 
-  const filteredJobs = sortJobs(applyClientFilters(response.data.jobs, params), params).map((job, index) => ({
-    ...toBrowseJob(job, index),
-    isBookmarked: params.savedJobIds.includes(String(job.id))
-  }))
+  let responseData: SearchJobsApiResponse
+
+  try {
+    responseData = await fetchSearchJobsApi(params, signal, useExcludeApplied)
+  } catch (error) {
+    const axiosError = error as AxiosError
+
+    if (!useExcludeApplied || !axios.isAxiosError(axiosError) || axiosError.response?.status !== 400) {
+      throw error
+    }
+
+    responseData = await fetchSearchJobsApi(params, signal, false)
+
+    try {
+      const applied = await getMyApplicationsApi({ page: 1, limit: 100 })
+      const appliedJobIds = new Set(applied.applications.map((application) => application.job.id))
+      responseData = {
+        ...responseData,
+        jobs: responseData.jobs.filter((job) => !appliedJobIds.has(job.id))
+      }
+    } catch {
+      // Ignore fallback filtering failure and keep the job list available.
+    }
+  }
+
+  const filteredJobs = applyClientFilters(responseData.jobs, params).map(toBrowseJob)
   const totalItems = filteredJobs.length
   const totalPages = Math.max(1, Math.ceil(totalItems / params.pageSize))
   const safeCurrentPage = Math.min(params.currentPage, totalPages)
@@ -335,6 +357,6 @@ export const fetchBrowseJobs = async (
       from: totalItems === 0 ? 0 : startIndex + 1,
       to: totalItems === 0 ? 0 : Math.min(startIndex + params.pageSize, totalItems)
     },
-    filters: mapFilterOptions(response.data.filters)
+    filters: mapFilterOptions(responseData.filters)
   }
 }

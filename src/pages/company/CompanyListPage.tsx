@@ -46,6 +46,7 @@ const HeaderSection = ({ total }: { total: number; visibleCount: number }) => {
 
         <div className='grid gap-3 sm:grid-cols-1'>
           <MetricCard icon={<Building2 className='h-5 w-5' />} label='Tổng công ty' value={total} />
+          {/* <MetricCard icon={<LayoutGrid className='h-5 w-5' />} label='Đang hiển thị' value={visibleCount} /> */}
         </div>
       </div>
     </section>
@@ -56,9 +57,7 @@ const MetricCard = ({ icon, label, value }: { icon: ReactNode; label: string; va
   return (
     <div className='rounded-[24px] border border-slate-200 bg-slate-50/80 px-4 py-4'>
       <div className='flex items-center gap-3'>
-        <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-violet-600 shadow-sm'>
-          {icon}
-        </div>
+        <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-violet-600 shadow-sm'>{icon}</div>
         <div>
           <p className='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>{label}</p>
           <p className='mt-1 text-2xl font-semibold text-slate-950'>{value}</p>

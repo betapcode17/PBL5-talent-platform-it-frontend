@@ -12,7 +12,7 @@ export type HeroTag = {
 export type Category = {
   id: string
   title: string
-  openRolesCount: number
+  openRoles: string
   icon: LucideIcon
 }
 

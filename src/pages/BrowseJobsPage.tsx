@@ -39,12 +39,8 @@ const BrowseJobsSearch = memo(() => {
 
 const BrowseJobsResults = memo(() => {
   const { jobs, pagination, activeFilters, isLoading, isFetching } = useBrowseJobs()
-  const quickView = useBrowseJobsStore((state) => state.quickView)
-  const sortBy = useBrowseJobsStore((state) => state.sortBy)
   const removeFilter = useBrowseJobsStore((state) => state.removeFilter)
   const resetFilters = useBrowseJobsStore((state) => state.resetFilters)
-  const setQuickView = useBrowseJobsStore((state) => state.setQuickView)
-  const setSortBy = useBrowseJobsStore((state) => state.setSortBy)
   const setCurrentPage = useBrowseJobsStore((state) => state.setCurrentPage)
 
   const handleRemoveFilter = useCallback(
@@ -61,10 +57,6 @@ const BrowseJobsResults = memo(() => {
         from={pagination.from}
         to={pagination.to}
         isFetching={isFetching}
-        quickView={quickView}
-        sortBy={sortBy}
-        onQuickViewChange={setQuickView}
-        onSortChange={setSortBy}
       />
 
       <ActiveFiltersBar
@@ -103,7 +95,7 @@ const BrowseJobsPage = () => {
 
   return (
     <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.10),_transparent_26%),linear-gradient(180deg,#f7f4ff_0%,#fafafc_100%)]'>
-      <Container className='max-w-[1500px] py-5 sm:py-6'>
+      <Container className='max-w-[1380px] py-5 sm:py-6'>
         <div className='mb-5 flex justify-center'>
           <BrowseJobsSearch />
         </div>
@@ -119,7 +111,7 @@ const BrowseJobsPage = () => {
           </button>
         </div>
 
-        <div className='grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_320px] 2xl:grid-cols-[336px_minmax(0,1fr)_336px]'>
+        <div className='grid gap-5 xl:grid-cols-[296px_minmax(0,1.45fr)_280px] 2xl:grid-cols-[304px_minmax(0,1.5fr)_292px]'>
           <FiltersSidebar isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
           <BrowseJobsResults />
 

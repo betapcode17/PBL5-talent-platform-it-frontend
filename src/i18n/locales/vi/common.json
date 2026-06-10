@@ -26,87 +26,6 @@
     "mobileNavigation": "Điều hướng di động",
     "primaryNavigation": "Điều hướng chính"
   },
-  "home": {
-    "hero": {
-      "title": "K\u1ebft n\u1ed1i nh\u00e2n t\u00e0i c\u00f4ng ngh\u1ec7 h\u00e0ng \u0111\u1ea7u Vi\u1ec7t Nam",
-      "highlight": "v\u1edbi c\u01a1 h\u1ed9i to\u00e0n c\u1ea7u",
-      "description": "T\u00ecm vai tr\u00f2 l\u1eadp tr\u00ecnh vi\u00ean ti\u1ebfp theo t\u1ea1i TP.HCM, H\u00e0 N\u1ed9i ho\u1eb7c \u0110\u00e0 N\u1eb5ng, v\u1edbi h\u01a1n 1.500 vi\u1ec7c l\u00e0m c\u00f4ng ngh\u1ec7 m\u1edbi h\u00f4m nay.",
-      "searchPlaceholder": "T\u00ean vi\u1ec7c l\u00e0m, k\u1ef9 n\u0103ng...",
-      "allLocations": "T\u1ea5t c\u1ea3 \u0111\u1ecba \u0111i\u1ec3m",
-      "searchButton": "T\u00ecm vi\u1ec7c",
-      "popular": "Ph\u1ed5 bi\u1ebfn"
-    },
-    "categories": {
-      "title": "Danh m\u1ee5c c\u00f4ng ngh\u1ec7 n\u1ed5i b\u1eadt",
-      "subtitle": "Kh\u00e1m ph\u00e1 c\u00e1c vai tr\u00f2 trong nh\u1eefng l\u0129nh v\u1ef1c \u0111ang \u0111\u01b0\u1ee3c t\u00ecm ki\u1ebfm nh\u1ea5t",
-      "viewAll": "Xem t\u1ea5t c\u1ea3",
-      "openPositions": "{{count}}+ v\u1ecb tr\u00ed \u0111ang tuy\u1ec3n"
-    },
-    "featuredJobs": {
-      "title": "Vi\u1ec7c l\u00e0m n\u1ed5i b\u1eadt",
-      "salary": "M\u1ee9c l\u01b0\u01a1ng",
-      "applyNow": "\u1ee8ng tuy\u1ec3n ngay",
-      "browseMore": "Xem th\u00eam {{count}}+ vi\u1ec7c l\u00e0m",
-      "badges": {
-        "new": "M\u1edbi",
-        "featured": "N\u1ed5i b\u1eadt"
-      }
-    },
-    "employers": {
-      "eyebrow": "Nh\u00e0 tuy\u1ec3n d\u1ee5ng c\u00f4ng ngh\u1ec7 h\u00e0ng \u0111\u1ea7u Vi\u1ec7t Nam"
-    },
-    "newsletter": {
-      "title": "\u0110\u1eebng b\u1ecf l\u1ee1 c\u01a1 h\u1ed9i vi\u1ec7c l\u00e0m.",
-      "description": "Nh\u1eadn c\u00e1c vi\u1ec7c l\u00e0m c\u00f4ng ngh\u1ec7 m\u1edbi nh\u1ea5t trong h\u1ed9p th\u01b0 m\u1ed7i bu\u1ed5i s\u00e1ng.",
-      "placeholder": "Nh\u1eadp email c\u1ee7a b\u1ea1n",
-      "submit": "\u0110\u0103ng k\u00fd ngay"
-    }
-  },
-  "footer": {
-    "description": "\u0110i\u1ec3m \u0111\u1ebfn cao c\u1ea5p cho chuy\u00ean gia CNTT t\u1ea1i Vi\u1ec7t Nam. Ch\u00fang t\u00f4i gi\u00fap l\u1eadp tr\u00ecnh vi\u00ean t\u00ecm c\u00f4ng vi\u1ec7c \u00fd ngh\u0129a t\u1ea1i c\u00e1c c\u00f4ng ty c\u00f4ng ngh\u1ec7 t\u1ed1t nh\u1ea5t.",
-    "copyrightPrefix": "\u00a9 2024 ITJobVN Network. \u0110\u01b0\u1ee3c x\u00e2y d\u1ef1ng v\u1edbi",
-    "copyrightSuffix": "t\u1ea1i TP. H\u1ed3 Ch\u00ed Minh.",
-    "jobsOnline": "{{count}} vi\u1ec7c l\u00e0m \u0111ang online",
-    "language": {
-      "en": "Ti\u1ebfng Anh (EN)",
-      "vi": "Ti\u1ebfng Vi\u1ec7t (VI)"
-    },
-    "groups": {
-      "For Candidates": {
-        "title": "Cho \u1ee9ng vi\u00ean",
-        "links": {
-          "Browse Jobs": "T\u00ecm vi\u1ec7c",
-          "Remote Jobs": "Vi\u1ec7c l\u00e0m t\u1eeb xa",
-          "CV Templates": "M\u1eabu CV",
-          "Salaries": "M\u1ee9c l\u01b0\u01a1ng"
-        }
-      },
-      "For Employers": {
-        "title": "Cho nh\u00e0 tuy\u1ec3n d\u1ee5ng",
-        "links": {
-          "Post a Job": "\u0110\u0103ng tuy\u1ec3n",
-          "Candidate Search": "T\u00ecm \u1ee9ng vi\u00ean",
-          "Pricing": "B\u1ea3ng gi\u00e1",
-          "Hiring Solutions": "Gi\u1ea3i ph\u00e1p tuy\u1ec3n d\u1ee5ng"
-        }
-      },
-      "Support": {
-        "title": "H\u1ed7 tr\u1ee3",
-        "links": {
-          "Help Center": "Trung t\u00e2m tr\u1ee3 gi\u00fap",
-          "Contact Us": "Li\u00ean h\u1ec7",
-          "Privacy Policy": "Ch\u00ednh s\u00e1ch b\u1ea3o m\u1eadt",
-          "Terms of Service": "\u0110i\u1ec1u kho\u1ea3n d\u1ecbch v\u1ee5"
-        }
-      }
-    }
-  },
-  "categoriesPage": {
-    "eyebrow": "Danh m\u1ee5c",
-    "title": "Duy\u1ec7t theo nh\u00f3m k\u1ef9 n\u0103ng",
-    "description": "B\u1eaft \u0111\u1ea7u t\u1eeb m\u1ed9t l\u0129nh v\u1ef1c, sau \u0111\u00f3 thu h\u1eb9p theo ng\u00f4n ng\u1eef, kinh nghi\u1ec7m, l\u01b0\u01a1ng v\u00e0 h\u00ecnh th\u1ee9c l\u00e0m vi\u1ec7c.",
-    "viewJobs": "Xem vi\u1ec7c l\u00e0m"
-  },
   "browseJobs": {
     "search": {
       "placeholder": "Tìm theo tên việc làm, kỹ năng hoặc công ty...",
@@ -121,10 +40,8 @@
       "title": "Bộ lọc",
       "description": "Tinh chỉnh kết quả việc làm",
       "programmingLanguages": "Ngôn ngữ lập trình",
-      "selectOption": "Chọn tùy chọn",
       "chooseLanguage": "Chọn ngôn ngữ",
       "noMatches": "Không có kết quả phù hợp",
-      "clearSearch": "Xóa tìm kiếm",
       "experienceLevel": "Cấp độ kinh nghiệm",
       "workType": "Hình thức làm việc",
       "jobType": "Loại việc làm",
@@ -150,8 +67,6 @@
       "showingJobs": "Đang hiển thị {{from}}-{{to}} trên {{count}} việc làm",
       "sortBy": "Sắp xếp",
       "newestFirst": "Mới nhất trước",
-      "salaryHigh": "L\u01b0\u01a1ng: cao \u0111\u1ebfn th\u1ea5p",
-      "salaryLow": "L\u01b0\u01a1ng: th\u1ea5p \u0111\u1ebfn cao",
       "suggestedFilters": "Bộ lọc gợi ý",
       "clearAll": "Xóa tất cả"
     },
@@ -200,10 +115,7 @@
       "partTime": "Bán thời gian",
       "allLevels": "Tất cả cấp độ",
       "locationFlexible": "Địa điểm linh hoạt",
-      "companyFallback": "Công ty",
       "salaryNegotiable": "Lương thỏa thuận",
-      "salaryFrom": "Từ {{value}}",
-      "salaryUpTo": "Tối đa {{value}}",
       "recentlyPosted": "Mới đăng gần đây",
       "justNow": "Vừa xong",
       "today": "Hôm nay",
@@ -347,7 +259,7 @@
     "sidebar": {
       "overview": "Tổng quan",
       "jobs": "Việc làm",
-      "resumeFilter": "Lọc hồ sơ",
+      "resumeFilter": "Lọc hồ sơ AI",
       "candidates": "Ứng viên",
       "interviews": "Phỏng vấn",
       "company": "Thông tin công ty",
@@ -401,8 +313,8 @@
     },
     "overview": {
       "eyebrow": "Trung tâm điều phối tuyển dụng",
-      "welcomeTitle": "Chào {{name}}",
-      "descriptionWithCompany": "Bạn đang quản lý hoạt động tuyển dụng cho {{company}}.",
+      "welcomeTitle": "Chào {{name}}, pipeline tuyển dụng hôm nay thế nào?",
+      "descriptionWithCompany": "Bạn đang quản lý hoạt động tuyển dụng cho {{company}}. Dữ liệu bên dưới được lấy trực tiếp từ backend hiện tại.",
       "descriptionFallback": "Theo dõi hiệu quả tuyển dụng, ứng viên mới và lịch phỏng vấn tại một nơi.",
       "createJob": "Tạo tin tuyển dụng mới",
       "viewCandidates": "Xem danh sách ứng viên",
@@ -492,17 +404,6 @@
         "notSpecified": "Chưa xác định",
         "viewApplications": "Xem hồ sơ ứng tuyển"
       },
-      "applicationsModal": {
-        "eyebrow": "{{count}} ứng viên",
-        "title": "Ứng viên đã ứng tuyển",
-        "close": "Đóng danh sách ứng viên đã ứng tuyển",
-        "searchPlaceholder": "Tìm theo tên, email hoặc kỹ năng...",
-        "loadingTitle": "Đang tải ứng viên đã ứng tuyển",
-        "loadingDescription": "Hệ thống đang lấy hồ sơ ứng tuyển cho việc làm này.",
-        "failedTitle": "Không tải được ứng viên đã ứng tuyển",
-        "emptyTitle": "Chưa có ứng viên",
-        "emptyDescription": "Các hồ sơ ứng tuyển vào việc làm này sẽ xuất hiện tại đây."
-      },
       "create": {
         "back": "Quay lại việc làm",
         "eyebrow": "Tạo tin mới",
@@ -580,20 +481,6 @@
         "candidateInformation": "Thông tin ứng viên",
         "notes": "Ghi chú phỏng vấn",
         "reschedule": "Đổi lịch"
-      },
-      "reschedule": {
-        "date": "Ngày mới *",
-        "startTime": "Giờ bắt đầu mới *",
-        "meetingLink": "Link cuộc họp *",
-        "location": "Địa điểm / thông tin gọi",
-        "submit": "Cập nhật lịch",
-        "submitting": "Đang cập nhật...",
-        "submitError": "Hiện chưa thể đổi lịch phỏng vấn này.",
-        "validation": {
-          "date": "Vui lòng chọn ngày phỏng vấn mới",
-          "startTime": "Vui lòng nhập giờ bắt đầu mới",
-          "meetingLink": "Vui lòng cung cấp link họp cho phỏng vấn online"
-        }
       },
       "scheduleForm": {
         "title": "Lên lịch phỏng vấn",
@@ -718,11 +605,7 @@
         "PASSED": "Đã qua vòng lọc",
         "ACCEPTED": "Đã duyệt",
         "REJECTED": "Đã từ chối",
-        "APPLICATION_SUBMITTED": "Đã nộp hồ sơ",
-        "APPLICATION_ACCEPTED": "Đã duyệt hồ sơ",
-        "APPLICATION_REJECTED": "Đã từ chối hồ sơ",
         "INTERVIEW_SCHEDULED": "Đã lên lịch phỏng vấn",
-        "INTERVIEW_RESCHEDULED": "Đã đổi lịch phỏng vấn",
         "INTERVIEW_COMPLETED": "Đã phỏng vấn xong",
         "INTERVIEW_CANCELLED": "Đã hủy phỏng vấn"
       }

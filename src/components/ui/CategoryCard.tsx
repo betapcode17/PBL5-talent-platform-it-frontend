@@ -1,12 +1,10 @@
 import type { Category } from '@/types'
-import { useTranslation } from 'react-i18next'
 
 type CategoryCardProps = {
   category: Category
 }
 
 const CategoryCard = ({ category }: CategoryCardProps) => {
-  const { t } = useTranslation()
   const Icon = category.icon
 
   return (
@@ -16,9 +14,7 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
       </div>
       <div className='space-y-2'>
         <h3 className='text-xl font-semibold tracking-[-0.03em] text-slate-950'>{category.title}</h3>
-        <p className='text-sm text-slate-500'>
-          {t('home.categories.openPositions', { count: category.openRolesCount })}
-        </p>
+        <p className='text-sm text-slate-500'>{category.openRoles}</p>
       </div>
     </article>
   )

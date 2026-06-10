@@ -469,9 +469,6 @@ const ResumeFilterPage = () => {
 
       <EmployerSectionCard
         title='Chọn tin tuyển dụng'
-        className='gap-0 py-0'
-        headerClassName='gap-2 px-4 pb-3 pt-3 sm:px-5'
-        titleClassName='text-lg'
         contentClassName='px-4 py-3 sm:px-5 sm:py-4'
       >
         {isJobsLoading ? (

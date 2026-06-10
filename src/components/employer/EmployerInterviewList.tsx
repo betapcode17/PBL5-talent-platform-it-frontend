@@ -10,10 +10,9 @@ import ViewInterviewModal from './ViewInterviewModal'
 
 type EmployerInterviewListProps = {
   interviews: EmployerInterviewItem[]
-  onInterviewUpdated?: () => void
 }
 
-const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInterviewListProps) => {
+const EmployerInterviewList = ({ interviews }: EmployerInterviewListProps) => {
   const { i18n, t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'date' | 'status'>('date')
@@ -89,7 +88,7 @@ const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInter
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className='w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium transition-colors lg:w-auto dark:border-slate-300/15 dark:bg-slate-200/8 dark:text-slate-100'
+            className='w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium lg:w-auto dark:border-white/8 dark:bg-white/5 dark:text-slate-100'
           >
             <option value='__ALL__'>{t('employer.interviews.filters.allStatus')}</option>
             <option value='SCHEDULED'>{t('employer.statuses.SCHEDULED')}</option>
@@ -97,12 +96,10 @@ const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInter
           </select>
           <button
             onClick={() => setSortBy(sortBy === 'date' ? 'status' : 'date')}
-            className='inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium transition hover:bg-slate-50 lg:w-auto dark:border-slate-300/15 dark:bg-slate-200/8 dark:text-slate-100 dark:hover:bg-slate-200/14'
+            className='inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium transition hover:bg-slate-50 lg:w-auto dark:border-white/8 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/8'
           >
             <ArrowUpDown className='h-4 w-4' />
-            {sortBy === 'date'
-              ? t('employer.interviews.filters.sortDate')
-              : t('employer.interviews.filters.sortStatus')}
+            {sortBy === 'date' ? t('employer.interviews.filters.sortDate') : t('employer.interviews.filters.sortStatus')}
           </button>
         </div>
 
@@ -115,29 +112,22 @@ const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInter
           <>
             <div className='grid min-w-0 gap-4 lg:hidden'>
               {filteredAndSorted.map((interview) => (
-                <article
-                  key={interview.id}
-                  className='min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-300/14 dark:bg-slate-200/7'
-                >
+                <article key={interview.id} className='min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/8 dark:bg-white/5'>
                   <div className='flex items-start gap-3'>
                     <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700'>
                       {interview.candidate.fullName?.charAt(0) || '?'}
                     </div>
                     <div className='min-w-0 flex-1'>
-                      <p className='break-words font-semibold text-slate-950 dark:text-white'>
-                        {interview.candidate.fullName || t('employer.interviews.table.unknown')}
-                      </p>
-                      <p className='mt-1 break-words text-sm text-slate-500 dark:text-slate-400'>
-                        {interview.job.title}
-                      </p>
+                      <p className='break-words font-semibold text-slate-950 dark:text-white'>{interview.candidate.fullName || t('employer.interviews.table.unknown')}</p>
+                      <p className='mt-1 break-words text-sm text-slate-500 dark:text-slate-400'>{interview.job.title}</p>
                     </div>
                     <span
                       className={`inline-flex shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
                         interview.status === 'COMPLETED'
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/12 dark:text-emerald-100'
+                          ? 'bg-emerald-50 text-emerald-700'
                           : interview.status === 'SCHEDULED'
-                            ? 'bg-violet-50 text-violet-700 dark:bg-violet-400/14 dark:text-violet-100'
-                            : 'bg-slate-100 text-slate-600 dark:bg-slate-200/10 dark:text-slate-200'
+                            ? 'bg-violet-50 text-violet-700'
+                            : 'bg-slate-100 text-slate-600'
                       }`}
                     >
                       {getStatusLabel(interview.status)}
@@ -146,9 +136,7 @@ const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInter
 
                   <div className='mt-4 grid gap-3 sm:grid-cols-2'>
                     <div>
-                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>
-                        {t('employer.interviews.table.date')}
-                      </p>
+                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.interviews.table.date')}</p>
                       <p className='mt-1 text-sm text-slate-700 dark:text-slate-300'>
                         {interview.interviewDate
                           ? new Date(interview.interviewDate).toLocaleDateString(locale, {
@@ -160,26 +148,18 @@ const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInter
                       </p>
                     </div>
                     <div>
-                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>
-                        {t('employer.interviews.table.time')}
-                      </p>
+                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.interviews.table.time')}</p>
                       <p className='mt-1 text-sm text-slate-700 dark:text-slate-300'>{interview.startTime || '-'}</p>
                     </div>
                     <div>
-                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>
-                        {t('employer.interviews.table.interviewType')}
-                      </p>
-                      <span className='mt-1 inline-flex rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:bg-sky-400/12 dark:text-sky-100'>
+                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.interviews.table.interviewType')}</p>
+                      <span className='mt-1 inline-flex rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700'>
                         {interview.interviewType || t('employer.interviews.table.notSpecified')}
                       </span>
                     </div>
                     <div>
-                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>
-                        {t('employer.interviews.table.location')}
-                      </p>
-                      <p className='mt-1 break-words text-sm text-slate-700 dark:text-slate-300'>
-                        {interview.location || '-'}
-                      </p>
+                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.interviews.table.location')}</p>
+                      <p className='mt-1 break-words text-sm text-slate-700 dark:text-slate-300'>{interview.location || '-'}</p>
                     </div>
                   </div>
 
@@ -199,49 +179,28 @@ const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInter
             <div className='hidden max-w-full overflow-x-auto rounded-2xl lg:block'>
               <table className='min-w-[66rem] w-full'>
                 <thead>
-                  <tr className='border-b border-slate-200 bg-slate-50 dark:border-slate-300/14 dark:bg-slate-200/8'>
-                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>
-                      {t('employer.interviews.table.candidate')}
-                    </th>
-                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>
-                      {t('employer.interviews.table.jobTitle')}
-                    </th>
-                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>
-                      {t('employer.interviews.table.dateTime')}
-                    </th>
-                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>
-                      {t('employer.interviews.table.interviewType')}
-                    </th>
-                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>
-                      {t('employer.interviews.table.location')}
-                    </th>
-                    <th className='px-4 py-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-300'>
-                      {t('employer.interviews.table.status')}
-                    </th>
-                    <th className='px-4 py-3 text-right text-sm font-semibold text-slate-600 dark:text-slate-300'>
-                      {t('employer.interviews.table.action')}
-                    </th>
+                  <tr className='border-b border-slate-200 bg-slate-50 dark:border-white/8 dark:bg-white/5'>
+                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>{t('employer.interviews.table.candidate')}</th>
+                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>{t('employer.interviews.table.jobTitle')}</th>
+                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>{t('employer.interviews.table.dateTime')}</th>
+                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>{t('employer.interviews.table.interviewType')}</th>
+                    <th className='px-4 py-3 text-left text-sm font-semibold text-slate-600 dark:text-slate-300'>{t('employer.interviews.table.location')}</th>
+                    <th className='px-4 py-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-300'>{t('employer.interviews.table.status')}</th>
+                    <th className='px-4 py-3 text-right text-sm font-semibold text-slate-600 dark:text-slate-300'>{t('employer.interviews.table.action')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAndSorted.map((interview) => (
-                    <tr
-                      key={interview.id}
-                      className='border-b border-slate-100 transition hover:bg-slate-50/50 dark:border-slate-300/12 dark:hover:bg-slate-200/7'
-                    >
+                    <tr key={interview.id} className='border-b border-slate-100 transition hover:bg-slate-50/50 dark:border-white/8 dark:hover:bg-white/5'>
                       <td className='max-w-[15rem] px-4 py-4'>
                         <div className='flex items-center gap-3'>
                           <div className='flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700'>
                             {interview.candidate.fullName?.charAt(0) || '?'}
                           </div>
-                          <p className='truncate font-semibold text-slate-950 dark:text-white'>
-                            {interview.candidate.fullName || t('employer.interviews.table.unknown')}
-                          </p>
+                          <p className='truncate font-semibold text-slate-950 dark:text-white'>{interview.candidate.fullName || t('employer.interviews.table.unknown')}</p>
                         </div>
                       </td>
-                      <td className='max-w-[16rem] truncate px-4 py-4 text-sm text-slate-700 dark:text-slate-300'>
-                        {interview.job.title}
-                      </td>
+                      <td className='max-w-[16rem] truncate px-4 py-4 text-sm text-slate-700 dark:text-slate-300'>{interview.job.title}</td>
                       <td className='px-4 py-4 text-sm text-slate-700 dark:text-slate-300'>
                         {interview.interviewDate ? (
                           <div>
@@ -252,30 +211,26 @@ const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInter
                                 day: 'numeric'
                               })}
                             </p>
-                            {interview.startTime && (
-                              <p className='text-xs text-slate-500 dark:text-slate-400'>{interview.startTime}</p>
-                            )}
+                            {interview.startTime && <p className='text-xs text-slate-500 dark:text-slate-400'>{interview.startTime}</p>}
                           </div>
                         ) : (
                           '-'
                         )}
                       </td>
                       <td className='px-4 py-4'>
-                        <span className='inline-block rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:bg-sky-400/12 dark:text-sky-100'>
+                        <span className='inline-block rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700'>
                           {interview.interviewType || t('employer.interviews.table.notSpecified')}
                         </span>
                       </td>
-                      <td className='max-w-[13rem] truncate px-4 py-4 text-sm text-slate-700 dark:text-slate-300'>
-                        {interview.location || '-'}
-                      </td>
+                      <td className='max-w-[13rem] truncate px-4 py-4 text-sm text-slate-700 dark:text-slate-300'>{interview.location || '-'}</td>
                       <td className='px-4 py-4 text-center'>
                         <span
                           className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
                             interview.status === 'COMPLETED'
-                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/12 dark:text-emerald-100'
+                              ? 'bg-emerald-50 text-emerald-700'
                               : interview.status === 'SCHEDULED'
-                                ? 'bg-violet-50 text-violet-700 dark:bg-violet-400/14 dark:text-violet-100'
-                                : 'bg-slate-100 text-slate-600 dark:bg-slate-200/10 dark:text-slate-200'
+                                ? 'bg-violet-50 text-violet-700'
+                                : 'bg-slate-100 text-slate-600'
                           }`}
                         >
                           {getStatusLabel(interview.status)}
@@ -302,12 +257,7 @@ const EmployerInterviewList = ({ interviews, onInterviewUpdated }: EmployerInter
       </div>
 
       {selectedInterview && (
-        <ViewInterviewModal
-          interview={selectedInterview}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onUpdated={onInterviewUpdated}
-        />
+        <ViewInterviewModal interview={selectedInterview} isOpen={isModalOpen} onClose={handleCloseModal} />
       )}
     </>
   )

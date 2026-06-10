@@ -127,14 +127,7 @@ const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
         )}
 
         {/* Bubble */}
-        <div
-          className={cn(
-            'min-w-0 break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
-            isUser
-              ? 'rounded-br-md bg-purple-600 text-white'
-              : 'rounded-bl-md bg-white text-slate-700 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-200/10 dark:text-slate-100 dark:ring-slate-300/12'
-          )}
-        >
+        <div className={cn('min-w-0 break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed', isUser ? 'rounded-br-md bg-purple-600 text-white' : 'rounded-bl-md bg-slate-100 text-slate-700')}>
           {isUser ? (
             <span className='whitespace-pre-wrap break-words'>{message.content}</span>
           ) : (
@@ -465,7 +458,7 @@ const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
                   key={index}
                   className={cn(
                     'flex items-center gap-2 rounded-lg p-2',
-                    isUser ? 'bg-purple-500' : 'bg-white dark:bg-slate-200/10'
+                    isUser ? 'bg-purple-500' : 'bg-white'
                   )}
                 >
                   <FileText className='h-4 w-4 flex-shrink-0' />
@@ -479,9 +472,7 @@ const ChatMessageBubble = ({ message }: ChatMessageBubbleProps) => {
                       download
                       className={cn(
                         'flex-shrink-0 rounded px-2 py-1 text-xs font-semibold',
-                        isUser
-                          ? 'bg-white text-purple-600 hover:bg-purple-100'
-                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                        isUser ? 'bg-white text-purple-600 hover:bg-purple-100' : 'bg-purple-600 text-white hover:bg-purple-700'
                       )}
                     >
                       Download

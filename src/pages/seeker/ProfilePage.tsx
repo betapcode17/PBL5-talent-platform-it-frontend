@@ -42,6 +42,8 @@ import {
   deleteCvProjectApi,
   deleteCvSkillApi,
   getCvDetailApi,
+  updateSeekerProfileApi,
+  uploadCvFileApi,
   updateCvCertificateApi,
   updateCvEducationApi,
   updateCvExperienceApi,
@@ -285,7 +287,10 @@ const emptyBasicInfoForm = {
   full_name: '',
   email: '',
   phone: '',
-  gender: ''
+  gender: '',
+  github_url: '',
+  linkedin_url: '',
+  portfolio_url: ''
 }
 
 const ProfilePage = () => {
@@ -333,8 +338,21 @@ const ProfilePage = () => {
         throw new Error(validationMessage)
       }
 
-      return updateMeApi({
+      const linksValidationMessage = validateSeekerLinksForm(basicInfoForm)
+
+      if (linksValidationMessage) {
+        setToastMessage(linksValidationMessage)
+        throw new Error(linksValidationMessage)
+      }
+
+      await updateMeApi({
         phone: basicInfoForm.phone.trim()
+      })
+
+      return updateSeekerProfileApi({
+        githubUrl: basicInfoForm.github_url.trim() || null,
+        linkedinUrl: basicInfoForm.linkedin_url.trim() || null,
+        portfolioUrl: basicInfoForm.portfolio_url.trim() || null
       })
     },
     onSuccess: () => {
@@ -349,7 +367,10 @@ const ProfilePage = () => {
           full_name: refreshedUser.full_name ?? '',
           email: refreshedUser.email ?? '',
           phone: refreshedUser.phone ?? '',
-          gender: refreshedUser.gender ?? ''
+          gender: refreshedUser.gender ?? '',
+          github_url: cvDetail?.seeker.githubUrl ?? '',
+          linkedin_url: cvDetail?.seeker.linkedinUrl ?? '',
+          portfolio_url: cvDetail?.seeker.portfolioUrl ?? ''
         })
         setExpandedSection(null)
         setToastMessage('Đã cập nhật thông tin cơ bản.')
@@ -358,6 +379,13 @@ const ProfilePage = () => {
     }
   })
   const uploadCvMutation = basicInfoMutation
+  const uploadCvFileMutation = useMutation({
+    mutationFn: uploadCvFileApi,
+    onSuccess: () => {
+      setCvFile(null)
+      void refreshCv('Đã tải CV lên thành công.')
+    }
+  })
 
   const educationMutation = useMutation({
     mutationFn: async () => {
@@ -594,12 +622,12 @@ const ProfilePage = () => {
   }
 
   const handleUploadCv = () => {
-    if (true) {
+    if (!cvFile) {
       setToastMessage('Vui lòng chọn file PDF/DOC/DOCX trước khi tải lên.')
       return
     }
 
-    return
+    uploadCvFileMutation.mutate(cvFile)
   }
 
   const handleExportCvPdf = () => {
@@ -620,7 +648,10 @@ const ProfilePage = () => {
           full_name: user?.full_name ?? '',
           email: user?.email ?? '',
           phone: user?.phone ?? '',
-          gender: user?.gender ?? ''
+          gender: user?.gender ?? '',
+          github_url: cvDetail?.seeker.githubUrl ?? '',
+          linkedin_url: cvDetail?.seeker.linkedinUrl ?? '',
+          portfolio_url: cvDetail?.seeker.portfolioUrl ?? ''
         })
       }
 
@@ -917,19 +948,87 @@ const ProfilePage = () => {
                 editLabel={expandedSection === 'basic-info' ? 'Đóng' : t('seekerProfile.common.edit')}
                 onEdit={() => toggleSectionEditor('basic-info')}
               >
-                <dl className='space-y-3'>
-                  <ProfileRow label={t('seekerProfile.basicInfo.fullName')} value={user?.full_name || fallbackText} />
-                  <ProfileRow label={t('seekerProfile.basicInfo.email')} value={user?.email || fallbackText} />
-                  <ProfileRow label={t('seekerProfile.basicInfo.phone')} value={user?.phone || fallbackText} />
-                  <ProfileRow label={t('seekerProfile.basicInfo.gender')} value={user?.gender || fallbackText} />
-                </dl>
+                <div className='grid gap-4 lg:grid-cols-2'>
+                  <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-4'>
+                    <dl className='space-y-3'>
+                      <ProfileRow label={t('seekerProfile.basicInfo.fullName')} value={user?.full_name || fallbackText} />
+                      <ProfileRow label={t('seekerProfile.basicInfo.email')} value={user?.email || fallbackText} />
+                      <ProfileRow label={t('seekerProfile.basicInfo.phone')} value={user?.phone || fallbackText} />
+                    </dl>
+                  </div>
+                  <div className='rounded-[24px] border border-slate-200 bg-slate-50/70 p-4'>
+                    <div className='space-y-3'>
+                      <LinkItem label='GitHub URL' value={cvDetail?.seeker.githubUrl || fallbackText} />
+                      <LinkItem label='LinkedIn URL' value={cvDetail?.seeker.linkedinUrl || fallbackText} />
+                      <LinkItem label='Portfolio URL' value={cvDetail?.seeker.portfolioUrl || fallbackText} />
+                    </div>
+                  </div>
+                </div>
+                <div className='mt-4'>
+                  {cvDetail?.cvUrl ? (
+                    <a
+                      href={cvDetail.cvUrl}
+                      target='_blank'
+                      rel='noreferrer'
+                      className='inline-flex flex-col items-center justify-center gap-3 rounded-[24px] border border-slate-200 bg-white p-5 text-sky-700 shadow-[0_12px_32px_rgba(15,23,42,0.08)] transition hover:border-sky-300 hover:bg-sky-50'
+                    >
+                      <div className='flex h-20 w-20 items-center justify-center rounded-[20px] bg-rose-50 text-rose-500'>
+                        <FileBadge2 className='h-10 w-10' />
+                      </div>
+                      <span className='text-sm font-semibold'>Xem CV hiện tại</span>
+                    </a>
+                  ) : (
+                    <div className='inline-flex flex-col items-center justify-center gap-3 rounded-[24px] border border-dashed border-slate-300 bg-slate-50/70 p-5 text-slate-500'>
+                      <div className='flex h-20 w-20 items-center justify-center rounded-[20px] bg-slate-100 text-slate-400'>
+                        <FileBadge2 className='h-10 w-10' />
+                      </div>
+                      <span className='text-sm font-semibold'>Chưa có CV hiện tại</span>
+                    </div>
+                  )}
+                </div>
                 {expandedSection === 'basic-info' ? (
                   <div className='mt-5 rounded-[24px] border border-sky-100 bg-sky-50/50 p-5'>
-                    <div className='grid gap-4 md:grid-cols-2'>
-                      <ProfileRow label='Họ và tên' value={basicInfoForm.full_name || fallbackText} />
-                      <ProfileRow label='Email' value={basicInfoForm.email || fallbackText} />
-                      <TextField label='Số điện thoại' value={basicInfoForm.phone} onChange={(value) => setBasicInfoForm((form) => ({ ...form, phone: value }))} />
-                      <ProfileRow label='Giới tính' value={basicInfoForm.gender || fallbackText} />
+                    <div className='grid gap-4 lg:grid-cols-2'>
+                      <div className='rounded-[24px] border border-slate-200 bg-white p-4'>
+                        <div className='space-y-3'>
+                          <ProfileRow label='Họ và tên' value={basicInfoForm.full_name || fallbackText} />
+                          <ProfileRow label='Email' value={basicInfoForm.email || fallbackText} />
+                          <TextField label='Số điện thoại' value={basicInfoForm.phone} onChange={(value) => setBasicInfoForm((form) => ({ ...form, phone: value }))} />
+                        </div>
+                      </div>
+                      <div className='rounded-[24px] border border-slate-200 bg-white p-4'>
+                        <div className='space-y-3'>
+                          <TextField label='GitHub URL' value={basicInfoForm.github_url} placeholder='https://github.com/username' onChange={(value) => setBasicInfoForm((form) => ({ ...form, github_url: value }))} />
+                          <TextField label='LinkedIn URL' value={basicInfoForm.linkedin_url} placeholder='https://linkedin.com/in/username' onChange={(value) => setBasicInfoForm((form) => ({ ...form, linkedin_url: value }))} />
+                          <TextField label='Portfolio URL' value={basicInfoForm.portfolio_url} placeholder='https://portfolio.example.com' onChange={(value) => setBasicInfoForm((form) => ({ ...form, portfolio_url: value }))} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className='mt-4 rounded-[22px] border border-slate-200 bg-white p-4'>
+                      <p className='text-sm font-semibold text-slate-950'>CV mặc định</p>
+                      <div className='mt-3 flex flex-col gap-3 sm:flex-row'>
+                        <input
+                          type='file'
+                          accept='.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                          onChange={(event) => setCvFile(event.target.files?.[0] ?? null)}
+                          className='min-h-12 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700'
+                        />
+                        <button
+                          type='button'
+                          onClick={handleUploadCv}
+                          disabled={uploadCvFileMutation.isPending}
+                          className='inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60'
+                        >
+                          <FileUp className='h-4 w-4' />
+                          {uploadCvFileMutation.isPending ? 'Đang tải...' : 'Tải CV'}
+                        </button>
+                      </div>
+                      {cvDetail?.cvUrl ? (
+                        <a href={cvDetail.cvUrl} target='_blank' rel='noreferrer' className='mt-4 inline-flex items-center gap-2 text-sm font-semibold text-sky-700'>
+                          Xem file CV hiện tại
+                          <ExternalLink className='h-4 w-4' />
+                        </a>
+                      ) : null}
                     </div>
                     <div className='hidden'>
                     <CvFormGrid>
@@ -1760,10 +1859,14 @@ const ProfileRow = ({ label, value }: { label: string; value: string }) => (
 const LinkItem = ({ label, value }: { label: string; value: string }) => (
   <div className='flex items-start justify-between gap-4 rounded-[18px] border border-slate-200 bg-white px-4 py-3'>
     <span className='text-sm font-semibold text-slate-900'>{label}</span>
-    <a href={value} target='_blank' rel='noreferrer' className='inline-flex min-w-0 items-center gap-2 text-right text-sm text-sky-600 hover:text-sky-700'>
-      <span className='truncate'>{value}</span>
-      <ExternalLink className='h-4 w-4 shrink-0' />
-    </a>
+    {/^https?:\/\//i.test(value) ? (
+      <a href={value} target='_blank' rel='noreferrer' className='inline-flex min-w-0 items-center gap-2 text-right text-sm text-sky-600 hover:text-sky-700'>
+        <span className='truncate'>{value}</span>
+        <ExternalLink className='h-4 w-4 shrink-0' />
+      </a>
+    ) : (
+      <span className='text-right text-sm text-slate-500'>{value}</span>
+    )}
   </div>
 )
 void LinkItem
@@ -1771,6 +1874,16 @@ void LinkItem
 const validateBasicInfoForm = (form: typeof emptyBasicInfoForm) => {
   if (form.phone.trim() && !/^[0-9+\s()-]{8,20}$/.test(form.phone.trim())) {
     return 'Số điện thoại không đúng định dạng.'
+  }
+
+  return null
+}
+
+const validateSeekerLinksForm = (form: typeof emptyBasicInfoForm) => {
+  for (const value of [form.github_url, form.linkedin_url, form.portfolio_url]) {
+    if (value.trim() && !/^https?:\/\/\S+$/i.test(value.trim())) {
+      return 'Link phải bắt đầu bằng http:// hoặc https://.'
+    }
   }
 
   return null

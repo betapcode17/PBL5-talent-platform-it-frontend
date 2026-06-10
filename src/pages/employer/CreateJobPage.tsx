@@ -32,7 +32,7 @@ const CreateJobPage = () => {
         description={t('employer.jobs.create.sectionDescription')}
         contentClassName='w-full max-w-3xl'
       >
-        <CreateJobForm />
+        <CreateJobForm mode='create' />
       </EmployerSectionCard>
     </div>
   )

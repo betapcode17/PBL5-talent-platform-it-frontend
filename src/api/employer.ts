@@ -93,6 +93,8 @@ type CreateJobInput = {
   requirements: string[]
 }
 
+type UpdateJobInput = Partial<CreateJobInput>
+
 type CreateInterviewInput = {
   applicationId: number
   type: 'video' | 'phone' | 'onsite'
@@ -150,6 +152,8 @@ const mapJob = async (job: CompanyJobsResponse['jobs'][number]): Promise<Employe
   return {
     id: job.id,
     title: job.title,
+    description: detail?.description ?? null,
+    requirements: Array.isArray(detail?.requirements) ? detail.requirements.join('\n') : (detail?.requirements ?? null),
     salary: job.salary ?? detail?.salary ?? null,
     workLocation: detail?.workLocation ?? null,
     level: detail?.level ?? null,
@@ -330,6 +334,16 @@ export const getEmployerJobTypeOptionsApi = async () => {
 
 export const createEmployerJobApi = async (data: CreateJobInput) => {
   const response = await axiosInstance.post<{ jobId: number }>('/jobs', data)
+  return response.data
+}
+
+export const updateEmployerJobApi = async (jobId: number, data: UpdateJobInput) => {
+  const response = await axiosInstance.put(`/jobs/${jobId}`, data)
+  return response.data
+}
+
+export const deleteEmployerJobApi = async (jobId: number) => {
+  const response = await axiosInstance.delete<{ message: string; jobId: number; rejectedApplications: number }>(`/jobs/${jobId}`)
   return response.data
 }
 

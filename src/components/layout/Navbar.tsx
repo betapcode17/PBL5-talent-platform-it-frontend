@@ -279,6 +279,15 @@ const Navbar = ({
                   >
                     {t('nav.signUp')}
                   </Link>
+                  <Link
+                    to='/register/employer'
+                    className={cn(
+                      'inline-flex h-11 min-w-[8.5rem] items-center justify-center rounded-full border border-violet-600 bg-white px-4 text-sm font-semibold text-violet-700 whitespace-nowrap shadow-[0_8px_22px_rgba(124,58,237,0.06)] transition hover:-translate-y-0.5 hover:bg-violet-50',
+                      baseFocusClassName
+                    )}
+                  >
+                    Đăng ký Nhà tuyển dụng
+                  </Link>
                 </>
               )
             ) : null}
@@ -414,6 +423,13 @@ const Navbar = ({
                       className='inline-flex h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 text-sm font-semibold text-white'
                     >
                       {t('nav.signUp')}
+                    </Link>
+                    <Link
+                      to='/register/employer'
+                      onClick={closeMenu}
+                      className='inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50'
+                    >
+                      Đăng ký Nhà tuyển dụng
                     </Link>
                   </>
                 )

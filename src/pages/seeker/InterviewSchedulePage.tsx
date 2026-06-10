@@ -69,8 +69,8 @@ const InterviewSchedulePage = () => {
   return (
     <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
       <section className='rounded-[34px] border border-slate-200/80 bg-white/92 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8'>
-        <div className='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
-          <div className='max-w-3xl'>
+        <div className='grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.95fr)] xl:items-end'>
+          <div className='min-w-0 max-w-3xl'>
             <div className='inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-sky-700'>
               <CalendarClock className='h-3.5 w-3.5' />
               {t('seekerTracking.interviews.eyebrow')}
@@ -78,10 +78,12 @@ const InterviewSchedulePage = () => {
             <h1 className='mt-4 text-3xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-[3rem]'>
               {t('seekerTracking.interviews.title')}
             </h1>
-            <p className='mt-3 text-sm leading-7 text-slate-500 sm:text-base'>{t('seekerTracking.interviews.description')}</p>
+            <p className='mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base'>
+              {t('seekerTracking.interviews.description')}
+            </p>
           </div>
 
-          <div className='grid w-full max-w-xl gap-3 sm:grid-cols-2 xl:grid-cols-4'>
+          <div className='grid w-full gap-3 sm:grid-cols-2'>
             <MetricCard label={t('seekerTracking.interviews.metrics.total')} value={metrics.total} />
             <MetricCard label={t('seekerTracking.interviews.metrics.upcoming')} value={metrics.upcoming} />
             <MetricCard label={t('seekerTracking.interviews.metrics.completed')} value={metrics.completed} />
@@ -89,7 +91,7 @@ const InterviewSchedulePage = () => {
           </div>
         </div>
 
-        <div className='mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]'>
+        <div className='mt-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-end'>
           <div className='relative'>
             <Search className='pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400' />
             <input
@@ -99,7 +101,7 @@ const InterviewSchedulePage = () => {
                 setPage(1)
               }}
               placeholder={t('seekerTracking.interviews.filters.searchPlaceholder')}
-              className='w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100'
+              className='h-[52px] w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100'
             />
           </div>
 
@@ -113,7 +115,7 @@ const InterviewSchedulePage = () => {
                 setStatus(event.target.value)
                 setPage(1)
               }}
-              className='h-[50px] rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-sm text-slate-700 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100'
+              className='h-[52px] rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-sm text-slate-700 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100'
             >
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -127,14 +129,22 @@ const InterviewSchedulePage = () => {
 
       <div className='mt-6 space-y-5'>
         {isLoading ? <TrackerSkeleton /> : null}
-        {error ? <TrackerError message={error instanceof Error ? error.message : t('seekerTracking.common.loadError')} /> : null}
+        {error ? (
+          <TrackerError message={error instanceof Error ? error.message : t('seekerTracking.common.loadError')} />
+        ) : null}
         {!isLoading && !error && paginatedItems.length === 0 ? (
-          <TrackerEmpty title={t('seekerTracking.interviews.empty.title')} description={t('seekerTracking.interviews.empty.description')} />
+          <TrackerEmpty
+            title={t('seekerTracking.interviews.empty.title')}
+            description={t('seekerTracking.interviews.empty.description')}
+          />
         ) : null}
 
         {!isLoading && !error && paginatedItems.length > 0
           ? paginatedItems.map((item) => (
-              <Card key={item.id} className='overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_56px_rgba(15,23,42,0.06)] sm:p-6'>
+              <Card
+                key={item.id}
+                className='overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_56px_rgba(15,23,42,0.06)] sm:p-6'
+              >
                 <div className='flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between'>
                   <div className='min-w-0 flex-1'>
                     <div className='flex flex-wrap gap-2'>
@@ -148,11 +158,17 @@ const InterviewSchedulePage = () => {
                       </span>
                     </div>
 
-                    <h2 className='mt-3 break-words text-xl font-semibold leading-tight text-slate-950 sm:text-2xl'>{item.job.title}</h2>
+                    <h2 className='mt-3 break-words text-xl font-semibold leading-tight text-slate-950 sm:text-2xl'>
+                      {item.job.title}
+                    </h2>
                     <p className='mt-1 text-sm font-medium text-sky-700'>{item.company.name}</p>
 
                     <div className='mt-5 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3 sm:gap-4'>
-                      <InfoCard label={t('seekerTracking.interviews.cards.schedule')} value={formatDateTime(item.schedule, locale)} icon={<CalendarClock className='h-4 w-4' />} />
+                      <InfoCard
+                        label={t('seekerTracking.interviews.cards.schedule')}
+                        value={formatDateTime(item.schedule, locale)}
+                        icon={<CalendarClock className='h-4 w-4' />}
+                      />
                       <InfoCard
                         label={t('seekerTracking.interviews.cards.duration')}
                         value={t('seekerTracking.interviews.durationValue', { count: item.duration })}
@@ -165,7 +181,9 @@ const InterviewSchedulePage = () => {
                       />
                       <InfoCard
                         label={t('seekerTracking.interviews.cards.applicationStatus')}
-                        value={t(`seekerTracking.applicationStatus.${item.applicationStatus}`, { defaultValue: item.applicationStatus })}
+                        value={t(`seekerTracking.applicationStatus.${item.applicationStatus}`, {
+                          defaultValue: item.applicationStatus
+                        })}
                         icon={<MapPin className='h-4 w-4' />}
                       />
                     </div>
@@ -198,7 +216,8 @@ const InterviewSchedulePage = () => {
 
                     {item.reason ? (
                       <div className='mt-5 rounded-[24px] border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-700'>
-                        <span className='font-semibold'>{t('seekerTracking.interviews.cards.reason')}</span> {item.reason}
+                        <span className='font-semibold'>{t('seekerTracking.interviews.cards.reason')}</span>{' '}
+                        {item.reason}
                       </div>
                     ) : null}
                   </div>
@@ -265,9 +284,9 @@ const InterviewSchedulePage = () => {
 }
 
 const MetricCard = ({ label, value }: { label: string; value: number }) => (
-  <div className='rounded-[24px] border border-slate-200 bg-slate-50/80 px-4 py-4'>
-    <p className='text-xs font-semibold uppercase tracking-[0.18em] text-slate-400'>{label}</p>
-    <p className='mt-2 text-2xl font-semibold text-slate-950'>{value}</p>
+  <div className='flex min-h-[112px] flex-col justify-between rounded-[24px] border border-slate-200 bg-slate-50/80 px-4 py-4'>
+    <p className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>{label}</p>
+    <p className='mt-3 text-2xl font-semibold leading-none text-slate-950 sm:text-[1.75rem]'>{value}</p>
   </div>
 )
 
@@ -284,7 +303,10 @@ const InfoCard = ({ label, value, icon }: { label: string; value: string; icon: 
 const TrackerSkeleton = () => (
   <div className='space-y-5'>
     {Array.from({ length: 3 }).map((_, index) => (
-      <div key={index} className='animate-pulse rounded-[30px] border border-slate-200/80 bg-white p-6 shadow-[0_18px_56px_rgba(15,23,42,0.06)]'>
+      <div
+        key={index}
+        className='animate-pulse rounded-[30px] border border-slate-200/80 bg-white p-6 shadow-[0_18px_56px_rgba(15,23,42,0.06)]'
+      >
         <div className='h-6 w-52 rounded-full bg-slate-200' />
         <div className='mt-6 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3 sm:gap-4'>
           <div className='h-20 rounded-[24px] bg-slate-200' />

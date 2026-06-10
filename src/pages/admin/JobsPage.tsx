@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Eye, RefreshCw, ShieldBan, ShieldCheck } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { AdminShell } from '@/components/admin/AdminShell'
 import { AdminDetailModal } from '@/components/admin/AdminDetailModal'
 import { Card, CardContent } from '@/components/ui/card'
@@ -19,7 +20,7 @@ const formatDate = (value?: string | null) => {
 }
 
 const formatSalaryRange = (value?: string | null) => {
-  if (!value) return 'Thoả thuận'
+  if (!value) return 'Thỏa thuận'
 
   const parts = value
     .split(/\s*-\s*/)
@@ -318,6 +319,14 @@ const JobsPage = () => {
                   <dd className='font-semibold text-white'>{selectedJob.isActive ? 'Active' : 'Banned'}</dd>
                 </div>
               </dl>
+
+              <Button
+                asChild
+                variant='outline'
+                className='mt-4 w-full justify-center border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white'
+              >
+                <Link to={`/jobs/${selectedJob.id}`}>Mở trang chi tiết công việc</Link>
+              </Button>
 
               <div className='mt-4 rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4'>
                 <p className='text-xs font-bold uppercase tracking-[0.14em] text-violet-300'>Mô tả công việc</p>

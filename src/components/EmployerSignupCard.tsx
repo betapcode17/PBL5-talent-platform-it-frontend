@@ -3,7 +3,6 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   Building2,
-  CalendarDays,
   CheckCircle2,
   Globe,
   Mail,
@@ -24,7 +23,6 @@ type FormState = {
   email: string
   phone: string
   role: string
-  joined_date: string
   company_name: string
   company_address: string
   company_website_url: string
@@ -35,7 +33,6 @@ const initialState: FormState = {
   email: '',
   phone: '',
   role: 'HR',
-  joined_date: '',
   company_name: '',
   company_address: '',
   company_website_url: ''
@@ -52,6 +49,7 @@ export default function EmployerSignupCard() {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [submitSuccess, setSubmitSuccess] = useState('')
+
   const formSections = [
     {
       id: 'representative',
@@ -64,6 +62,7 @@ export default function EmployerSignupCard() {
       subtitle: t('employerSignup.sections.company.subtitle')
     }
   ] as const
+
   const roleOptions = [
     { value: 'HR', label: t('employerSignup.roleOptions.hr') },
     { value: 'Admin', label: t('employerSignup.roleOptions.admin') },
@@ -72,17 +71,19 @@ export default function EmployerSignupCard() {
   ]
 
   const validate = useCallback(() => {
-    const e: Record<string, string> = {}
-    if (!form.full_name.trim()) e.full_name = t('employerSignup.errors.fullNameRequired')
-    if (!emailRe.test(form.email)) e.email = t('employerSignup.errors.invalidEmail')
-    if (form.phone && !phoneRe.test(form.phone)) e.phone = t('employerSignup.errors.invalidPhone')
-    if (!form.company_name.trim()) e.company_name = t('employerSignup.errors.companyNameRequired')
-    if (!form.company_address.trim()) e.company_address = t('employerSignup.errors.companyAddressRequired')
+    const nextErrors: Record<string, string> = {}
+
+    if (!form.full_name.trim()) nextErrors.full_name = t('employerSignup.errors.fullNameRequired')
+    if (!emailRe.test(form.email)) nextErrors.email = t('employerSignup.errors.invalidEmail')
+    if (form.phone && !phoneRe.test(form.phone)) nextErrors.phone = t('employerSignup.errors.invalidPhone')
+    if (!form.company_name.trim()) nextErrors.company_name = t('employerSignup.errors.companyNameRequired')
+    if (!form.company_address.trim()) nextErrors.company_address = t('employerSignup.errors.companyAddressRequired')
     if (form.company_website_url && !/^https?:\/\//.test(form.company_website_url)) {
-      e.company_website_url = t('employerSignup.errors.websiteProtocolRequired')
+      nextErrors.company_website_url = t('employerSignup.errors.websiteProtocolRequired')
     }
-    setErrors(e)
-    return e
+
+    setErrors(nextErrors)
+    return nextErrors
   }, [form, t])
 
   useEffect(() => {
@@ -120,7 +121,6 @@ export default function EmployerSignupCard() {
         email: form.email.trim(),
         phone: form.phone.trim(),
         role: form.role.trim(),
-        joined_date: form.joined_date ? new Date(form.joined_date).toISOString() : undefined,
         company_name: form.company_name.trim(),
         company_address: form.company_address.trim(),
         company_website_url: form.company_website_url.trim() || undefined
@@ -128,9 +128,7 @@ export default function EmployerSignupCard() {
 
       setForm(initialState)
       setTouched({})
-      setSubmitSuccess(
-        response.message || 'Yeu cau dang ky nha tuyen dung da duoc gui den admin de cho phe duyet.'
-      )
+      setSubmitSuccess(response.message || 'Yêu cầu đăng ký nhà tuyển dụng đã được gửi đến admin để chờ phê duyệt.')
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string | string[] }>
       const message = axiosError.response?.data?.message
@@ -168,7 +166,7 @@ export default function EmployerSignupCard() {
                   <BriefcaseBusiness className='h-5 w-5' />
                 </div>
                 <div>
-                  <p className='text-sm font-semibold tracking-[0.18em] text-white/80 uppercase'>TalentPlatformIT</p>
+                  <p className='text-sm font-semibold uppercase tracking-[0.18em] text-white/80'>TalentPlatformIT</p>
                   <p className='text-sm text-white/72'>{t('employerSignup.badge')}</p>
                 </div>
               </div>
@@ -210,16 +208,16 @@ export default function EmployerSignupCard() {
                     <p className='text-base font-semibold'>{t('employerSignup.whatHappens.title')}</p>
                     <ul className='mt-3 space-y-2 text-sm text-white/78'>
                       <li className='flex items-center gap-2'>
-                        <CheckCircle2 className='h-4 w-4 text-emerald-300' />
-                        Gui yeu cau dang ky vao bang duyet cua admin
+                        <CheckCircle2 className='h-4 w-4 shrink-0 text-emerald-300' />
+                        Gửi yêu cầu đăng ký vào bảng duyệt của admin
                       </li>
                       <li className='flex items-center gap-2'>
-                        <CheckCircle2 className='h-4 w-4 text-emerald-300' />
-                        Neu duoc phe duyet, he thong tao moi cong ty va tai khoan employee
+                        <CheckCircle2 className='h-4 w-4 shrink-0 text-emerald-300' />
+                        Nếu được phê duyệt, hệ thống tạo mới công ty và tài khoản employee
                       </li>
                       <li className='flex items-center gap-2'>
-                        <CheckCircle2 className='h-4 w-4 text-emerald-300' />
-                        Email dang nhap va mat khau random se duoc gui ve email dang ky
+                        <CheckCircle2 className='h-4 w-4 shrink-0 text-emerald-300' />
+                        Email đăng nhập và mật khẩu ngẫu nhiên sẽ được gửi về email đăng ký
                       </li>
                     </ul>
                   </div>
@@ -250,13 +248,13 @@ export default function EmployerSignupCard() {
               </div>
 
               {submitSuccess ? (
-                <div className='mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700 shadow-sm'>
+                <div className='mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700 shadow-sm break-words whitespace-normal'>
                   {submitSuccess}
                 </div>
               ) : null}
 
               {submitError ? (
-                <div className='mt-6 rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-600 shadow-sm'>
+                <div className='mt-6 rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-600 shadow-sm break-words whitespace-normal'>
                   {submitError}
                 </div>
               ) : null}
@@ -324,42 +322,24 @@ export default function EmployerSignupCard() {
                             {renderError('phone')}
                           </div>
 
-                          <div className='grid gap-4 sm:grid-cols-2'>
-                            <div>
-                              <label className='mb-2 block text-sm font-medium text-slate-700'>
-                                {t('employerSignup.labels.role')}
-                              </label>
-                              <div className='relative'>
-                                <BriefcaseBusiness className='pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-400' />
-                                <select
-                                  className={cn(inputClassName('role'), 'appearance-none')}
-                                  value={form.role}
-                                  onChange={(event) => onChange('role', event.target.value)}
-                                  onBlur={() => onBlur('role')}
-                                >
-                                  {roleOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                      {option.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className='mb-2 block text-sm font-medium text-slate-700'>
-                                {t('employerSignup.labels.joinedDate')}
-                              </label>
-                              <div className='relative'>
-                                <CalendarDays className='pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-400' />
-                                <input
-                                  type='date'
-                                  className={inputClassName('joined_date')}
-                                  value={form.joined_date}
-                                  onChange={(event) => onChange('joined_date', event.target.value)}
-                                  onBlur={() => onBlur('joined_date')}
-                                />
-                              </div>
+                          <div>
+                            <label className='mb-2 block text-sm font-medium text-slate-700'>
+                              {t('employerSignup.labels.role')}
+                            </label>
+                            <div className='relative'>
+                              <BriefcaseBusiness className='pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-400' />
+                              <select
+                                className={cn(inputClassName('role'), 'appearance-none')}
+                                value={form.role}
+                                onChange={(event) => onChange('role', event.target.value)}
+                                onBlur={() => onBlur('role')}
+                              >
+                                {roleOptions.map((option) => (
+                                  <option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </select>
                             </div>
                           </div>
                         </div>
@@ -420,7 +400,7 @@ export default function EmployerSignupCard() {
                             <p className='text-sm font-semibold text-violet-700'>
                               {t('employerSignup.companyMatching.title')}
                             </p>
-                            <p className='mt-1 text-sm leading-6 text-violet-600'>
+                            <p className='mt-1 break-words text-sm leading-6 text-violet-600'>
                               {t('employerSignup.companyMatching.description')}
                             </p>
                           </div>
@@ -430,17 +410,17 @@ export default function EmployerSignupCard() {
                   ))}
                 </div>
                 <div className='flex flex-col gap-4 rounded-[28px] border border-slate-100 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between'>
-                  <div>
-                    <p className='text-base font-semibold text-slate-950'>Gui yeu cau dang ky nha tuyen dung</p>
-                    <p className='mt-1 text-sm text-slate-500'>
-                      Sau khi admin phe duyet, he thong se tao moi cong ty va tai khoan dang nhap cho nha tuyen dung.
+                  <div className='min-w-0'>
+                    <p className='text-base font-semibold text-slate-950'>Gửi yêu cầu đăng ký nhà tuyển dụng</p>
+                    <p className='mt-1 break-words text-sm text-slate-500'>
+                      Sau khi admin phê duyệt, hệ thống sẽ tạo mới công ty và tài khoản đăng nhập cho nhà tuyển dụng.
                     </p>
                   </div>
 
-                  <div className='flex flex-col gap-3 sm:flex-row'>
+                  <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
                     <button
                       type='button'
-                      className='inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-5 text-sm font-medium text-slate-600 transition hover:bg-slate-100'
+                      className='inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 whitespace-nowrap'
                       onClick={() => {
                         setForm(initialState)
                         setTouched({})
@@ -454,7 +434,7 @@ export default function EmployerSignupCard() {
                     <button
                       type='submit'
                       disabled={submitting}
-                      className='inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#7c3aed_0%,#8b5cf6_50%,#a855f7_100%)] px-6 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(124,58,237,0.28)] transition hover:-translate-y-px hover:shadow-[0_22px_48px_rgba(124,58,237,0.32)] disabled:cursor-not-allowed disabled:opacity-60'
+                      className='inline-flex min-w-[220px] h-12 items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#7c3aed_0%,#8b5cf6_50%,#a855f7_100%)] px-6 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(124,58,237,0.28)] transition hover:-translate-y-px hover:shadow-[0_22px_48px_rgba(124,58,237,0.32)] disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap'
                     >
                       {submitting ? t('employerSignup.actions.creating') : t('employerSignup.actions.register')}
                       <ArrowRight className='h-4 w-4' />

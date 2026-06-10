@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -7,14 +7,18 @@ import {
   createEmployerJobApi,
   getEmployerCategoryOptionsApi,
   getEmployerJobTypeOptionsApi,
-  getEmployerProfileApi
+  getEmployerProfileApi,
+  updateEmployerJobApi
 } from '@/api/employer'
+import type { EmployerJobItem } from '@/@types/employer'
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 interface CreateJobFormProps {
   onClose?: () => void
+  mode?: 'create' | 'edit'
+  initialJob?: EmployerJobItem | null
 }
 
 type Option = {
@@ -33,7 +37,22 @@ const parseSalary = (value: string) => {
   }
 }
 
-const CreateJobForm = ({ onClose }: CreateJobFormProps) => {
+const extractDescriptionContent = (value: string | null | undefined) =>
+  (value ?? '')
+    .split('\n')
+    .filter((line) => !/^\s*(địa điểm|location)\s*:/i.test(line.trim()))
+    .join('\n')
+    .trim()
+
+const extractLocationFromDescription = (value: string | null | undefined) => {
+  const locationLine = (value ?? '')
+    .split('\n')
+    .find((line) => /^\s*(địa điểm|location)\s*:/i.test(line.trim()))
+
+  return locationLine ? locationLine.replace(/^\s*(địa điểm|location)\s*:/i, '').trim() : ''
+}
+
+const CreateJobForm = ({ onClose, mode = 'create', initialJob = null }: CreateJobFormProps) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [companyId, setCompanyId] = useState<number | null>(null)
@@ -50,6 +69,9 @@ const CreateJobForm = ({ onClose }: CreateJobFormProps) => {
     salary: '',
     requirements: ''
   })
+  const isEditMode = mode === 'edit'
+  const initialCategoryId = useMemo(() => String(initialJob?.category?.category_id ?? ''), [initialJob?.category?.category_id])
+  const initialJobTypeId = useMemo(() => String(initialJob?.jobType?.job_type_id ?? ''), [initialJob?.jobType?.job_type_id])
 
   useEffect(() => {
     let isMounted = true
@@ -69,8 +91,16 @@ const CreateJobForm = ({ onClose }: CreateJobFormProps) => {
         setJobTypes(jobTypeOptions)
         setForm((current) => ({
           ...current,
-          categoryId: current.categoryId || String(categoryOptions[0]?.id ?? ''),
-          jobTypeId: current.jobTypeId || String(jobTypeOptions[0]?.id ?? '')
+          title: current.title || initialJob?.title || '',
+          description: current.description || extractDescriptionContent(initialJob?.description) || '',
+          workLocation: current.workLocation || initialJob?.workLocation || extractLocationFromDescription(initialJob?.description) || '',
+          salary: current.salary || initialJob?.salary || '',
+          requirements:
+            current.requirements ||
+            (Array.isArray(initialJob?.requirements) ? initialJob.requirements.join('\n') : initialJob?.requirements) ||
+            '',
+          categoryId: current.categoryId || initialCategoryId || String(categoryOptions[0]?.id ?? ''),
+          jobTypeId: current.jobTypeId || initialJobTypeId || String(jobTypeOptions[0]?.id ?? ''),
         }))
       } catch {
         if (isMounted) {
@@ -84,7 +114,7 @@ const CreateJobForm = ({ onClose }: CreateJobFormProps) => {
     return () => {
       isMounted = false
     }
-  }, [t])
+  }, [initialCategoryId, initialJob?.description, initialJob?.requirements, initialJob?.salary, initialJob?.title, initialJob?.workLocation, initialJobTypeId, t])
 
   const handleChange = (key: keyof typeof form, value: string) => {
     setForm((current) => ({ ...current, [key]: value }))
@@ -108,7 +138,7 @@ const CreateJobForm = ({ onClose }: CreateJobFormProps) => {
     setIsSubmitting(true)
 
     try {
-      await createEmployerJobApi({
+      const payload = {
         title: form.title,
         description: [form.description, form.workLocation ? `${t('employer.jobs.table.location')}: ${form.workLocation}` : null].filter(Boolean).join('\n\n'),
         categoryId: Number(form.categoryId),
@@ -116,7 +146,13 @@ const CreateJobForm = ({ onClose }: CreateJobFormProps) => {
         companyId,
         salaryRange,
         requirements: requirements.length > 0 ? requirements : [t('employer.jobs.create.fallbackRequirement')]
-      })
+      }
+
+      if (isEditMode && initialJob) {
+        await updateEmployerJobApi(initialJob.id, payload)
+      } else {
+        await createEmployerJobApi(payload)
+      }
 
       onClose?.()
       navigate('/employer/jobs')
@@ -225,7 +261,11 @@ const CreateJobForm = ({ onClose }: CreateJobFormProps) => {
         <div className='flex flex-col gap-3 pt-4 sm:flex-row'>
           <Button type='submit' disabled={isSubmitting} className='w-full flex-1 rounded-xl'>
             <Plus className='h-4 w-4' />
-            {isSubmitting ? t('employer.actions.creating') : t('employer.jobs.create.submit')}
+            {isSubmitting
+              ? t('employer.actions.creating')
+              : isEditMode
+                ? t('employer.jobs.edit.submit', { defaultValue: 'Lưu thay đổi' })
+                : t('employer.jobs.create.submit')}
           </Button>
           {onClose && (
             <Button type='button' variant='outline' className='w-full flex-1 rounded-xl' onClick={onClose}>

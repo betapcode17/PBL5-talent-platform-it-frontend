@@ -45,6 +45,39 @@ interface AuthState {
   clearError: () => void
 }
 
+type PersistedAuthState = Pick<AuthState, 'user' | 'accessToken' | 'refreshToken' | 'isAuthenticated'>
+
+const decodeJwtPayload = (token: string) => {
+  try {
+    const [, payload] = token.split('.')
+    if (!payload) return null
+
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), '=')
+    const decoded = atob(padded)
+
+    return JSON.parse(decoded) as { exp?: number }
+  } catch (error) {
+    console.warn('[AuthStore] Failed to decode access token payload:', error)
+    return null
+  }
+}
+
+const isTokenExpired = (token: string | null | undefined) => {
+  if (!token) return true
+
+  const payload = decodeJwtPayload(token)
+  if (!payload?.exp) return true
+
+  return payload.exp * 1000 <= Date.now()
+}
+
+const clearPersistedAuthStorage = () => {
+  localStorage.removeItem('accessToken')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('auth-storage')
+}
+
 export const useAuthStore = create<AuthState>()(
   // persist middleware: Tự động lưu state vào localStorage
   persist(
@@ -412,6 +445,25 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage', // Key trong localStorage
       storage: createJSONStorage(() => localStorage),
+      merge: (persistedState, currentState) => {
+        const persistedAuth = persistedState as PersistedAuthState | undefined
+
+        if (!persistedAuth?.accessToken || isTokenExpired(persistedAuth.accessToken)) {
+          clearPersistedAuthStorage()
+          return {
+            ...currentState,
+            user: null,
+            accessToken: null,
+            refreshToken: null,
+            isAuthenticated: false
+          }
+        }
+
+        return {
+          ...currentState,
+          ...persistedAuth
+        }
+      },
       // Chỉ persist những field cần thiết (không lưu isLoading, error)
       partialize: (state) => ({
         user: state.user,

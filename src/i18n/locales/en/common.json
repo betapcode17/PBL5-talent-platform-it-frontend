@@ -308,6 +308,8 @@
     "actions": {
       "export": "Export",
       "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
       "close": "Close",
       "cancel": "Cancel",
       "creating": "Creating..."
@@ -427,6 +429,11 @@
         "notSpecified": "Not specified",
         "viewApplications": "View Applications"
       },
+      "delete": {
+        "confirm": "Are you sure you want to delete \"{{title}}\"?",
+        "failed": "Unable to delete this job right now.",
+        "deleting": "Deleting..."
+      },
       "create": {
         "back": "Back to Jobs",
         "eyebrow": "Create new posting",
@@ -455,6 +462,16 @@
           "requirements": "One requirement per line"
         },
         "submit": "Create Job"
+      },
+      "edit": {
+        "eyebrow": "Edit job",
+        "title": "Update job posting",
+        "description": "Adjust the job information and save the latest version to the system.",
+        "sectionTitle": "Update job details",
+        "sectionDescription": "Edit the required information and save your changes.",
+        "submit": "Save changes",
+        "notFoundTitle": "Job not found",
+        "notFoundDescription": "This job does not exist or you no longer have permission to edit it."
       }
     },
     "interviews": {

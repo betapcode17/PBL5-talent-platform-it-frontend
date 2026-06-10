@@ -9,8 +9,8 @@ export interface RegisterRequest {
   full_name: string
   email: string
   password: string
-  confirmPassword: string
   role: 'SEEKER' | 'EMPLOYEE' | 'ADMIN'
+  is_active: boolean
 }
 
 export interface LoginResponse {

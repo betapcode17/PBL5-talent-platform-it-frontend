@@ -77,25 +77,25 @@ export const SeekerCompanyCollectionView = ({
   return (
     <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(139,92,246,0.14),_transparent_32%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)]'>
       <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
-        <section className='rounded-[32px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8'>
-          <div className='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
-            <div className='max-w-2xl'>
+        <section className='rounded-[34px] border border-slate-200/80 bg-white/92 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8'>
+          <div className='grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,320px)] lg:items-stretch lg:gap-8'>
+            <div className='min-w-0 max-w-3xl'>
               <div className='inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-violet-700'>
                 <Building2 className='h-3.5 w-3.5' />
                 {eyebrow}
               </div>
 
-              <h1 className='mt-4 text-3xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-[3.1rem]'>{title}</h1>
-              <p className='mt-3 max-w-xl text-sm leading-7 text-slate-500 sm:text-base'>{description}</p>
+              <h1 className='mt-4 text-3xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-[3rem]'>{title}</h1>
+              <p className='mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base'>{description}</p>
             </div>
 
-            <div className='w-full max-w-sm rounded-[24px] border border-slate-200 bg-slate-50/80 p-4'>
+            <div className='flex min-h-[112px] w-full flex-col justify-between rounded-[24px] border border-slate-200 bg-slate-50/80 p-4 lg:min-h-full lg:px-5 lg:py-5'>
               <p className='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>{totalLabel}</p>
-              <p className='mt-2 text-3xl font-semibold text-slate-950'>{totalItems}</p>
+              <p className='mt-3 text-3xl font-semibold leading-none text-slate-950 sm:text-[2rem]'>{totalItems}</p>
             </div>
           </div>
 
-          <div className='mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]'>
+          <div className='mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end'>
             <div className='relative'>
               <Search className='pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400' />
               <input
@@ -103,7 +103,7 @@ export const SeekerCompanyCollectionView = ({
                 onChange={(event) => onSearchChange(event.target.value)}
                 placeholder={searchPlaceholder}
                 aria-label={t('seekerCompanies.common.searchLabel')}
-                className='w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100'
+                className='h-[52px] w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100'
               />
             </div>
 
@@ -113,7 +113,7 @@ export const SeekerCompanyCollectionView = ({
                 <select
                   value={statusFilter.value}
                   onChange={(event) => statusFilter.onChange(event.target.value)}
-                  className='h-[50px] rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-sm text-slate-700 outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100'
+                  className='h-[52px] rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-sm text-slate-700 outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100'
                 >
                   {statusFilter.options.map((option) => (
                     <option key={option.value} value={option.value}>

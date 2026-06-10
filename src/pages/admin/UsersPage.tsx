@@ -44,7 +44,8 @@ const UsersPage = () => {
         page: targetPage,
         limit: pageSize,
         search: search.trim() || undefined,
-        active: statusFilter === 'all' ? undefined : statusFilter === 'active'
+        active: statusFilter === 'all' ? undefined : statusFilter === 'active',
+        excludeAdmins: true
       })
 
       setPage(response.page)
@@ -295,7 +296,7 @@ const UsersPage = () => {
 
               {selectedUser.employee ? (
                 <div className='mt-4 rounded-2xl border border-sky-400/20 bg-sky-500/10 p-4'>
-                  <p className='text-xs font-bold uppercase tracking-[0.14em] text-sky-300'>Thông tin Employer</p>
+                  <p className='text-xs font-bold uppercase tracking-[0.14em] text-sky-300'>Thông tin nhà tuyển dụng</p>
                   <p className='mt-2 text-sm font-semibold text-white'>Công ty: {selectedUser.employee.company.name}</p>
                   <p className='text-sm text-slate-300'>Vai trò: {selectedUser.employee.role}</p>
                 </div>
@@ -303,7 +304,7 @@ const UsersPage = () => {
 
               {selectedUser.seeker ? (
                 <div className='mt-4 rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4'>
-                  <p className='text-xs font-bold uppercase tracking-[0.14em] text-violet-300'>Thông tin Seeker</p>
+                  <p className='text-xs font-bold uppercase tracking-[0.14em] text-violet-300'>Thông tin ứng viên</p>
                   <p className='mt-2 text-sm text-slate-300'>CV: {selectedUser.seeker.fileCv || 'Chưa có CV'}</p>
                 </div>
               ) : null}

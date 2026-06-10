@@ -285,6 +285,8 @@
     "actions": {
       "export": "Xuất file",
       "view": "Xem",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
       "close": "Đóng",
       "cancel": "Hủy",
       "creating": "Đang tạo..."
@@ -404,6 +406,11 @@
         "notSpecified": "Chưa xác định",
         "viewApplications": "Xem hồ sơ ứng tuyển"
       },
+      "delete": {
+        "confirm": "Bạn có chắc muốn xóa tin tuyển dụng \"{{title}}\" không?",
+        "failed": "Không thể xóa việc làm lúc này.",
+        "deleting": "Đang xóa..."
+      },
       "create": {
         "back": "Quay lại việc làm",
         "eyebrow": "Tạo tin mới",
@@ -432,6 +439,16 @@
           "requirements": "Mỗi dòng là một yêu cầu"
         },
         "submit": "Tạo việc làm"
+      },
+      "edit": {
+        "eyebrow": "Chỉnh sửa việc làm",
+        "title": "Cập nhật tin tuyển dụng",
+        "description": "Điều chỉnh thông tin vị trí tuyển dụng và lưu lại ngay trên hệ thống.",
+        "sectionTitle": "Cập nhật chi tiết việc làm",
+        "sectionDescription": "Chỉnh sửa thông tin cần thiết rồi lưu thay đổi.",
+        "submit": "Lưu thay đổi",
+        "notFoundTitle": "Không tìm thấy việc làm",
+        "notFoundDescription": "Việc làm này không tồn tại hoặc bạn không còn quyền chỉnh sửa."
       }
     },
     "interviews": {

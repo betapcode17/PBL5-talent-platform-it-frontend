@@ -35,6 +35,7 @@ type JobApplicationsResponse = {
       email?: string
       phone?: string | null
       userImage?: string | null
+      defaultCvUrl?: string | null
       githubUrl?: string | null
       linkedinUrl?: string | null
       portfolioUrl?: string | null
@@ -229,6 +230,7 @@ const getAllCompanyApplications = async (jobs: EmployerJobItem[]) => {
         email: application.candidate.email,
         phone: application.candidate.phone ?? undefined,
         avatar: application.candidate.userImage ?? undefined,
+        cvUrl: application.candidate.defaultCvUrl ?? null,
         githubUrl: application.candidate.githubUrl ?? null,
         linkedinUrl: application.candidate.linkedinUrl ?? null,
         portfolioUrl: application.candidate.portfolioUrl ?? null,

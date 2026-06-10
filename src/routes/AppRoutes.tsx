@@ -15,6 +15,7 @@ import EmployerJobsPage from '@/pages/employer/JobsPage'
 import EmployerCandidatesPage from '@/pages/employer/CandidatesPage'
 import EmployerInterviewsPage from '@/pages/employer/InterviewsPage'
 import EmployerCompanyInfoPage from '@/pages/employer/CompanyInfoPage'
+import EmployerCandidateCvProfilePage from '@/pages/employer/CandidateCvProfilePage'
 import CreateJobPage from '@/pages/employer/CreateJobPage'
 import CreateInterviewPage from '@/pages/employer/CreateInterviewPage'
 import EditJobPage from '@/pages/employer/EditJobPage'
@@ -105,6 +106,7 @@ export function AppRoutes() {
             <Route path='jobs/create' element={<CreateJobPage />} />
             <Route path='jobs/:id/edit' element={<EditJobPage />} />
             <Route path='candidates' element={<EmployerCandidatesPage />} />
+            <Route path='candidates/:seekerId/profile' element={<EmployerCandidateCvProfilePage />} />
             <Route path='interviews' element={<EmployerInterviewsPage />} />
             <Route path='interviews/create' element={<CreateInterviewPage />} />
             <Route path='companyInfo' element={<EmployerCompanyInfoPage />} />

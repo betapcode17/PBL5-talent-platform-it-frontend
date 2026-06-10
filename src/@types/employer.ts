@@ -77,6 +77,7 @@ export interface EmployerCandidateItem {
     email?: string
     phone?: string
     avatar?: string
+    cvUrl?: string | null
     githubUrl?: string | null
     linkedinUrl?: string | null
     portfolioUrl?: string | null

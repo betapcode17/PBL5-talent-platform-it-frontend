@@ -1,10 +1,23 @@
 import { useEffect, useState, type ComponentType, type FormEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Briefcase, Building2, Edit3, Globe, Mail, MapPin, Save, TrendingUp, Users, X } from 'lucide-react'
+import {
+  Briefcase,
+  Building2,
+  Edit3,
+  Globe,
+  ImageUp,
+  Mail,
+  MapPin,
+  Save,
+  TrendingUp,
+  Upload,
+  Users,
+  X
+} from 'lucide-react'
 
 import type { CompanyDetail, UpdateCompanyRequest } from '@/@types/company'
-import { getCompanyByIdApi, updateCompanyApi } from '@/api/company'
+import { getCompanyByIdApi, updateCompanyApi, uploadCompanyCoverApi, uploadCompanyLogoApi } from '@/api/company'
 import EmployerPageHeader from '@/components/employer/EmployerPageHeader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -99,6 +112,7 @@ const EmployerCompanyInfoPage = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState<CompanyFormState>(emptyCompanyForm)
   const [message, setMessage] = useState<string | null>(null)
+  const [uploadingField, setUploadingField] = useState<'company_image' | 'cover_image' | null>(null)
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['company', companyId],
@@ -154,6 +168,32 @@ const EmployerCompanyInfoPage = () => {
     updateMutation.mutate(buildUpdatePayload(form))
   }
 
+  const handleImageUpload = async (field: 'company_image' | 'cover_image', file?: File | null) => {
+    if (!companyId || !file) return
+
+    try {
+      setUploadingField(field)
+      setMessage(null)
+
+      const response =
+        field === 'company_image'
+          ? await uploadCompanyLogoApi(companyId, file)
+          : await uploadCompanyCoverApi(companyId, file)
+
+      updateFormValue(field, response.imageUrl)
+      setMessage(field === 'company_image' ? 'Tải logo công ty thành công.' : 'Tải ảnh bìa công ty thành công.')
+      await queryClient.invalidateQueries({ queryKey: ['company', companyId] })
+    } catch (uploadError) {
+      const apiMessage =
+        uploadError && typeof uploadError === 'object' && 'response' in uploadError
+          ? (uploadError as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+      setMessage(apiMessage || 'Không thể tải ảnh lên lúc này.')
+    } finally {
+      setUploadingField(null)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className='min-w-0 space-y-6'>
@@ -200,7 +240,11 @@ const EmployerCompanyInfoPage = () => {
   const infoItems = [
     { label: t('employer.company.industry'), value: company.company_industry, icon: Briefcase },
     { label: t('employer.company.size'), value: company.company_size, icon: Users },
-    { label: t('employer.company.location'), value: [company.city, company.country].filter(Boolean).join(', '), icon: MapPin },
+    {
+      label: t('employer.company.location'),
+      value: [company.city, company.country].filter(Boolean).join(', '),
+      icon: MapPin
+    },
     { label: t('employer.company.email'), value: company.company_email, icon: Mail }
   ]
 
@@ -216,7 +260,9 @@ const EmployerCompanyInfoPage = () => {
         <div>
           <p className='text-sm font-semibold uppercase tracking-[0.14em] text-violet-600'>Company profile</p>
           <h2 className='mt-1 text-xl font-bold text-slate-950 dark:text-white'>Quản lý thông tin công ty</h2>
-          <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>Chỉnh sửa tên, mô tả, liên hệ, địa điểm và các thông tin tuyển dụng.</p>
+          <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>
+            Chỉnh sửa tên, mô tả, liên hệ, địa điểm và các thông tin tuyển dụng.
+          </p>
         </div>
         <Button
           type='button'
@@ -233,27 +279,101 @@ const EmployerCompanyInfoPage = () => {
       </section>
 
       {isEditing ? (
-        <form onSubmit={submitCompanyForm} className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'>
+        <form
+          onSubmit={submitCompanyForm}
+          className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'
+        >
           <div className='grid gap-4 md:grid-cols-2'>
-            <CompanyInput label='Tên công ty *' value={form.company_name} onChange={(value) => updateFormValue('company_name', value)} />
-            <CompanyInput label='Email công ty' type='email' value={form.company_email} onChange={(value) => updateFormValue('company_email', value)} />
-            <CompanyInput label='Ngành' value={form.company_industry} onChange={(value) => updateFormValue('company_industry', value)} />
-            <CompanyInput label='Quy mô' value={form.company_size} onChange={(value) => updateFormValue('company_size', value)} />
-            <CompanyInput label='Loại công ty' value={form.company_type} onChange={(value) => updateFormValue('company_type', value)} />
-            <CompanyInput label='Website' value={form.company_website_url} onChange={(value) => updateFormValue('company_website_url', value)} />
+            <CompanyInput
+              label='Tên công ty *'
+              value={form.company_name}
+              onChange={(value) => updateFormValue('company_name', value)}
+            />
+            <CompanyInput
+              label='Email công ty'
+              type='email'
+              value={form.company_email}
+              onChange={(value) => updateFormValue('company_email', value)}
+            />
+            <CompanyInput
+              label='Ngành'
+              value={form.company_industry}
+              onChange={(value) => updateFormValue('company_industry', value)}
+            />
+            <CompanyInput
+              label='Quy mô'
+              value={form.company_size}
+              onChange={(value) => updateFormValue('company_size', value)}
+            />
+            <CompanyInput
+              label='Loại công ty'
+              value={form.company_type}
+              onChange={(value) => updateFormValue('company_type', value)}
+            />
+            <CompanyInput
+              label='Website'
+              value={form.company_website_url}
+              onChange={(value) => updateFormValue('company_website_url', value)}
+            />
             <CompanyInput label='Thành phố' value={form.city} onChange={(value) => updateFormValue('city', value)} />
-            <CompanyInput label='Quốc gia' value={form.country} onChange={(value) => updateFormValue('country', value)} />
-            <CompanyInput label='Ngày làm việc' value={form.working_days} onChange={(value) => updateFormValue('working_days', value)} />
-            <CompanyInput label='Giờ làm việc' value={form.working_time} onChange={(value) => updateFormValue('working_time', value)} />
-            <CompanyInput label='URL logo' value={form.company_image} onChange={(value) => updateFormValue('company_image', value)} wide />
-            <CompanyInput label='URL ảnh bìa' value={form.cover_image} onChange={(value) => updateFormValue('cover_image', value)} wide />
-            <CompanyTextarea label='Mô tả công ty' value={form.profile_description} onChange={(value) => updateFormValue('profile_description', value)} rows={4} />
-            <CompanyTextarea label='Kỹ năng chính' value={form.key_skills} onChange={(value) => updateFormValue('key_skills', value)} rows={3} />
-            <CompanyTextarea label='Lý do yêu thích môi trường này' value={form.why_love_working_here} onChange={(value) => updateFormValue('why_love_working_here', value)} rows={3} />
-            <CompanyTextarea label='Chính sách OT' value={form.overtime_policy} onChange={(value) => updateFormValue('overtime_policy', value)} rows={3} />
+            <CompanyInput
+              label='Quốc gia'
+              value={form.country}
+              onChange={(value) => updateFormValue('country', value)}
+            />
+            <CompanyInput
+              label='Ngày làm việc'
+              value={form.working_days}
+              onChange={(value) => updateFormValue('working_days', value)}
+            />
+            <CompanyInput
+              label='Giờ làm việc'
+              value={form.working_time}
+              onChange={(value) => updateFormValue('working_time', value)}
+            />
+            <CompanyFileUpload
+              label='Logo công ty'
+              value={form.company_image}
+              uploading={uploadingField === 'company_image'}
+              onFileChange={(file) => void handleImageUpload('company_image', file)}
+            />
+            <CompanyFileUpload
+              label='Ảnh bìa công ty'
+              value={form.cover_image}
+              uploading={uploadingField === 'cover_image'}
+              onFileChange={(file) => void handleImageUpload('cover_image', file)}
+            />
+            <CompanyTextarea
+              label='Mô tả công ty'
+              value={form.profile_description}
+              onChange={(value) => updateFormValue('profile_description', value)}
+              rows={4}
+            />
+            <CompanyTextarea
+              label='Kỹ năng chính'
+              value={form.key_skills}
+              onChange={(value) => updateFormValue('key_skills', value)}
+              rows={3}
+            />
+            <CompanyTextarea
+              label='Lý do yêu thích môi trường này'
+              value={form.why_love_working_here}
+              onChange={(value) => updateFormValue('why_love_working_here', value)}
+              rows={3}
+            />
+            <CompanyTextarea
+              label='Chính sách OT'
+              value={form.overtime_policy}
+              onChange={(value) => updateFormValue('overtime_policy', value)}
+              rows={3}
+            />
           </div>
 
-          {message ? <p className='mt-4 rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 dark:bg-white/5 dark:text-slate-200'>{message}</p> : null}
+          {message ? (
+            <p className='mt-4 rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 dark:bg-white/5 dark:text-slate-200'>
+              {message}
+            </p>
+          ) : null}
 
           <div className='mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end'>
             <Button type='button' variant='outline' className='rounded-lg' onClick={cancelEdit}>
@@ -267,7 +387,9 @@ const EmployerCompanyInfoPage = () => {
         </form>
       ) : null}
 
-      {message && !isEditing ? <p className='rounded-lg bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700'>{message}</p> : null}
+      {message && !isEditing ? (
+        <p className='rounded-lg bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700'>{message}</p>
+      ) : null}
 
       <section
         className='relative overflow-hidden rounded-3xl bg-slate-950 p-8 shadow-2xl lg:p-12'
@@ -284,7 +406,11 @@ const EmployerCompanyInfoPage = () => {
         <div className='relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
           <div className='flex min-w-0 gap-5'>
             {company.company_image ? (
-              <img src={company.company_image} alt={company.company_name} className='h-20 w-20 rounded-2xl border border-white/20 object-cover' />
+              <img
+                src={company.company_image}
+                alt={company.company_name}
+                className='h-20 w-20 rounded-2xl border border-white/20 object-cover'
+              />
             ) : (
               <div className='flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 text-2xl font-bold text-white'>
                 {company.company_name.charAt(0)}
@@ -292,10 +418,15 @@ const EmployerCompanyInfoPage = () => {
             )}
             <div className='min-w-0'>
               <h1 className='break-words text-4xl font-bold text-white lg:text-5xl'>{company.company_name}</h1>
-              <p className='mt-3 max-w-3xl text-lg text-violet-100'>{company.profile_description || 'Welcome to our company'}</p>
+              <p className='mt-3 max-w-3xl text-lg text-violet-100'>
+                {company.profile_description || 'Welcome to our company'}
+              </p>
               <div className='mt-6 flex flex-wrap gap-2'>
                 {[company.company_industry, company.company_size, company.company_type].filter(Boolean).map((item) => (
-                  <span key={item} className='rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm'>
+                  <span
+                    key={item}
+                    className='rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm'
+                  >
                     {item}
                   </span>
                 ))}
@@ -309,12 +440,19 @@ const EmployerCompanyInfoPage = () => {
         {infoItems.map((info) => {
           const Icon = info.icon
           return (
-            <article key={info.label} className='rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'>
+            <article
+              key={info.label}
+              className='rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'
+            >
               <div className='mb-3 inline-flex rounded-xl bg-violet-100 p-3 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300'>
                 <Icon className='h-5 w-5' />
               </div>
-              <p className='text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400'>{info.label}</p>
-              <p className='mt-2 break-words text-sm font-bold text-slate-900 dark:text-white'>{info.value || t('employer.company.notSpecified')}</p>
+              <p className='text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400'>
+                {info.label}
+              </p>
+              <p className='mt-2 break-words text-sm font-bold text-slate-900 dark:text-white'>
+                {info.value || t('employer.company.notSpecified')}
+              </p>
             </article>
           )
         })}
@@ -332,7 +470,9 @@ const EmployerCompanyInfoPage = () => {
             <CompanyPanel title='Thông tin tuyển dụng' icon={TrendingUp}>
               <div className='space-y-4 text-sm text-slate-600 dark:text-slate-300'>
                 {company.key_skills ? <InfoBlock label='Kỹ năng chính' value={company.key_skills} /> : null}
-                {company.why_love_working_here ? <InfoBlock label='Vì sao yêu thích môi trường này' value={company.why_love_working_here} /> : null}
+                {company.why_love_working_here ? (
+                  <InfoBlock label='Vì sao yêu thích môi trường này' value={company.why_love_working_here} />
+                ) : null}
                 {company.overtime_policy ? <InfoBlock label='Chính sách OT' value={company.overtime_policy} /> : null}
               </div>
             </CompanyPanel>
@@ -340,10 +480,23 @@ const EmployerCompanyInfoPage = () => {
         </div>
 
         <aside className='space-y-6'>
-          <CompanyStat icon={Users} label={t('employer.company.staffCount')} value={company.company_size || t('employer.company.notSpecified')} />
-          <CompanyStat icon={TrendingUp} label={t('employer.company.industry')} value={company.company_industry || t('employer.company.notSpecified')} />
+          <CompanyStat
+            icon={Users}
+            label={t('employer.company.staffCount')}
+            value={company.company_size || t('employer.company.notSpecified')}
+          />
+          <CompanyStat
+            icon={TrendingUp}
+            label={t('employer.company.industry')}
+            value={company.company_industry || t('employer.company.notSpecified')}
+          />
           {company.company_website_url ? (
-            <CompanyStat icon={Globe} label={t('employer.company.website')} value={company.company_website_url} href={company.company_website_url} />
+            <CompanyStat
+              icon={Globe}
+              label={t('employer.company.website')}
+              value={company.company_website_url}
+              href={company.company_website_url}
+            />
           ) : null}
         </aside>
       </section>
@@ -351,12 +504,27 @@ const EmployerCompanyInfoPage = () => {
       {(company.company_email || company.city || company.country || company.working_days || company.working_time) && (
         <CompanyPanel title='Contact Information' icon={Mail}>
           <div className='grid gap-5 sm:grid-cols-2'>
-            {company.company_email ? <ContactItem icon={Mail} label='Email' value={company.company_email} href={`mailto:${company.company_email}`} /> : null}
-            {[company.city, company.country].filter(Boolean).length > 0 ? (
-              <ContactItem icon={MapPin} label='Location' value={[company.city, company.country].filter(Boolean).join(', ')} />
+            {company.company_email ? (
+              <ContactItem
+                icon={Mail}
+                label='Email'
+                value={company.company_email}
+                href={`mailto:${company.company_email}`}
+              />
             ) : null}
-            {company.working_days ? <ContactItem icon={Briefcase} label='Ngày làm việc' value={company.working_days} /> : null}
-            {company.working_time ? <ContactItem icon={Users} label='Giờ làm việc' value={company.working_time} /> : null}
+            {[company.city, company.country].filter(Boolean).length > 0 ? (
+              <ContactItem
+                icon={MapPin}
+                label='Location'
+                value={[company.city, company.country].filter(Boolean).join(', ')}
+              />
+            ) : null}
+            {company.working_days ? (
+              <ContactItem icon={Briefcase} label='Ngày làm việc' value={company.working_days} />
+            ) : null}
+            {company.working_time ? (
+              <ContactItem icon={Users} label='Giờ làm việc' value={company.working_time} />
+            ) : null}
           </div>
         </CompanyPanel>
       )}
@@ -369,11 +537,10 @@ type CompanyInputProps = {
   value: string
   onChange: (value: string) => void
   type?: string
-  wide?: boolean
 }
 
-const CompanyInput = ({ label, value, onChange, type = 'text', wide = false }: CompanyInputProps) => (
-  <label className={`space-y-2 ${wide ? 'md:col-span-2' : ''}`}>
+const CompanyInput = ({ label, value, onChange, type = 'text' }: CompanyInputProps) => (
+  <label className='space-y-2'>
     <span className='text-sm font-semibold text-slate-700 dark:text-slate-200'>{label}</span>
     <Input type={type} value={value} onChange={(event) => onChange(event.target.value)} />
   </label>
@@ -398,6 +565,43 @@ const CompanyTextarea = ({ label, value, onChange, rows }: CompanyTextareaProps)
   </label>
 )
 
+type CompanyFileUploadProps = {
+  label: string
+  value: string
+  uploading: boolean
+  onFileChange: (file?: File | null) => void
+}
+
+const CompanyFileUpload = ({ label, value, uploading, onFileChange }: CompanyFileUploadProps) => (
+  <label className='space-y-2 md:col-span-2'>
+    <span className='text-sm font-semibold text-slate-700 dark:text-slate-200'>{label}</span>
+    <div className='rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-900/20'>
+      <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='min-w-0'>
+          <p className='flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200'>
+            <ImageUp className='h-4 w-4 text-violet-500' />
+            Chọn ảnh từ máy tính
+          </p>
+          <p className='mt-1 break-all text-xs text-slate-500 dark:text-slate-400'>
+            {value || 'Chưa có ảnh nào được tải lên.'}
+          </p>
+        </div>
+        <label className='inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700'>
+          <Upload className='h-4 w-4' />
+          {uploading ? 'Đang tải...' : 'Tải ảnh lên'}
+          <input
+            type='file'
+            accept='image/png,image/jpeg,image/jpg,image/webp'
+            className='hidden'
+            disabled={uploading}
+            onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
+          />
+        </label>
+      </div>
+    </div>
+  </label>
+)
+
 type IconComponent = ComponentType<{ className?: string }>
 
 const CompanyPanel = ({ title, icon: Icon, children }: { title: string; icon: IconComponent; children: ReactNode }) => (
@@ -414,7 +618,17 @@ const CompanyPanel = ({ title, icon: Icon, children }: { title: string; icon: Ic
   </section>
 )
 
-const CompanyStat = ({ icon: Icon, label, value, href }: { icon: IconComponent; label: string; value: string; href?: string }) => (
+const CompanyStat = ({
+  icon: Icon,
+  label,
+  value,
+  href
+}: {
+  icon: IconComponent
+  label: string
+  value: string
+  href?: string
+}) => (
   <article className='overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700/50 dark:bg-slate-900/30'>
     <div className='bg-violet-600 px-6 py-4'>
       <div className='flex items-center gap-2'>
@@ -424,7 +638,12 @@ const CompanyStat = ({ icon: Icon, label, value, href }: { icon: IconComponent; 
     </div>
     <div className='px-6 py-5'>
       {href ? (
-        <a href={href} target='_blank' rel='noopener noreferrer' className='break-all text-sm font-semibold text-violet-700 hover:text-violet-800 dark:text-violet-300'>
+        <a
+          href={href}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='break-all text-sm font-semibold text-violet-700 hover:text-violet-800 dark:text-violet-300'
+        >
           {value}
         </a>
       ) : (
@@ -441,7 +660,17 @@ const InfoBlock = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
-const ContactItem = ({ icon: Icon, label, value, href }: { icon: IconComponent; label: string; value: string; href?: string }) => (
+const ContactItem = ({
+  icon: Icon,
+  label,
+  value,
+  href
+}: {
+  icon: IconComponent
+  label: string
+  value: string
+  href?: string
+}) => (
   <div className='flex gap-4'>
     <div className='rounded-lg bg-violet-100 p-3 dark:bg-violet-900/30'>
       <Icon className='h-5 w-5 text-violet-600 dark:text-violet-400' />
@@ -449,7 +678,10 @@ const ContactItem = ({ icon: Icon, label, value, href }: { icon: IconComponent; 
     <div className='min-w-0'>
       <p className='text-xs font-semibold uppercase text-slate-500 dark:text-slate-400'>{label}</p>
       {href ? (
-        <a href={href} className='mt-1 block break-all text-sm font-medium text-violet-700 hover:text-violet-800 dark:text-violet-300'>
+        <a
+          href={href}
+          className='mt-1 block break-all text-sm font-medium text-violet-700 hover:text-violet-800 dark:text-violet-300'
+        >
           {value}
         </a>
       ) : (

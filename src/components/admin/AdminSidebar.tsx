@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   BellDot,
   BriefcaseBusiness,
   Building2,
@@ -11,9 +10,8 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
-  Settings,
-  UserPlus,
   Sun,
+  UserPlus,
   UsersRound
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -35,9 +33,7 @@ const menuItems = [
   { labelKey: 'admin.menu.users', icon: UsersRound, path: '/admin/users' },
   { labelKey: 'admin.menu.approvals', icon: UserPlus, path: '/admin/employer-requests' },
   { labelKey: 'admin.menu.companies', icon: Building2, path: '/admin/companies' },
-  { labelKey: 'admin.menu.jobs', icon: BriefcaseBusiness, path: '/admin/jobs' },
-  { labelKey: 'admin.menu.reports', icon: BarChart3, path: '/admin/reports' },
-  { labelKey: 'admin.menu.settings', icon: Settings, path: '/admin/settings' }
+  { labelKey: 'admin.menu.jobs', icon: BriefcaseBusiness, path: '/admin/jobs' }
 ]
 
 const isMenuActive = (pathname: string, path: string) => {

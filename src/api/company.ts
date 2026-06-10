@@ -1,5 +1,10 @@
 import axiosInstance from './axiosInstance'
-import type { GetCompaniesRequest, GetCompaniesResponse, GetCompanyDetailResponse, UpdateCompanyRequest } from '@/@types/company'
+import type {
+  GetCompaniesRequest,
+  GetCompaniesResponse,
+  GetCompanyDetailResponse,
+  UpdateCompanyRequest
+} from '@/@types/company'
 
 // get list companies
 export const getCompaniesApi = async (params: GetCompaniesRequest): Promise<GetCompaniesResponse> => {
@@ -13,7 +18,9 @@ export const getCompaniesApi = async (params: GetCompaniesRequest): Promise<GetC
 
   const raw = response.data
 
-  const visibleCompanies = (raw.companies ?? []).filter((company: { is_active?: boolean }) => company.is_active !== false)
+  const visibleCompanies = (raw.companies ?? []).filter(
+    (company: { is_active?: boolean }) => company.is_active !== false
+  )
 
   return {
     data: visibleCompanies,
@@ -31,5 +38,21 @@ export const getCompanyByIdApi = async (id: number): Promise<GetCompanyDetailRes
 
 export const updateCompanyApi = async (id: number, data: UpdateCompanyRequest) => {
   const res = await axiosInstance.patch(`/companies/${id}`, data)
+  return res.data
+}
+
+export const uploadCompanyLogoApi = async (id: number, file: File) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const res = await axiosInstance.put<{ field: 'company_image'; imageUrl: string }>(`/companies/${id}/logo`, formData)
+  return res.data
+}
+
+export const uploadCompanyCoverApi = async (id: number, file: File) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const res = await axiosInstance.put<{ field: 'cover_image'; imageUrl: string }>(`/companies/${id}/cover`, formData)
   return res.data
 }

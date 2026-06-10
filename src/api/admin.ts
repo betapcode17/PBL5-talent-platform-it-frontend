@@ -66,6 +66,7 @@ type AdminUsersQuery = {
   search?: string
   role?: 'ADMIN' | 'SEEKER' | 'EMPLOYEE'
   active?: boolean
+  excludeAdmins?: boolean
 }
 
 type AdminCompaniesQuery = {
@@ -292,9 +293,7 @@ export const toggleAdminJobStatusApi = async (jobId: number, shouldActivate: boo
   return response.data
 }
 
-export const getAdminEmployerRegistrationRequestsApi = async (
-  params: AdminEmployerRegistrationRequestsQuery = {}
-) => {
+export const getAdminEmployerRegistrationRequestsApi = async (params: AdminEmployerRegistrationRequestsQuery = {}) => {
   const response = await axiosInstance.get<AdminEmployerRegistrationRequestsResponse>(
     '/admin/employer-registration-requests',
     { params }

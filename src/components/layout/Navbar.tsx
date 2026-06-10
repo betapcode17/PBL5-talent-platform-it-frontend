@@ -1,4 +1,16 @@
-import { BriefcaseBusiness, CalendarDays, ChevronDown, ClipboardList, Heart, LogOut, Menu, MessageCircle, Search, User, X } from 'lucide-react'
+import {
+  BriefcaseBusiness,
+  CalendarDays,
+  ChevronDown,
+  ClipboardList,
+  Heart,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Search,
+  User,
+  X
+} from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
@@ -236,7 +248,9 @@ const Navbar = ({
                     {isProfileOpen ? (
                       <div className='absolute right-0 mt-3 w-64 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.14)]'>
                         <div className='border-b border-slate-100 bg-slate-50 px-4 py-4'>
-                          <p className='truncate text-sm font-semibold text-slate-900'>{user?.full_name || 'Account'}</p>
+                          <p className='truncate text-sm font-semibold text-slate-900'>
+                            {user?.full_name || 'Account'}
+                          </p>
                           <p className='mt-1 truncate text-xs text-slate-500'>{user?.email}</p>
                         </div>
                         <div className='p-2'>
@@ -305,7 +319,7 @@ const Navbar = ({
                       baseFocusClassName
                     )}
                   >
-                    Dang ky Nha tuyen dung
+                    Đăng ký Nhà tuyển dụng
                   </Link>
                 </>
               )
@@ -454,7 +468,7 @@ const Navbar = ({
                       onClick={closeMenu}
                       className='inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50'
                     >
-                      Dang ky Nha tuyen dung
+                      Đăng ký Nhà tuyển dụng
                     </Link>
                   </>
                 )

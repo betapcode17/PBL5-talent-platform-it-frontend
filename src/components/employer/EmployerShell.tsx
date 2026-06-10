@@ -23,6 +23,8 @@ const EmployerShell = ({ children }: EmployerShellProps) => {
   })
   const [isThemeWaveActive, setIsThemeWaveActive] = useState(false)
   const waveTimeoutRef = useRef<number | null>(null)
+  const themeApplyTimeoutRef = useRef<number | null>(null)
+  const themeTransitionActiveRef = useRef(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
 
@@ -38,6 +40,9 @@ const EmployerShell = ({ children }: EmployerShellProps) => {
       if (waveTimeoutRef.current) {
         window.clearTimeout(waveTimeoutRef.current)
       }
+      if (themeApplyTimeoutRef.current) {
+        window.clearTimeout(themeApplyTimeoutRef.current)
+      }
     }
   }, [])
 
@@ -50,6 +55,8 @@ const EmployerShell = ({ children }: EmployerShellProps) => {
   }, [])
 
   const handleToggleTheme = () => {
+    if (themeTransitionActiveRef.current) return
+
     const nextTheme = theme === 'dark' ? 'light' : 'dark'
     const root = document.documentElement
     const transitionDocument = document as ViewTransitionDocument
@@ -59,11 +66,15 @@ const EmployerShell = ({ children }: EmployerShellProps) => {
     }
 
     root.dataset.themeTransition = nextTheme === 'dark' ? 'to-dark' : 'to-light'
+    themeTransitionActiveRef.current = true
     setIsThemeWaveActive(true)
 
     const finishWave = () => {
       delete root.dataset.themeTransition
-      waveTimeoutRef.current = window.setTimeout(() => setIsThemeWaveActive(false), 140)
+      waveTimeoutRef.current = window.setTimeout(() => {
+        setIsThemeWaveActive(false)
+        themeTransitionActiveRef.current = false
+      }, 140)
     }
 
     const applyNextTheme = () => {
@@ -78,8 +89,8 @@ const EmployerShell = ({ children }: EmployerShellProps) => {
       return
     }
 
-    waveTimeoutRef.current = window.setTimeout(applyNextTheme, 280)
-    window.setTimeout(finishWave, 980)
+    themeApplyTimeoutRef.current = window.setTimeout(applyNextTheme, 280)
+    waveTimeoutRef.current = window.setTimeout(finishWave, 980)
   }
 
   return (

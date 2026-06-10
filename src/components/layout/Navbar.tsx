@@ -57,7 +57,7 @@ const Navbar = ({
   const [headerSearchQuery, setHeaderSearchQuery] = useState('')
   const navigate = useNavigate()
   const { isAuthenticated, logout, user } = useAuthStore()
-  const { setWidgetOpen } = useChatbotStore()
+  const { setToggleDismissed, setWidgetOpen } = useChatbotStore()
   const profileRef = useRef<HTMLDivElement>(null)
 
   const isCompact = variant === 'compact'
@@ -98,6 +98,7 @@ const Navbar = ({
   }
 
   const handleOpenChatbot = () => {
+    setToggleDismissed(false)
     setWidgetOpen(true)
     closeMenu()
   }

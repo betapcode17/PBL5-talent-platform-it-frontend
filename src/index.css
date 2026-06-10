@@ -28,25 +28,163 @@
 }
 
 .dark {
-  --background: #1a1625;
+  --background: #11141c;
   --foreground: #fafafa;
-  --card: #221d2e;
+  --card: #191d27;
   --card-foreground: #fafafa;
-  --popover: #221d2e;
+  --popover: #191d27;
   --popover-foreground: #fafafa;
   --primary: #a78bfa;
-  --primary-foreground: #1a1625;
-  --secondary: #2e2640;
-  --secondary-foreground: #c4b5fd;
-  --muted: #2e2640;
-  --muted-foreground: #a3a3a3;
-  --accent: #2e2640;
-  --accent-foreground: #c4b5fd;
+  --primary-foreground: #11141c;
+  --secondary: #252a35;
+  --secondary-foreground: #d5dae3;
+  --muted: #252a35;
+  --muted-foreground: #b8c0cc;
+  --accent: #2b303b;
+  --accent-foreground: #e5e7eb;
   --destructive: #7f1d1d;
   --destructive-foreground: #fafafa;
-  --border: #3d3455;
-  --input: #3d3455;
+  --border: #3f4655;
+  --input: #343a46;
   --ring: #a78bfa;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 980ms;
+  animation-timing-function: linear;
+  mix-blend-mode: normal;
+}
+
+html[data-theme-transition]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-theme-transition]::view-transition-new(root) {
+  animation-name: employer-theme-wave-reveal;
+  will-change: clip-path;
+}
+
+@keyframes employer-theme-wave-reveal {
+  0% {
+    clip-path: inset(0 0 100% 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.theme-wave {
+  pointer-events: none;
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 9999;
+  height: 11.5rem;
+  opacity: 0;
+  overflow: hidden;
+  transform: translate3d(0, -135%, 0);
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(186, 230, 253, 0.18) 30%,
+      rgba(255, 255, 255, 0.6) 68%,
+      transparent 100%
+    ),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.16), rgba(255, 255, 255, 0.68), rgba(167, 139, 250, 0.22));
+  backface-visibility: hidden;
+  contain: layout paint;
+  will-change: transform, opacity;
+}
+
+.theme-wave::before,
+.theme-wave::after {
+  content: '';
+  position: absolute;
+  inset-inline: -18%;
+  bottom: -0.25rem;
+  height: 8.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg width='1440' height='180' viewBox='0 0 1440 180' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 84 C120 24 240 144 360 84 S600 24 720 84 S960 144 1080 84 S1320 24 1440 84 V180 H0 Z' fill='%23f8fafc' fill-opacity='0.9'/%3E%3Cpath d='M0 112 C150 58 270 152 430 104 S690 54 850 104 S1120 156 1440 96 V180 H0 Z' fill='%23bae6fd' fill-opacity='0.38'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 90rem 100%;
+  opacity: 0.88;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.theme-wave::after {
+  bottom: -0.8rem;
+  height: 6.75rem;
+  opacity: 0.22;
+  transform: translate3d(4%, 0, 0) scaleY(0.72);
+}
+
+.theme-wave--active {
+  animation:
+    employer-theme-wave-travel 980ms linear forwards,
+    employer-theme-wave-fade 980ms ease-in-out forwards;
+}
+
+.theme-wave--active::before {
+  animation: employer-theme-foam 980ms linear forwards;
+}
+
+.theme-wave--active::after {
+  animation: employer-theme-foam-soft 980ms linear forwards;
+}
+
+@keyframes employer-theme-wave-travel {
+  0% {
+    transform: translate3d(0, -135%, 0);
+  }
+  100% {
+    transform: translate3d(0, calc(100vh + 2.5rem), 0);
+  }
+}
+
+@keyframes employer-theme-wave-fade {
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.94;
+  }
+  82% {
+    opacity: 0.82;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes employer-theme-foam {
+  0% {
+    transform: translate3d(-5%, 0, 0);
+  }
+  100% {
+    transform: translate3d(7%, 0, 0);
+  }
+}
+
+@keyframes employer-theme-foam-soft {
+  0% {
+    transform: translate3d(4%, 0, 0) scaleY(0.72);
+  }
+  100% {
+    transform: translate3d(6%, 0, 0) scaleY(0.72);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 1ms;
+  }
+
+  .theme-wave--active {
+    animation-duration: 1ms;
+  }
 }
 
 @theme inline {
@@ -89,17 +227,19 @@
   html {
     overflow-y: scroll;
   }
+  html.employer-dashboard-scrollbar-hidden {
+    scrollbar-width: none;
+  }
+  html.employer-dashboard-scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
   body {
     width: 100%;
     min-height: 100vh;
   }
   body {
     @apply bg-background text-foreground;
-    font-family:
-      'Plus Jakarta Sans',
-      'Inter',
-      'Segoe UI',
-      sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }

@@ -89,8 +89,8 @@ const ApplicationTrackerPage = () => {
   return (
     <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
       <section className='rounded-[34px] border border-slate-200/80 bg-white/92 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8'>
-        <div className='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
-          <div className='max-w-3xl'>
+        <div className='grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.95fr)] xl:items-end'>
+          <div className='min-w-0 max-w-3xl'>
             <div className='inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-sky-700'>
               <BriefcaseBusiness className='h-3.5 w-3.5' />
               {t('seekerTracking.applications.eyebrow')}
@@ -98,10 +98,12 @@ const ApplicationTrackerPage = () => {
             <h1 className='mt-4 text-3xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-[3rem]'>
               {t('seekerTracking.applications.title')}
             </h1>
-            <p className='mt-3 text-sm leading-7 text-slate-500 sm:text-base'>{t('seekerTracking.applications.description')}</p>
+            <p className='mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base'>
+              {t('seekerTracking.applications.description')}
+            </p>
           </div>
 
-          <div className='grid w-full max-w-xl gap-3 sm:grid-cols-2 xl:grid-cols-4'>
+          <div className='grid w-full gap-3 sm:grid-cols-2'>
             <MetricCard label={t('seekerTracking.applications.metrics.total')} value={metrics.total} />
             <MetricCard label={t('seekerTracking.applications.metrics.pending')} value={metrics.pending} />
             <MetricCard label={t('seekerTracking.applications.metrics.accepted')} value={metrics.accepted} />
@@ -109,7 +111,7 @@ const ApplicationTrackerPage = () => {
           </div>
         </div>
 
-        <div className='mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]'>
+        <div className='mt-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-end'>
           <div className='relative'>
             <Search className='pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400' />
             <input
@@ -119,7 +121,7 @@ const ApplicationTrackerPage = () => {
                 setPage(1)
               }}
               placeholder={t('seekerTracking.applications.filters.searchPlaceholder')}
-              className='w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100'
+              className='h-[52px] w-full rounded-2xl border border-slate-200 bg-slate-50/70 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100'
             />
           </div>
 
@@ -133,7 +135,7 @@ const ApplicationTrackerPage = () => {
                 setStatus(event.target.value)
                 setPage(1)
               }}
-              className='h-[50px] rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-sm text-slate-700 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100'
+              className='h-[52px] rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-sm text-slate-700 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-4 focus:ring-sky-100'
             >
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -215,12 +217,14 @@ const ApplicationTrackerPage = () => {
                         {t('seekerTracking.common.viewJob')}
                         <ExternalLink className='h-4 w-4' />
                       </Link>
-                      <Link
-                        to='/seeker/interviews'
-                        className='inline-flex h-12 items-center gap-2 rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700'
-                      >
-                        {t('seekerTracking.common.viewInterviews')}
-                      </Link>
+                      {item.interviews.length > 0 ? (
+                        <Link
+                          to='/seeker/interviews'
+                          className='inline-flex h-12 items-center gap-2 rounded-2xl border border-slate-200 px-5 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700'
+                        >
+                          {t('seekerTracking.common.viewInterviews')}
+                        </Link>
+                      ) : null}
                       {item.interviews.length > 0 ? (
                         <button
                           type='button'
@@ -435,9 +439,9 @@ const ApplicationTrackerPage = () => {
 }
 
 const MetricCard = ({ label, value }: { label: string; value: number }) => (
-  <div className='rounded-[24px] border border-slate-200 bg-slate-50/80 px-4 py-4'>
-    <p className='text-xs font-semibold uppercase tracking-[0.18em] text-slate-400'>{label}</p>
-    <p className='mt-2 text-2xl font-semibold text-slate-950'>{value}</p>
+  <div className='flex min-h-[112px] flex-col justify-between rounded-[24px] border border-slate-200 bg-slate-50/80 px-4 py-4'>
+    <p className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-400'>{label}</p>
+    <p className='mt-3 text-2xl font-semibold leading-none text-slate-950 sm:text-[1.75rem]'>{value}</p>
   </div>
 )
 

@@ -1,9 +1,10 @@
-import { Eye, Search } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { MoreHorizontal, Pencil, Search, Trash2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
+import { deleteEmployerJobApi } from '@/api/employer'
 import type { EmployerJobItem } from '@/@types/employer'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import EmployerEmptyState from './EmployerEmptyState'
 import ViewJobModal from './ViewJobModal'
@@ -14,26 +15,36 @@ type EmployerJobListProps = {
 
 const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
   const { i18n, t } = useTranslation()
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
+  const [jobItems, setJobItems] = useState(jobs)
   const [selectedJob, setSelectedJob] = useState<EmployerJobItem | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeletingJobId, setIsDeletingJobId] = useState<number | null>(null)
+  const [openActionJobId, setOpenActionJobId] = useState<number | null>(null)
   const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
 
+  useEffect(() => {
+    setJobItems(jobs)
+  }, [jobs])
+
   const filteredJobs = useMemo(() => {
-    if (!searchTerm) return jobs
+    if (!searchTerm) return jobItems
     const term = searchTerm.toLowerCase()
-    return jobs.filter(
+
+    return jobItems.filter(
       (job) =>
         job.title.toLowerCase().includes(term) ||
         job.category?.name.toLowerCase().includes(term) ||
         job.workLocation?.toLowerCase().includes(term) ||
         job.salary?.toLowerCase().includes(term)
     )
-  }, [jobs, searchTerm])
+  }, [jobItems, searchTerm])
 
   const handleViewJob = (job: EmployerJobItem) => {
     setSelectedJob(job)
     setIsModalOpen(true)
+    setOpenActionJobId(null)
   }
 
   const handleCloseModal = () => {
@@ -41,7 +52,53 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
     setSelectedJob(null)
   }
 
-  if (jobs.length === 0) {
+  const handleEditJob = (job: EmployerJobItem) => {
+    setOpenActionJobId(null)
+    navigate(`/employer/jobs/${job.id}/edit`, { state: { job } })
+  }
+
+  const toggleActionMenu = (jobId: number) => {
+    setOpenActionJobId((currentId) => (currentId === jobId ? null : jobId))
+  }
+
+  const handleDeleteJob = async (job: EmployerJobItem) => {
+    const confirmed = window.confirm(
+      t('employer.jobs.delete.confirm', {
+        defaultValue: `Bạn có chắc muốn xóa tin tuyển dụng "${job.title}" không?`,
+        title: job.title
+      })
+    )
+
+    if (!confirmed) return
+
+    setIsDeletingJobId(job.id)
+    setOpenActionJobId(null)
+
+    try {
+      await deleteEmployerJobApi(job.id)
+      setJobItems((currentJobs) => currentJobs.filter((item) => item.id !== job.id))
+
+      if (selectedJob?.id === job.id) {
+        handleCloseModal()
+      }
+    } catch (error) {
+      const message =
+        error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+
+      window.alert(
+        message ||
+          t('employer.jobs.delete.failed', {
+            defaultValue: 'Không thể xóa việc làm lúc này.'
+          })
+      )
+    } finally {
+      setIsDeletingJobId(null)
+    }
+  }
+
+  if (jobItems.length === 0) {
     return (
       <EmployerEmptyState
         title={t('employer.jobs.empty.noJobsTitle')}
@@ -58,7 +115,7 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
           <Input
             placeholder={t('employer.jobs.filters.searchPlaceholder')}
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(event) => setSearchTerm(event.target.value)}
             className='rounded-lg pl-10'
           />
         </div>
@@ -72,61 +129,83 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
           <>
             <div className='grid min-w-0 gap-4 lg:hidden'>
               {filteredJobs.map((job) => (
-                <article key={job.id} className='min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/8 dark:bg-white/5'>
+                <article
+                  key={job.id}
+                  role='button'
+                  tabIndex={0}
+                  onClick={() => handleViewJob(job)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      handleViewJob(job)
+                    }
+                  }}
+                  className='min-w-0 cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-sky-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 dark:border-white/8 dark:bg-white/5'
+                >
                   <div className='flex items-start justify-between gap-3'>
                     <div className='min-w-0'>
                       <p className='break-words font-semibold text-slate-950 dark:text-white'>{job.title}</p>
                       <p className='mt-1 break-words text-sm text-slate-500 dark:text-slate-400'>{job.jobType?.job_type || '-'}</p>
                     </div>
-                    <span
-                      className={`inline-flex shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
-                        job.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
-                      }`}
-                    >
-                      {job.isActive ? t('employer.statuses.OPEN') : t('employer.statuses.PAUSED')}
-                    </span>
+
+                    <div className='relative flex shrink-0 items-start gap-2'>
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                          job.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {job.isActive ? t('employer.statuses.OPEN') : t('employer.statuses.PAUSED')}
+                      </span>
+                      <button
+                        type='button'
+                        aria-label={t('employer.jobs.table.action')}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          toggleActionMenu(job.id)
+                        }}
+                        className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700'
+                      >
+                        <MoreHorizontal className='h-4 w-4' />
+                      </button>
+
+                      {openActionJobId === job.id ? (
+                        <ActionMenu
+                          isDeleting={isDeletingJobId === job.id}
+                          editLabel={t('employer.actions.edit')}
+                          deleteLabel={t('employer.actions.delete', { defaultValue: 'Xóa' })}
+                          deletingLabel={t('employer.jobs.delete.deleting', { defaultValue: 'Đang xóa...' })}
+                          onEdit={(event) => {
+                            event.stopPropagation()
+                            handleEditJob(job)
+                          }}
+                          onDelete={(event) => {
+                            event.stopPropagation()
+                            void handleDeleteJob(job)
+                          }}
+                        />
+                      ) : null}
+                    </div>
                   </div>
 
                   <div className='mt-4 grid gap-3 sm:grid-cols-2'>
-                    <div>
-                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.jobs.table.category')}</p>
-                      <p className='mt-1 break-words text-sm text-slate-700 dark:text-slate-300'>{job.category?.name || '-'}</p>
-                    </div>
-                    <div>
-                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.jobs.table.location')}</p>
-                      <p className='mt-1 break-words text-sm text-slate-700 dark:text-slate-300'>{job.workLocation || '-'}</p>
-                    </div>
-                    <div>
-                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.jobs.table.salary')}</p>
-                      <p className='mt-1 break-words text-sm font-medium text-violet-700 dark:text-violet-300'>{job.salary || '-'}</p>
-                    </div>
+                    <InfoCell label={t('employer.jobs.table.category')} value={job.category?.name || '-'} />
+                    <InfoCell label={t('employer.jobs.table.location')} value={job.workLocation || '-'} />
+                    <InfoCell label={t('employer.jobs.table.salary')} value={job.salary || '-'} accent />
                     <div>
                       <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.jobs.table.applicants')}</p>
                       <span className='mt-1 inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700'>
                         {job.applicantCount}
                       </span>
                     </div>
-                    <div>
-                      <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{t('employer.jobs.table.updated')}</p>
-                      <p className='mt-1 text-sm text-slate-700 dark:text-slate-300'>
-                        {new Date(job.updatedDate).toLocaleDateString(locale, {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit'
-                        })}
-                      </p>
-                    </div>
+                    <InfoCell
+                      label={t('employer.jobs.table.updated')}
+                      value={new Date(job.updatedDate).toLocaleDateString(locale, {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                      })}
+                    />
                   </div>
-
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className='mt-4 w-full rounded-lg'
-                    onClick={() => handleViewJob(job)}
-                  >
-                    <Eye className='h-4 w-4' />
-                    {t('employer.actions.view')}
-                  </Button>
                 </article>
               ))}
             </div>
@@ -147,7 +226,11 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
                 </thead>
                 <tbody>
                   {filteredJobs.map((job) => (
-                    <tr key={job.id} className='border-b border-slate-100 transition hover:bg-slate-50/50 dark:border-white/8 dark:hover:bg-white/5'>
+                    <tr
+                      key={job.id}
+                      onClick={() => handleViewJob(job)}
+                      className='cursor-pointer border-b border-slate-100 transition hover:bg-slate-50/50 dark:border-white/8 dark:hover:bg-white/5'
+                    >
                       <td className='max-w-[16rem] px-4 py-4'>
                         <p className='truncate font-semibold text-slate-950 dark:text-white'>{job.title}</p>
                         <p className='mt-1 truncate text-xs text-slate-500 dark:text-slate-400'>{job.jobType?.job_type}</p>
@@ -179,10 +262,36 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
                         })}
                       </td>
                       <td className='px-4 py-4 text-right'>
-                        <Button variant='outline' size='sm' className='rounded-lg' onClick={() => handleViewJob(job)}>
-                          <Eye className='h-4 w-4' />
-                          {t('employer.actions.view')}
-                        </Button>
+                        <div className='relative flex justify-end'>
+                          <button
+                            type='button'
+                            aria-label={t('employer.jobs.table.action')}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              toggleActionMenu(job.id)
+                            }}
+                            className='inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700'
+                          >
+                            <MoreHorizontal className='h-4 w-4' />
+                          </button>
+
+                          {openActionJobId === job.id ? (
+                            <ActionMenu
+                              isDeleting={isDeletingJobId === job.id}
+                              editLabel={t('employer.actions.edit')}
+                              deleteLabel={t('employer.actions.delete', { defaultValue: 'Xóa' })}
+                              deletingLabel={t('employer.jobs.delete.deleting', { defaultValue: 'Đang xóa...' })}
+                              onEdit={(event) => {
+                                event.stopPropagation()
+                                handleEditJob(job)
+                              }}
+                              onDelete={(event) => {
+                                event.stopPropagation()
+                                void handleDeleteJob(job)
+                              }}
+                            />
+                          ) : null}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -193,9 +302,52 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
         )}
       </div>
 
-      {selectedJob && <ViewJobModal job={selectedJob} isOpen={isModalOpen} onClose={handleCloseModal} />}
+      {selectedJob ? <ViewJobModal job={selectedJob} isOpen={isModalOpen} onClose={handleCloseModal} /> : null}
     </>
   )
 }
+
+const InfoCell = ({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) => (
+  <div>
+    <p className='text-xs font-medium uppercase tracking-[0.12em] text-slate-400'>{label}</p>
+    <p className={`mt-1 break-words text-sm ${accent ? 'font-medium text-violet-700 dark:text-violet-300' : 'text-slate-700 dark:text-slate-300'}`}>{value}</p>
+  </div>
+)
+
+const ActionMenu = ({
+  isDeleting,
+  editLabel,
+  deleteLabel,
+  deletingLabel,
+  onEdit,
+  onDelete
+}: {
+  isDeleting: boolean
+  editLabel: string
+  deleteLabel: string
+  deletingLabel: string
+  onEdit: (event: React.MouseEvent<HTMLButtonElement>) => void
+  onDelete: (event: React.MouseEvent<HTMLButtonElement>) => void
+}) => (
+  <div className='absolute right-0 top-11 z-20 w-40 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl'>
+    <button
+      type='button'
+      onClick={onEdit}
+      className='flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50'
+    >
+      <Pencil className='h-4 w-4' />
+      {editLabel}
+    </button>
+    <button
+      type='button'
+      disabled={isDeleting}
+      onClick={onDelete}
+      className='flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-rose-600 transition hover:bg-rose-50 disabled:opacity-60'
+    >
+      <Trash2 className='h-4 w-4' />
+      {isDeleting ? deletingLabel : deleteLabel}
+    </button>
+  </div>
+)
 
 export default EmployerJobList

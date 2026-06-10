@@ -29,6 +29,19 @@ const getDuration = (date: string, startTime: string, endTime: string) => {
   return Number.isFinite(diffMinutes) && diffMinutes > 0 ? diffMinutes : 60
 }
 
+const isInterviewEligibleCandidate = (candidate: EmployerCandidateItem) => {
+  const normalizedStatus = candidate.status?.toUpperCase()
+  const normalizedStage = candidate.stage?.toUpperCase()
+
+  return (
+    normalizedStatus === 'PASSED' ||
+    normalizedStatus === 'ACCEPTED' ||
+    normalizedStage === 'PASSED' ||
+    normalizedStage === 'ACCEPTED' ||
+    normalizedStage === 'APPLICATION_ACCEPTED'
+  )
+}
+
 const CreateInterviewScheduleForm = ({ onClose }: CreateInterviewScheduleFormProps) => {
   const { t } = useTranslation()
   const [candidates, setCandidates] = useState<EmployerCandidateItem[]>([])
@@ -72,6 +85,10 @@ const CreateInterviewScheduleForm = ({ onClose }: CreateInterviewScheduleFormPro
   const selectedCandidate = useMemo(
     () => candidates.find((candidate) => String(candidate.applicationId) === formData.applicationId) ?? null,
     [candidates, formData.applicationId]
+  )
+  const eligibleCandidates = useMemo(
+    () => candidates.filter(isInterviewEligibleCandidate),
+    [candidates]
   )
 
   const validateForm = () => {
@@ -148,13 +165,20 @@ const CreateInterviewScheduleForm = ({ onClose }: CreateInterviewScheduleFormPro
               className='w-full min-w-0 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-white/8 dark:bg-white/5 dark:text-slate-100'
             >
               <option value=''>{t('employer.interviews.create.chooseCandidate')}</option>
-              {candidates.map((candidate) => (
+              {eligibleCandidates.map((candidate) => (
                 <option key={candidate.applicationId} value={candidate.applicationId}>
                   {candidate.seeker.fullName || candidate.seeker.email || t('employer.interviews.table.candidate')} - {candidate.job.title}
                 </option>
               ))}
             </select>
             {errors.applicationId && <p className='mt-1 text-xs text-red-500'>{errors.applicationId}</p>}
+            {!loadError && eligibleCandidates.length === 0 ? (
+              <p className='mt-1 text-xs text-slate-500'>
+                {t('employer.interviews.create.noEligibleCandidates', {
+                  defaultValue: 'Chỉ những ứng viên đã được duyệt mới có thể tạo lịch phỏng vấn.'
+                })}
+              </p>
+            ) : null}
           </div>
           <div className='min-w-0'>
             <label className='mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300'>{t('employer.interviews.create.jobPosition')}</label>

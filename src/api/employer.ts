@@ -252,6 +252,38 @@ export const getEmployerJobsApi = async (_page = 1, limit = 10): Promise<Employe
   return getCompanyJobsWithDetails(profile.company.company_id, limit)
 }
 
+export const getEmployerJobDetailApi = async (jobId: number): Promise<EmployerJobItem> => {
+  const response = await axiosInstance.get<JobDetailApiResponse>(`/jobs/${jobId}`)
+  const detail = response.data
+
+  return {
+    id: detail.id,
+    title: detail.title,
+    description: detail.description ?? null,
+    requirements: Array.isArray(detail.requirements) ? detail.requirements.join('\n') : (detail.requirements ?? null),
+    salary: detail.salary ?? null,
+    workLocation: detail.workLocation ?? null,
+    level: detail.level ?? null,
+    experience: detail.experience ?? null,
+    isActive: detail.isActive ?? true,
+    createdDate: detail.createdDate ?? new Date().toISOString(),
+    updatedDate: detail.updatedDate ?? detail.createdDate ?? new Date().toISOString(),
+    applicantCount: 0,
+    category: detail.category
+      ? {
+          category_id: detail.category.category_id,
+          name: detail.category.name
+        }
+      : null,
+    jobType: detail.jobType
+      ? {
+          job_type_id: detail.jobType.job_type_id,
+          job_type: detail.jobType.job_type
+        }
+      : null
+  }
+}
+
 export const getEmployerCandidatesApi = async (_page = 1, limit = 100): Promise<EmployerCandidatesResponse> => {
   const profile = await requireEmployerProfile()
   const { jobs } = await getCompanyJobsWithDetails(profile.company.company_id, limit)

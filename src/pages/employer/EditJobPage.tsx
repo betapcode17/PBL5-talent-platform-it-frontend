@@ -1,14 +1,15 @@
 import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 
+import { getEmployerJobDetailApi } from '@/api/employer'
 import type { EmployerJobItem } from '@/@types/employer'
 import CreateJobForm from '@/components/employer/CreateJobForm'
 import EmployerEmptyState from '@/components/employer/EmployerEmptyState'
 import EmployerPageHeader from '@/components/employer/EmployerPageHeader'
 import EmployerSectionCard from '@/components/employer/EmployerSectionCard'
 import { Button } from '@/components/ui/button'
-import { useEmployerJobs } from '@/hooks/useEmployerData'
 
 const EditJobPage = () => {
   const { t } = useTranslation()
@@ -16,8 +17,38 @@ const EditJobPage = () => {
   const params = useParams()
   const jobId = Number(params.id)
   const locationJob = (location.state as { job?: EmployerJobItem } | null)?.job ?? null
-  const { data, isLoading } = useEmployerJobs(1, 100)
-  const job = locationJob ?? data?.jobs.find((item) => item.id === jobId) ?? null
+  const [job, setJob] = useState<EmployerJobItem | null>(locationJob)
+  const [isLoading, setIsLoading] = useState(!locationJob)
+
+  useEffect(() => {
+    if (locationJob || !Number.isFinite(jobId) || jobId <= 0) {
+      return
+    }
+
+    let isMounted = true
+
+    const loadJob = async () => {
+      try {
+        setIsLoading(true)
+        const detail = await getEmployerJobDetailApi(jobId)
+        if (!isMounted) return
+        setJob(detail)
+      } catch {
+        if (!isMounted) return
+        setJob(null)
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void loadJob()
+
+    return () => {
+      isMounted = false
+    }
+  }, [jobId, locationJob])
 
   return (
     <div className='min-w-0 space-y-6'>

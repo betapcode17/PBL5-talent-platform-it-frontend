@@ -26,6 +26,21 @@ type Option = {
   name: string
 }
 
+const getApiErrorMessage = (error: unknown) => {
+  if (!error || typeof error !== 'object' || !('response' in error)) {
+    return null
+  }
+
+  const data = (error as { response?: { data?: { message?: string | string[] } } }).response?.data
+  const message = data?.message
+
+  if (Array.isArray(message)) {
+    return message.join(', ')
+  }
+
+  return typeof message === 'string' ? message : null
+}
+
 const parseSalary = (value: string) => {
   const numbers = value.match(/\d+/g)?.map(Number) ?? []
   const min = numbers[0] ?? 0
@@ -143,7 +158,6 @@ const CreateJobForm = ({ onClose, mode = 'create', initialJob = null }: CreateJo
         description: [form.description, form.workLocation ? `${t('employer.jobs.table.location')}: ${form.workLocation}` : null].filter(Boolean).join('\n\n'),
         categoryId: Number(form.categoryId),
         jobTypeId: Number(form.jobTypeId),
-        companyId,
         salaryRange,
         requirements: requirements.length > 0 ? requirements : [t('employer.jobs.create.fallbackRequirement')]
       }
@@ -151,16 +165,16 @@ const CreateJobForm = ({ onClose, mode = 'create', initialJob = null }: CreateJo
       if (isEditMode && initialJob) {
         await updateEmployerJobApi(initialJob.id, payload)
       } else {
-        await createEmployerJobApi(payload)
+        await createEmployerJobApi({
+          ...payload,
+          companyId
+        })
       }
 
       onClose?.()
       navigate('/employer/jobs')
     } catch (submitError) {
-      const message =
-        submitError && typeof submitError === 'object' && 'response' in submitError
-          ? (submitError as { response?: { data?: { message?: string } } }).response?.data?.message
-          : null
+      const message = getApiErrorMessage(submitError)
       setError(message || t('employer.jobs.create.submitError'))
     } finally {
       setIsSubmitting(false)

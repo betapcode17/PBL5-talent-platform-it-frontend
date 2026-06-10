@@ -13,6 +13,11 @@ type EmployerJobListProps = {
   jobs: EmployerJobItem[]
 }
 
+type DeleteDialogState = {
+  job: EmployerJobItem
+  errorMessage: string | null
+}
+
 const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
   const { i18n, t } = useTranslation()
   const navigate = useNavigate()
@@ -22,6 +27,7 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeletingJobId, setIsDeletingJobId] = useState<number | null>(null)
   const [openActionJobId, setOpenActionJobId] = useState<number | null>(null)
+  const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState | null>(null)
   const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
 
   useEffect(() => {
@@ -61,22 +67,24 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
     setOpenActionJobId((currentId) => (currentId === jobId ? null : jobId))
   }
 
-  const handleDeleteJob = async (job: EmployerJobItem) => {
-    const confirmed = window.confirm(
-      t('employer.jobs.delete.confirm', {
-        defaultValue: `Bạn có chắc muốn xóa tin tuyển dụng "${job.title}" không?`,
-        title: job.title
-      })
-    )
-
-    if (!confirmed) return
-
-    setIsDeletingJobId(job.id)
+  const handleRequestDeleteJob = (job: EmployerJobItem) => {
+    setDeleteDialog({
+      job,
+      errorMessage: null
+    })
     setOpenActionJobId(null)
+  }
+
+  const handleConfirmDeleteJob = async () => {
+    if (!deleteDialog) return
+
+    const { job } = deleteDialog
+    setIsDeletingJobId(job.id)
 
     try {
       await deleteEmployerJobApi(job.id)
       setJobItems((currentJobs) => currentJobs.filter((item) => item.id !== job.id))
+      setDeleteDialog(null)
 
       if (selectedJob?.id === job.id) {
         handleCloseModal()
@@ -87,11 +95,17 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
           ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
           : null
 
-      window.alert(
-        message ||
-          t('employer.jobs.delete.failed', {
-            defaultValue: 'Không thể xóa việc làm lúc này.'
-          })
+      setDeleteDialog((currentState) =>
+        currentState
+          ? {
+              ...currentState,
+              errorMessage:
+                message ||
+                t('employer.jobs.delete.failed', {
+                  defaultValue: 'Không thể xóa việc làm lúc này.'
+                })
+            }
+          : null
       )
     } finally {
       setIsDeletingJobId(null)
@@ -180,7 +194,7 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
                           }}
                           onDelete={(event) => {
                             event.stopPropagation()
-                            void handleDeleteJob(job)
+                            handleRequestDeleteJob(job)
                           }}
                         />
                       ) : null}
@@ -287,7 +301,7 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
                               }}
                               onDelete={(event) => {
                                 event.stopPropagation()
-                                void handleDeleteJob(job)
+                                handleRequestDeleteJob(job)
                               }}
                             />
                           ) : null}
@@ -303,6 +317,28 @@ const EmployerJobList = ({ jobs }: EmployerJobListProps) => {
       </div>
 
       {selectedJob ? <ViewJobModal job={selectedJob} isOpen={isModalOpen} onClose={handleCloseModal} /> : null}
+      {deleteDialog ? (
+        <DeleteJobDialog
+          title={t('employer.jobs.delete.confirm', {
+            defaultValue: `Bạn có chắc muốn xóa tin tuyển dụng "${deleteDialog.job.title}" không?`,
+            title: deleteDialog.job.title
+          })}
+          description={t('employer.jobs.delete.description', {
+            defaultValue: 'Thao tác này sẽ ẩn tin tuyển dụng và ảnh hưởng đến các hồ sơ đang chờ xử lý.'
+          })}
+          errorMessage={deleteDialog.errorMessage}
+          isDeleting={isDeletingJobId === deleteDialog.job.id}
+          cancelLabel={t('employer.actions.cancel')}
+          confirmLabel={t('employer.actions.delete', { defaultValue: 'Xóa' })}
+          deletingLabel={t('employer.jobs.delete.deleting', { defaultValue: 'Đang xóa...' })}
+          onClose={() => {
+            if (isDeletingJobId !== deleteDialog.job.id) {
+              setDeleteDialog(null)
+            }
+          }}
+          onConfirm={() => void handleConfirmDeleteJob()}
+        />
+      ) : null}
     </>
   )
 }
@@ -347,6 +383,60 @@ const ActionMenu = ({
       <Trash2 className='h-4 w-4' />
       {isDeleting ? deletingLabel : deleteLabel}
     </button>
+  </div>
+)
+
+const DeleteJobDialog = ({
+  title,
+  description,
+  errorMessage,
+  isDeleting,
+  cancelLabel,
+  confirmLabel,
+  deletingLabel,
+  onClose,
+  onConfirm
+}: {
+  title: string
+  description: string
+  errorMessage: string | null
+  isDeleting: boolean
+  cancelLabel: string
+  confirmLabel: string
+  deletingLabel: string
+  onClose: () => void
+  onConfirm: () => void
+}) => (
+  <div className='fixed inset-0 z-[60] flex items-center justify-center p-4'>
+    <button type='button' className='absolute inset-0 bg-slate-950/35 backdrop-blur-[2px]' onClick={onClose} />
+    <div className='relative w-full max-w-md rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_30px_90px_rgba(15,23,42,0.22)]'>
+      <div className='inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-rose-600'>
+        Delete job
+      </div>
+      <h3 className='mt-4 text-xl font-semibold text-slate-950'>{title}</h3>
+      <p className='mt-2 text-sm leading-6 text-slate-600'>{description}</p>
+      {errorMessage ? (
+        <div className='mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700'>{errorMessage}</div>
+      ) : null}
+      <div className='mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end'>
+        <button
+          type='button'
+          onClick={onClose}
+          disabled={isDeleting}
+          className='inline-flex h-11 items-center justify-center rounded-2xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60'
+        >
+          {cancelLabel}
+        </button>
+        <button
+          type='button'
+          onClick={onConfirm}
+          disabled={isDeleting}
+          className='inline-flex h-11 items-center justify-center rounded-2xl bg-rose-600 px-4 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(225,29,72,0.24)] transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60'
+        >
+          {isDeleting ? deletingLabel : confirmLabel}
+        </button>
+      </div>
+    </div>
   </div>
 )
 

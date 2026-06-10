@@ -28,10 +28,12 @@ interface ChatState {
   streamStatus: string | null
   deletingConversationId: string | null
   isWidgetOpen: boolean
+  isToggleDismissed: boolean
   isFullScreen: boolean
   chatMode: ChatMode
   error: string | null
   setWidgetOpen: (open: boolean) => void
+  setToggleDismissed: (dismissed: boolean) => void
   toggleWidget: () => void
   setFullScreen: (full: boolean) => void
   setChatMode: (mode: ChatMode) => Promise<void>
@@ -181,11 +183,13 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
   streamStatus: null,
   deletingConversationId: null,
   isWidgetOpen: false,
+  isToggleDismissed: false,
   isFullScreen: false,
   chatMode: 'jobs',
   error: null,
 
   setWidgetOpen: (open) => set({ isWidgetOpen: open }),
+  setToggleDismissed: (dismissed) => set({ isToggleDismissed: dismissed }),
   toggleWidget: () => set((s) => ({ isWidgetOpen: !s.isWidgetOpen })),
   setFullScreen: (full) => set({ isFullScreen: full }),
   setChatMode: async (mode) => {

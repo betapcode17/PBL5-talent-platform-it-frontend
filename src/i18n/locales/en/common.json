@@ -282,6 +282,7 @@
     "sidebar": {
       "overview": "Overview",
       "jobs": "Jobs",
+      "resumeFilter": "AI resume filter",
       "candidates": "Candidates",
       "interviews": "Interviews",
       "company": "Company info",

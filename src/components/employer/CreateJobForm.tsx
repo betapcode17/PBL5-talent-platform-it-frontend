@@ -95,7 +95,10 @@ const CreateJobForm = ({ onClose, mode = 'create', initialJob = null }: CreateJo
           description: current.description || extractDescriptionContent(initialJob?.description) || '',
           workLocation: current.workLocation || initialJob?.workLocation || extractLocationFromDescription(initialJob?.description) || '',
           salary: current.salary || initialJob?.salary || '',
-          requirements: current.requirements || initialJob?.requirements || '',
+          requirements:
+            current.requirements ||
+            (Array.isArray(initialJob?.requirements) ? initialJob.requirements.join('\n') : initialJob?.requirements) ||
+            '',
           categoryId: current.categoryId || initialCategoryId || String(categoryOptions[0]?.id ?? ''),
           jobTypeId: current.jobTypeId || initialJobTypeId || String(jobTypeOptions[0]?.id ?? ''),
         }))

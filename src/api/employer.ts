@@ -1,13 +1,17 @@
 import axiosInstance from '@/api/axiosInstance'
 import { getMeApi } from '@/api/auth'
 import type {
+  AiScreeningQueuedResponse,
+  AiScreeningRunResponse,
   EmployerCandidatesResponse,
   EmployerDashboardResponse,
   EmployerInterviewItem,
   EmployerInterviewsResponse,
+  EmployerJobApplicationsResponse,
   EmployerJobItem,
   EmployerJobsResponse,
-  EmployerProfileResponse
+  EmployerProfileResponse,
+  RunAiScreeningInput
 } from '@/@types/employer'
 import type { CompanyJobsResponse, JobDetailApiResponse } from '@/types/job-detail'
 
@@ -257,6 +261,42 @@ export const getEmployerCandidatesApi = async (_page = 1, limit = 100): Promise<
     total: candidates.length,
     candidates
   }
+}
+
+export const getEmployerJobApplicationsApi = async (
+  jobPostId: number,
+  page = 1,
+  limit = 100,
+  status?: string
+): Promise<EmployerJobApplicationsResponse> => {
+  const response = await axiosInstance.get<EmployerJobApplicationsResponse>(`/applications/job/${jobPostId}`, {
+    params: {
+      page,
+      limit,
+      ...(status ? { status } : {})
+    }
+  })
+  return response.data
+}
+
+export const runEmployerAiScreeningApi = async (
+  jobId: number,
+  data: RunAiScreeningInput
+): Promise<AiScreeningQueuedResponse> => {
+  const response = await axiosInstance.post<AiScreeningQueuedResponse>(`/employees/me/jobs/${jobId}/ai-screening`, data)
+  return response.data
+}
+
+export const getEmployerAiScreeningRunApi = async (runId: number): Promise<AiScreeningRunResponse> => {
+  const response = await axiosInstance.get<AiScreeningRunResponse>(`/employees/me/ai-screening-runs/${runId}`)
+  return response.data
+}
+
+export const getEmployerActiveAiScreeningRunApi = async (jobId?: number): Promise<AiScreeningRunResponse | null> => {
+  const response = await axiosInstance.get<AiScreeningRunResponse | null>(
+    jobId ? `/employees/me/jobs/${jobId}/ai-screening/active` : '/employees/me/ai-screening-runs/active'
+  )
+  return response.data
 }
 
 export const getEmployerInterviewsApi = async (page = 1, limit = 20): Promise<EmployerInterviewsResponse> => {

@@ -26,6 +26,13 @@ const formatDate = (value?: string | null) => {
   return date.toLocaleString('vi-VN')
 }
 
+const statusLabel = (status: StatusFilter | AdminEmployerRegistrationRequestListItem['status']) => {
+  if (status === 'PENDING') return 'Chờ duyệt'
+  if (status === 'APPROVED') return 'Đã duyệt'
+  if (status === 'REJECTED') return 'Đã từ chối'
+  return 'Tất cả'
+}
+
 const EmployerRegistrationRequestsPage = () => {
   const pageSize = 10
   const [search, setSearch] = useState('')
@@ -86,7 +93,7 @@ const EmployerRegistrationRequestsPage = () => {
       setRequests([])
       setStatusCounts(emptyStatusCounts)
       setRoleCounts([])
-      setError('Khong the tai danh sach yeu cau dang ky nha tuyen dung.')
+      setError('Không thể tải danh sách yêu cầu đăng ký nhà tuyển dụng.')
     } finally {
       setIsLoading(false)
     }
@@ -107,37 +114,37 @@ const EmployerRegistrationRequestsPage = () => {
   }, [selectedRequest])
 
   const rowsText = useMemo(() => {
-    if (isLoading) return 'Dang tai du lieu...'
+    if (isLoading) return 'Đang tải dữ liệu...'
     if (error) return error
-    if (total === 0) return 'Chua co yeu cau dang ky nao.'
+    if (total === 0) return 'Chưa có yêu cầu đăng ký nào.'
     const fromRecord = (page - 1) * pageSize + 1
     const toRecord = Math.min(page * pageSize, total)
-    return `Hien thi ${fromRecord}-${toRecord} tren ${total} yeu cau`
+    return `Hiển thị ${fromRecord}-${toRecord} trên ${total} yêu cầu`
   }, [error, isLoading, page, pageSize, total])
 
   const summaryCards = useMemo(
     () => [
       {
         key: 'total',
-        label: 'Tong yeu cau',
+        label: 'Tổng yêu cầu',
         value: statusCounts.total,
         tone: 'text-slate-900 dark:text-white'
       },
       {
         key: 'pending',
-        label: 'Cho duyet',
+        label: 'Chờ duyệt',
         value: statusCounts.pending,
         tone: 'text-amber-600 dark:text-amber-300'
       },
       {
         key: 'approved',
-        label: 'Da duyet',
+        label: 'Đã duyệt',
         value: statusCounts.approved,
         tone: 'text-emerald-600 dark:text-emerald-300'
       },
       {
         key: 'rejected',
-        label: 'Da tu choi',
+        label: 'Đã từ chối',
         value: statusCounts.rejected,
         tone: 'text-rose-600 dark:text-rose-300'
       }
@@ -179,8 +186,8 @@ const EmployerRegistrationRequestsPage = () => {
 
   return (
     <AdminShell
-      title='Duyet dang ky nha tuyen dung'
-      subtitle='Admin phe duyet yeu cau moi. Moi yeu cau duoc phe duyet se tao moi cong ty va tai khoan employee.'
+      title='Duyệt đăng ký nhà tuyển dụng'
+      subtitle='Admin phê duyệt yêu cầu mới. Mỗi yêu cầu được phê duyệt sẽ tạo mới công ty và tài khoản employee.'
     >
       <section className='space-y-5'>
         <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4'>
@@ -205,7 +212,7 @@ const EmployerRegistrationRequestsPage = () => {
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder='Tim theo ten nguoi dang ky, email, cong ty...'
+                placeholder='Tìm theo tên người đăng ký, email, công ty...'
                 className='h-10 max-w-md border-slate-200 bg-white dark:border-white/10 dark:bg-white/5'
               />
               <Button
@@ -217,17 +224,17 @@ const EmployerRegistrationRequestsPage = () => {
                 }}
               >
                 <RefreshCw className='size-4' />
-                Lam moi
+                Làm mới
               </Button>
             </div>
 
             <div className='mt-3 flex flex-wrap gap-2'>
               {(
                 [
-                  ['all', 'Tat ca'],
-                  ['PENDING', 'Cho duyet'],
-                  ['APPROVED', 'Da duyet'],
-                  ['REJECTED', 'Da tu choi']
+                  ['all', 'Tất cả'],
+                  ['PENDING', 'Chờ duyệt'],
+                  ['APPROVED', 'Đã duyệt'],
+                  ['REJECTED', 'Đã từ chối']
                 ] as const
               ).map(([value, label]) => (
                 <button
@@ -251,7 +258,7 @@ const EmployerRegistrationRequestsPage = () => {
 
             <div className='mt-3 flex flex-wrap items-center gap-2'>
               <span className='text-xs font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400'>
-                Loc theo vai tro
+                Lọc theo vai trò
               </span>
               <button
                 type='button'
@@ -266,7 +273,7 @@ const EmployerRegistrationRequestsPage = () => {
                     : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-white/5 dark:text-slate-300'
                 )}
               >
-                Tat ca
+                Tất cả
               </button>
               {roleCounts.map((item) => (
                 <button
@@ -294,12 +301,12 @@ const EmployerRegistrationRequestsPage = () => {
               <table className='w-full min-w-230 border-separate border-spacing-0'>
                 <thead>
                   <tr className='text-left text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400'>
-                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Nguoi dang ky</th>
-                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Cong ty</th>
-                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Vai tro</th>
-                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Trang thai</th>
-                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Tao luc</th>
-                    <th className='border-b border-slate-200 pb-3 text-right dark:border-white/10'>Thao tac</th>
+                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Người đăng ký</th>
+                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Công ty</th>
+                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Vai trò</th>
+                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Trạng thái</th>
+                    <th className='border-b border-slate-200 pb-3 dark:border-white/10'>Tạo lúc</th>
+                    <th className='border-b border-slate-200 pb-3 text-right dark:border-white/10'>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -310,7 +317,7 @@ const EmployerRegistrationRequestsPage = () => {
                         <p className='text-xs text-slate-500 dark:text-slate-400'>{request.email}</p>
                         <p className='text-xs text-slate-500 dark:text-slate-400'>{request.phone}</p>
                         <p className='mt-1 text-xs font-semibold text-slate-600 dark:text-slate-300'>
-                          Joined: {formatDate(request.joinedDate)}
+                          Ngày vào làm: {formatDate(request.joinedDate)}
                         </p>
                       </td>
                       <td className='border-b border-slate-200/80 py-3 dark:border-white/10'>
@@ -334,7 +341,7 @@ const EmployerRegistrationRequestsPage = () => {
                                 : 'bg-rose-500/15 text-rose-700 dark:text-rose-300'
                           )}
                         >
-                          {request.status}
+                          {statusLabel(request.status)}
                         </span>
                       </td>
                       <td className='border-b border-slate-200/80 py-3 text-sm text-slate-600 dark:border-white/10 dark:text-slate-300'>
@@ -343,7 +350,7 @@ const EmployerRegistrationRequestsPage = () => {
                       <td className='border-b border-slate-200/80 py-3 text-right dark:border-white/10'>
                         <Button variant='outline' size='sm' onClick={() => setSelectedRequest(request)}>
                           <Eye className='size-4' />
-                          Chi tiet
+                          Chi tiết
                         </Button>
                       </td>
                     </tr>
@@ -364,7 +371,7 @@ const EmployerRegistrationRequestsPage = () => {
                   disabled={isLoading || page <= 1}
                   onClick={() => setPage((current) => Math.max(1, current - 1))}
                 >
-                  Truoc
+                  Trước
                 </Button>
 
                 {visiblePages.map((item) => (
@@ -400,7 +407,7 @@ const EmployerRegistrationRequestsPage = () => {
           {selectedRequest ? (
             <>
               <div className='rounded-2xl border border-white/10 bg-white/4 p-4'>
-                <p className='text-sm text-slate-400'>Nguoi dang ky</p>
+                <p className='text-sm text-slate-400'>Người đăng ký</p>
                 <p className='text-base font-bold text-white'>{selectedRequest.fullName}</p>
                 <p className='mt-1 text-sm text-slate-300'>{selectedRequest.email}</p>
                 <p className='mt-1 text-sm text-slate-300'>{selectedRequest.phone}</p>
@@ -408,11 +415,11 @@ const EmployerRegistrationRequestsPage = () => {
 
               <dl className='mt-4 space-y-3 text-sm'>
                 <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
-                  <dt className='text-slate-400'>Cong ty</dt>
+                  <dt className='text-slate-400'>Công ty</dt>
                   <dd className='font-semibold text-white'>{selectedRequest.companyName}</dd>
                 </div>
                 <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
-                  <dt className='text-slate-400'>Dia chi</dt>
+                  <dt className='text-slate-400'>Địa chỉ</dt>
                   <dd className='text-right font-semibold text-white'>{selectedRequest.companyAddress}</dd>
                 </div>
                 <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
@@ -420,46 +427,46 @@ const EmployerRegistrationRequestsPage = () => {
                   <dd className='truncate font-semibold text-white'>{selectedRequest.companyWebsiteUrl || 'N/A'}</dd>
                 </div>
                 <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
-                  <dt className='text-slate-400'>Vai tro dang ky</dt>
+                  <dt className='text-slate-400'>Vai trò đăng ký</dt>
                   <dd className='font-semibold text-white'>{selectedRequest.role}</dd>
                 </div>
                 <div className='flex justify-between gap-4 border-b border-white/10 pb-3'>
-                  <dt className='text-slate-400'>Ngay vao lam</dt>
+                  <dt className='text-slate-400'>Ngày vào làm</dt>
                   <dd className='font-semibold text-white'>{formatDate(selectedRequest.joinedDate)}</dd>
                 </div>
                 <div className='flex justify-between gap-4'>
-                  <dt className='text-slate-400'>Trang thai</dt>
-                  <dd className='font-semibold text-white'>{selectedRequest.status}</dd>
+                  <dt className='text-slate-400'>Trạng thái</dt>
+                  <dd className='font-semibold text-white'>{statusLabel(selectedRequest.status)}</dd>
                 </div>
                 <div className='flex justify-between gap-4 border-t border-white/10 pt-3'>
-                  <dt className='text-slate-400'>Tao luc</dt>
+                  <dt className='text-slate-400'>Tạo lúc</dt>
                   <dd className='font-semibold text-white'>{formatDate(selectedRequest.createdDate)}</dd>
                 </div>
                 <div className='flex justify-between gap-4'>
-                  <dt className='text-slate-400'>Cap nhat luc</dt>
+                  <dt className='text-slate-400'>Cập nhật lúc</dt>
                   <dd className='font-semibold text-white'>{formatDate(selectedRequest.updatedDate)}</dd>
                 </div>
                 <div className='flex justify-between gap-4'>
-                  <dt className='text-slate-400'>Approved at</dt>
+                  <dt className='text-slate-400'>Duyệt lúc</dt>
                   <dd className='font-semibold text-white'>{formatDate(selectedRequest.approvedAt)}</dd>
                 </div>
                 <div className='flex justify-between gap-4'>
-                  <dt className='text-slate-400'>Rejected at</dt>
+                  <dt className='text-slate-400'>Từ chối lúc</dt>
                   <dd className='font-semibold text-white'>{formatDate(selectedRequest.rejectedAt)}</dd>
                 </div>
                 <div className='flex justify-between gap-4'>
-                  <dt className='text-slate-400'>Company ID</dt>
+                  <dt className='text-slate-400'>ID công ty</dt>
                   <dd className='font-semibold text-white'>{selectedRequest.companyId ?? 'N/A'}</dd>
                 </div>
                 <div className='flex justify-between gap-4'>
-                  <dt className='text-slate-400'>User ID</dt>
+                  <dt className='text-slate-400'>ID người dùng</dt>
                   <dd className='font-semibold text-white'>{selectedRequest.createdUserId ?? 'N/A'}</dd>
                 </div>
               </dl>
 
               <div className='mt-4 space-y-3'>
                 <label className='block text-xs font-bold uppercase tracking-[0.14em] text-violet-300'>
-                  Ghi chu admin
+                  Ghi chú admin
                 </label>
                 <textarea
                   rows={4}
@@ -467,13 +474,13 @@ const EmployerRegistrationRequestsPage = () => {
                   onChange={(event) => setReviewNote(event.target.value)}
                   disabled={selectedRequest.status !== 'PENDING'}
                   className='w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none transition focus:border-violet-400'
-                  placeholder='Nhap ghi chu phe duyet hoac ly do tu choi...'
+                  placeholder='Nhập ghi chú phê duyệt hoặc lý do từ chối...'
                 />
               </div>
 
               {selectedRequest.generatedLoginEmail ? (
                 <div className='mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4'>
-                  <p className='text-xs font-bold uppercase tracking-[0.14em] text-emerald-300'>Tai khoan da tao</p>
+                  <p className='text-xs font-bold uppercase tracking-[0.14em] text-emerald-300'>Tài khoản đã tạo</p>
                   <p className='mt-2 text-sm text-slate-200'>{selectedRequest.generatedLoginEmail}</p>
                 </div>
               ) : null}
@@ -484,7 +491,7 @@ const EmployerRegistrationRequestsPage = () => {
                   onClick={() => setSelectedRequest(null)}
                   className='border-white/10 bg-white/5 text-white hover:bg-white/10'
                 >
-                  Dong
+                  Đóng
                 </Button>
                 {selectedRequest.status === 'PENDING' ? (
                   <>
@@ -494,14 +501,14 @@ const EmployerRegistrationRequestsPage = () => {
                       onClick={() => void handleReject(selectedRequest)}
                     >
                       <XCircle className='size-4' />
-                      Tu choi
+                      Từ chối
                     </Button>
                     <Button
                       disabled={isUpdating === selectedRequest.id}
                       onClick={() => void handleApprove(selectedRequest)}
                     >
                       <CheckCircle2 className='size-4' />
-                      Phe duyet va tao tai khoan
+                      Phê duyệt và tạo tài khoản
                     </Button>
                   </>
                 ) : null}

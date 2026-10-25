@@ -11,12 +11,16 @@ import {
   Link2,
   MapPin,
   Search,
-  SearchX
+  SearchX,
+  XCircle
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 
+import { cancelApplicationApi } from '@/api/applications'
+import CancelApplicationModal from '@/components/seeker/CancelApplicationModal'
 import { SeekerActionToast } from '@/components/seeker/SeekerActionToast'
 import { SeekerStatusBadge } from '@/components/seeker/SeekerStatusBadge'
 import { Card } from '@/components/ui/card'
@@ -32,8 +36,11 @@ const ApplicationTrackerPage = () => {
   const [status, setStatus] = useState(ALL_STATUSES)
   const [page, setPage] = useState(1)
   const [expandedApplicationId, setExpandedApplicationId] = useState<number | null>(null)
+  const [confirmingCancelId, setConfirmingCancelId] = useState<number | null>(null)
+  const [cancelingId, setCancelingId] = useState<number | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const { data, isLoading, error } = useSeekerApplicationsTracker()
+  const queryClient = useQueryClient()
   const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US'
 
   const statusOptions = useMemo(
@@ -84,6 +91,20 @@ const ApplicationTrackerPage = () => {
   const handleCopyMeetingLink = async (meetingLink: string) => {
     await navigator.clipboard.writeText(meetingLink)
     setToastMessage(t('seekerTracking.common.meetingLinkCopied'))
+  }
+
+  const handleCancelApplication = async (applicationId: number) => {
+    try {
+      setCancelingId(applicationId)
+      await cancelApplicationApi(applicationId)
+      setToastMessage(t('seekerTracking.applications.actions.cancelSuccess', { defaultValue: 'Đã hủy ứng tuyển thành công.' }))
+      await queryClient.invalidateQueries({ queryKey: ['seeker', 'applications-tracker'] })
+      setConfirmingCancelId(null)
+    } catch {
+      setToastMessage(t('seekerTracking.applications.actions.cancelError', { defaultValue: 'Không thể hủy ứng tuyển. Vui lòng thử lại sau.' }))
+    } finally {
+      setCancelingId(null)
+    }
   }
 
   return (
@@ -217,6 +238,21 @@ const ApplicationTrackerPage = () => {
                         {t('seekerTracking.common.viewJob')}
                         <ExternalLink className='h-4 w-4' />
                       </Link>
+                      {item.status === 'PENDING' && (
+                        <button
+                          type='button'
+                          disabled={cancelingId === item.applicationId}
+                          onClick={() => setConfirmingCancelId(item.applicationId)}
+                          className='inline-flex h-12 items-center gap-2 rounded-2xl border border-rose-200 px-5 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50'
+                        >
+                          {cancelingId === item.applicationId ? (
+                            <div className='h-4 w-4 animate-spin rounded-full border-2 border-rose-600 border-t-transparent' />
+                          ) : (
+                            <XCircle className='h-4 w-4' />
+                          )}
+                          {t('seekerTracking.common.cancelApplication', { defaultValue: 'Hủy ứng tuyển' })}
+                        </button>
+                      )}
                       {item.interviews.length > 0 ? (
                         <Link
                           to='/seeker/interviews'
@@ -434,6 +470,17 @@ const ApplicationTrackerPage = () => {
           onClose={() => setToastMessage(null)}
         />
       ) : null}
+
+      <CancelApplicationModal
+        open={confirmingCancelId !== null}
+        isCanceling={cancelingId !== null}
+        onClose={() => setConfirmingCancelId(null)}
+        onConfirm={() => {
+          if (confirmingCancelId) {
+            void handleCancelApplication(confirmingCancelId)
+          }
+        }}
+      />
     </div>
   )
 }

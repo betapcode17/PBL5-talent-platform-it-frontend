@@ -1,8 +1,10 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useCompany } from '@/hooks/useCompany'
 import { useCompanyFilterStore } from '@/store/companyFilterStore'
 
 export const CompanyPagination = () => {
+  const { t } = useTranslation()
   const { page, limit, setFilter } = useCompanyFilterStore()
   const { total } = useCompany()
 
@@ -17,7 +19,7 @@ export const CompanyPagination = () => {
   return (
     <div className='flex flex-col gap-4 rounded-[28px] border border-slate-200/80 bg-white px-5 py-4 shadow-[0_18px_56px_rgba(15,23,42,0.06)] sm:flex-row sm:items-center sm:justify-between'>
       <p className='text-sm text-slate-500'>
-        Trang <span className='font-semibold text-slate-900'>{page}</span> / {totalPages}
+        {t('company.pageInfo', { page, totalPages })}
       </p>
 
       <div className='flex flex-wrap items-center gap-2'>
@@ -28,7 +30,7 @@ export const CompanyPagination = () => {
           className='inline-flex h-11 items-center gap-2 rounded-2xl border border-slate-200 px-4 text-sm font-semibold text-slate-600 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-50'
         >
           <ChevronLeft className='h-4 w-4' />
-          Trước
+          {t('company.previous')}
         </button>
 
         {pages.map((item) => (
@@ -52,7 +54,7 @@ export const CompanyPagination = () => {
           disabled={page === totalPages}
           className='inline-flex h-11 items-center gap-2 rounded-2xl border border-slate-200 px-4 text-sm font-semibold text-slate-600 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-50'
         >
-          Sau
+          {t('company.next')}
           <ChevronRight className='h-4 w-4' />
         </button>
       </div>

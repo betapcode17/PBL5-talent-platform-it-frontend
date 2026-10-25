@@ -1,5 +1,6 @@
 import { useChatbot } from '@/hooks/useChatbot'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import ChatSidebar from './ChatbotSidebar'
 import ChatHeader from './ChatbotHeader'
 import ChatMessageList from './ChatbotMessageList'
@@ -8,6 +9,7 @@ import ChatSuggestions from './ChatbotSuggestions'
 import type { HeaderMessageFilter } from './ChatbotHeader'
 
 const ChatbotFullPage = () => {
+  const { t } = useTranslation()
   const [messageFilter, setMessageFilter] = useState<HeaderMessageFilter>('all')
   const {
     user,
@@ -85,7 +87,11 @@ const ChatbotFullPage = () => {
           onSend={handleSendMessage}
           onAnalyzeCv={handleCvUpload}
           disabled={isSending}
-          placeholder={chatMode === 'jobs' ? 'Ask me anything about your IT career...' : 'Choose a CV PDF to analyze'}
+          placeholder={
+            chatMode === 'jobs'
+              ? t('chatbot.inputPlaceholderJobs')
+              : t('chatbot.inputPlaceholderCv')
+          }
         />
       </div>
     </div>

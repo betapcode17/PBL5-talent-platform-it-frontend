@@ -1,5 +1,6 @@
 import { useChatbot } from '@/hooks/useChatbot'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import ChatHeader from './ChatbotHeader'
 import ChatMessageList from './ChatbotMessageList'
 import ChatInput from './ChatbotInput'
@@ -7,6 +8,7 @@ import ChatSuggestions from './ChatbotSuggestions'
 import type { HeaderMessageFilter } from './ChatbotHeader'
 
 const ChatWidget = () => {
+  const { t } = useTranslation()
   const [messageFilter, setMessageFilter] = useState<HeaderMessageFilter>('all')
   const {
     user,
@@ -29,7 +31,7 @@ const ChatWidget = () => {
   const hasMessages = messages.length > 0
 
   return (
-    <div className='fixed bottom-10 right-6 z-50 flex h-[560px] w-[400px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl'>
+    <div className='fixed bottom-4 right-4 z-50 flex h-[min(640px,calc(100vh-80px))] w-[calc(100vw-32px)] max-w-[440px] sm:bottom-6 sm:right-6 sm:w-[430px] flex-col overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_25px_70px_-12px_rgba(15,23,42,0.22)] ring-1 ring-slate-900/5 animate-in fade-in-0 zoom-in-95 duration-200'>
       <ChatHeader
         onClose={() => setWidgetOpen(false)}
         isFullScreen={false}
@@ -64,7 +66,7 @@ const ChatWidget = () => {
         onSend={handleSendMessage}
         onAnalyzeCv={handleCvUpload}
         disabled={isSending}
-        placeholder={chatMode === 'jobs' ? 'Ask me anything about your IT career...' : 'Choose a CV PDF to analyze'}
+        placeholder={chatMode === 'jobs' ? t('chatbot.inputPlaceholderJobs') : t('chatbot.inputPlaceholderCv')}
       />
     </div>
   )

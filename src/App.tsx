@@ -8,7 +8,7 @@ import { ScrollToTop } from './hooks/useScrollToTop'
 
 const ChatOverlay = () => {
   const { pathname } = useLocation()
-  const hiddenPrefixes = ['/chatbot', '/admin', '/employer']
+  const hiddenPrefixes = ['/chatbot', '/admin', '/employer', '/chat']
 
   if (hiddenPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))) {
     return null

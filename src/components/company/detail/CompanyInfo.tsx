@@ -1,21 +1,24 @@
 import type { ReactNode } from 'react'
 import type { CompanyDetail } from '@/@types/company'
 import { BriefcaseBusiness, CalendarDays, Clock3, Rocket, TimerReset } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export const CompanyInfo = ({ company }: { company: CompanyDetail }) => {
+  const { t } = useTranslation()
+
   return (
     <section className='rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_56px_rgba(15,23,42,0.06)]'>
       <div className='mb-5'>
-        <p className='text-xs font-semibold uppercase tracking-[0.24em] text-slate-400'>Company Facts</p>
-        <h2 className='mt-2 text-xl font-semibold text-slate-950'>Thông tin công ty</h2>
+        <p className='text-xs font-semibold uppercase tracking-[0.24em] text-slate-400'>{t('company.companyFacts')}</p>
+        <h2 className='mt-2 text-xl font-semibold text-slate-950'>{t('company.companyFacts')}</h2>
       </div>
 
       <div className='space-y-3'>
-        <Info icon={<Rocket className='h-4 w-4' />} label='Loại hình' value={company.company_type} />
-        <Info icon={<CalendarDays className='h-4 w-4' />} label='Thành lập' value={company.establishment_date?.slice(0, 10)} />
-        <Info icon={<BriefcaseBusiness className='h-4 w-4' />} label='Ngày làm việc' value={company.working_days} />
-        <Info icon={<Clock3 className='h-4 w-4' />} label='Giờ làm việc' value={company.working_time} />
-        <Info icon={<TimerReset className='h-4 w-4' />} label='Chính sách OT' value={company.overtime_policy} />
+        <Info icon={<Rocket className='h-4 w-4' />} label={t('company.companyType')} value={company.company_type} />
+        <Info icon={<CalendarDays className='h-4 w-4' />} label={t('company.established')} value={company.establishment_date?.slice(0, 10)} />
+        <Info icon={<BriefcaseBusiness className='h-4 w-4' />} label={t('company.workingDays')} value={company.working_days} />
+        <Info icon={<Clock3 className='h-4 w-4' />} label={t('company.workingHours')} value={company.working_time} />
+        <Info icon={<TimerReset className='h-4 w-4' />} label={t('company.otPolicy')} value={company.overtime_policy} />
       </div>
     </section>
   )

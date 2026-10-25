@@ -1,8 +1,10 @@
 import type { Company } from '@/@types/company'
 import { useFollow } from '@/hooks/useFollow'
 import { ArrowUpRight, Building2, Globe, MapPin, Users } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export const CompanyHeader = ({ company }: { company: Company }) => {
+  const { t } = useTranslation()
   const { isFollowed, isLoading, toggleFollow, followerCount } = useFollow(company.company_id)
 
   return (
@@ -57,7 +59,7 @@ export const CompanyHeader = ({ company }: { company: Company }) => {
                   )}
                   <span className='inline-flex items-center gap-2'>
                     <Building2 className='h-4 w-4 text-violet-500' />
-                    {followerCount} người đang theo dõi
+                    {t('company.followers', { count: followerCount })}
                   </span>
                 </div>
               </div>
@@ -73,7 +75,7 @@ export const CompanyHeader = ({ company }: { company: Company }) => {
                     : 'bg-violet-600 text-white hover:bg-violet-700 disabled:bg-violet-500'
                 }`}
               >
-                {isLoading ? 'Đang xử lý...' : isFollowed ? 'Hủy theo dõi' : 'Theo dõi công ty'}
+                {isLoading ? t('company.processing') : isFollowed ? t('company.unfollow') : t('company.follow')}
               </button>
 
               {company.company_website_url && (

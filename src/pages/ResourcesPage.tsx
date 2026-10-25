@@ -14,98 +14,177 @@ import {
   WandSparkles
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-
+import { useTranslation } from 'react-i18next'
 import Container from '@/components/ui/Container'
 
-const resources = [
+const getResources = (isEn: boolean) => [
   {
-    title: 'CV tips',
-    description: 'Shape a concise technical profile that recruiters can scan quickly.',
+    title: isEn ? 'CV Tips' : 'Mẹo viết CV',
+    description: isEn
+      ? 'Shape a concise technical profile that recruiters can scan quickly.'
+      : 'Tạo hồ sơ kỹ thuật ngắn gọn, chuyên nghiệp giúp nhà tuyển dụng quét nhanh.',
     icon: FileText,
-    tips: [
-      'Viết phần giới thiệu ngắn 3–5 dòng, nêu rõ vị trí mong muốn.',
-      'Đưa kỹ năng quan trọng lên đầu CV.',
-      'Mô tả dự án theo: vai trò, công nghệ, chức năng, kết quả.',
-      'Ưu tiên số liệu cụ thể nếu có.',
-      'Giữ CV gọn trong 1–2 trang.'
-    ]
+    tips: isEn
+      ? [
+          'Write a concise 3-5 line introduction highlighting your target role.',
+          'Place primary skills and core tech stack at the top of your resume.',
+          'Describe projects with: role, tech stack, responsibilities, and results.',
+          'Highlight concrete metrics and impact (e.g. reduced latency by 35%).',
+          'Keep your CV clean and concise within 1-2 pages.'
+        ]
+      : [
+          'Viết phần giới thiệu ngắn 3–5 dòng, nêu rõ vị trí mong muốn.',
+          'Đưa kỹ năng quan trọng lên đầu CV.',
+          'Mô tả dự án theo: vai trò, công nghệ, chức năng, kết quả.',
+          'Ưu tiên số liệu cụ thể nếu có.',
+          'Giữ CV gọn trong 1–2 trang.'
+        ]
   },
   {
-    title: 'Interview prep',
-    description: 'Practice the questions and signals that matter in modern tech interviews.',
+    title: isEn ? 'Interview Prep' : 'Chuẩn bị phỏng vấn',
+    description: isEn
+      ? 'Practice the questions and signals that matter in modern tech interviews.'
+      : 'Rèn luyện các câu hỏi và kỹ năng cốt lõi trong các buổi phỏng vấn công nghệ.',
     icon: ShieldCheck,
-    tips: [
-      'Chuẩn bị phần giới thiệu bản thân 60–90 giây.',
-      'Ôn kiến thức theo vị trí ứng tuyển.',
-      'Tập giải thích dự án đã làm.',
-      'Chuẩn bị câu hỏi để hỏi nhà tuyển dụng.',
-      'Kiểm tra camera, mic và internet trước buổi phỏng vấn.'
-    ]
+    tips: isEn
+      ? [
+          'Prepare a compelling 60-90 second self-introduction.',
+          'Review fundamental computer science and role-specific concepts.',
+          'Practice explaining your architectural and coding decisions.',
+          'Prepare thoughtful questions to ask the interviewer.',
+          'Test camera, microphone, and internet connection before the interview.'
+        ]
+      : [
+          'Chuẩn bị phần giới thiệu bản thân 60–90 giây.',
+          'Ôn kiến thức theo vị trí ứng tuyển.',
+          'Tập giải thích dự án đã làm.',
+          'Chuẩn bị câu hỏi để hỏi nhà tuyển dụng.',
+          'Kiểm tra camera, mic và internet trước buổi phỏng vấn.'
+        ]
   },
   {
-    title: 'Salary guide',
-    description: 'Use market ranges to set better expectations before applying.',
+    title: isEn ? 'Salary Guide' : 'Cẩm nang mức lương',
+    description: isEn
+      ? 'Use market ranges to set better expectations before applying.'
+      : 'Tham khảo mặt bằng thị trường để đặt kỳ vọng đãi ngộ phù hợp.',
     icon: Lightbulb,
-    tips: [
-      'Xác định mức lương mong muốn và mức tối thiểu.',
-      'Tìm hiểu mặt bằng lương theo vị trí.',
-      'Đánh giá thêm benefit, thưởng và cơ hội học hỏi.',
-      'Deal lương dựa trên kỹ năng và giá trị đóng góp.',
-      'Không nên đưa con số quá sớm nếu chưa rõ công việc.'
-    ]
+    tips: isEn
+      ? [
+          'Determine your target salary range and bottom line.',
+          'Research market benchmarks for your tech stack and seniority level.',
+          'Evaluate the full package: bonuses, stock options, and flexibility.',
+          'Negotiate based on demonstrated impact and skill set.',
+          'Avoid committing to a single number before understanding scope.'
+        ]
+      : [
+          'Xác định mức lương mong muốn và mức tối thiểu.',
+          'Tìm hiểu mặt bằng lương theo vị trí.',
+          'Đánh giá thêm benefit, thưởng và cơ hội học hỏi.',
+          'Deal lương dựa trên kỹ năng và giá trị đóng góp.',
+          'Không nên đưa con số quá sớm nếu chưa rõ công việc.'
+        ]
   }
 ]
 
-const checklist = [
-  'CV đã cập nhật thông tin mới nhất',
-  'Portfolio/GitHub có dự án nổi bật',
-  'Đã đọc kỹ mô tả công việc',
-  'Chuẩn bị câu trả lời cho câu hỏi thường gặp'
-]
+const getChecklist = (isEn: boolean) =>
+  isEn
+    ? [
+        'Resume updated with latest project achievements',
+        'Portfolio / GitHub showcases top technical work',
+        'Carefully reviewed the target job requirements',
+        'Prepared answers for common technical questions'
+      ]
+    : [
+        'CV đã cập nhật thông tin mới nhất',
+        'Portfolio/GitHub có dự án nổi bật',
+        'Đã đọc kỹ mô tả công việc',
+        'Chuẩn bị câu trả lời cho câu hỏi thường gặp'
+      ]
 
-const timeline = [
+const getTimeline = (isEn: boolean) => [
   {
-    day: 'Day 1',
-    title: 'Review profile',
-    description: 'Kiểm tra CV, thông tin cá nhân, kỹ năng và kinh nghiệm liên quan.'
+    day: isEn ? 'Day 1' : 'Ngày 1',
+    title: isEn ? 'Review Profile' : 'Rà soát hồ sơ',
+    description: isEn
+      ? 'Audit CV, technical skills, and past engineering accomplishments.'
+      : 'Kiểm tra CV, thông tin cá nhân, kỹ năng và kinh nghiệm liên quan.'
   },
   {
-    day: 'Day 2',
-    title: 'Practice interview',
-    description: 'Luyện giới thiệu bản thân, trình bày dự án và trả lời câu hỏi kỹ thuật.'
+    day: isEn ? 'Day 2' : 'Ngày 2',
+    title: isEn ? 'Practice Interview' : 'Luyện phỏng vấn',
+    description: isEn
+      ? 'Rehearse self-intro, system design concepts, and behavioral stories.'
+      : 'Luyện giới thiệu bản thân, trình bày dự án và trả lời câu hỏi kỹ thuật.'
   },
   {
-    day: 'Day 3',
-    title: 'Apply & follow up',
-    description: 'Ứng tuyển các vị trí phù hợp và chuẩn bị nội dung follow-up lịch sự.'
+    day: isEn ? 'Day 3' : 'Ngày 3',
+    title: isEn ? 'Apply & Follow Up' : 'Ứng tuyển & Theo dõi',
+    description: isEn
+      ? 'Submit applications to vetted positions and prepare polite follow-up messages.'
+      : 'Ứng tuyển các vị trí phù hợp và chuẩn bị nội dung follow-up lịch sự.'
   }
 ]
 
-const cvTemplate = [
-  'Thông tin cá nhân',
-  'Mục tiêu nghề nghiệp',
-  'Kỹ năng chính',
-  'Dự án nổi bật',
-  'Kinh nghiệm làm việc',
-  'Học vấn & chứng chỉ'
-]
+const getCvTemplate = (isEn: boolean) =>
+  isEn
+    ? [
+        'Contact & Summary',
+        'Career Objective',
+        'Core Tech Stack',
+        'Featured Projects',
+        'Work Experience',
+        'Education & Certs'
+      ]
+    : [
+        'Thông tin cá nhân',
+        'Mục tiêu nghề nghiệp',
+        'Kỹ năng chính',
+        'Dự án nổi bật',
+        'Kinh nghiệm làm việc',
+        'Học vấn & chứng chỉ'
+      ]
 
-const faqs = [
-  {
-    question: 'CV nên dài bao nhiêu?',
-    answer: 'Với fresher hoặc junior, CV nên gọn trong 1 trang. Nếu có nhiều kinh nghiệm, có thể dùng 2 trang.'
-  },
-  {
-    question: 'Có nên đưa tất cả dự án vào CV không?',
-    answer: 'Không nên. Hãy chọn 2–4 dự án nổi bật, liên quan trực tiếp đến vị trí ứng tuyển.'
-  },
-  {
-    question: 'Khi phỏng vấn nên nói gì về điểm yếu?',
-    answer: 'Nên chọn điểm yếu thật nhưng không quá ảnh hưởng đến công việc, kèm cách bạn đang cải thiện.'
-  }
-]
+const getFaqs = (isEn: boolean) =>
+  isEn
+    ? [
+        {
+          question: 'How long should an engineering CV be?',
+          answer: 'For juniors and mid-levels, 1 page is ideal. For senior or staff engineers with 5+ years, 2 pages is standard.'
+        },
+        {
+          question: 'Should I include all past projects on my CV?',
+          answer: 'Focus on 2-4 key projects directly relevant to the role you are targeting to maximize readability.'
+        },
+        {
+          question: 'How should I answer questions about weaknesses?',
+          answer: 'Choose a genuine growth area that does not compromise core job expectations, and explain steps you took to improve.'
+        }
+      ]
+    : [
+        {
+          question: 'CV nên dài bao nhiêu?',
+          answer: 'Với fresher hoặc junior, CV nên gọn trong 1 trang. Nếu có nhiều kinh nghiệm, có thể dùng 2 trang.'
+        },
+        {
+          question: 'Có nên đưa tất cả dự án vào CV không?',
+          answer: 'Không nên. Hãy chọn 2–4 dự án nổi bật, liên quan trực tiếp đến vị trí ứng tuyển.'
+        },
+        {
+          question: 'Khi phỏng vấn nên nói gì về điểm yếu?',
+          answer: 'Nên chọn điểm yếu thật nhưng không quá ảnh hưởng đến công việc, kèm cách bạn đang cải thiện.'
+        }
+      ]
 
 const ResourcesPage = () => {
+  const { t, i18n } = useTranslation()
+  const isEn = i18n.language === 'en'
+
+  const resources = getResources(isEn)
+  const checklist = getChecklist(isEn)
+  const timeline = getTimeline(isEn)
+  const cvTemplate = getCvTemplate(isEn)
+  const faqs = getFaqs(isEn)
+
   return (
     <div className='min-h-screen bg-[linear-gradient(180deg,#f8f5ff_0%,#ffffff_42%,#f8fafc_100%)] text-slate-950'>
       <Container className='py-12 sm:py-16'>
@@ -117,16 +196,15 @@ const ResourcesPage = () => {
             <div>
               <span className='inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-violet-700'>
                 <Sparkles className='h-3.5 w-3.5' />
-                Resources
+                {t('resourcesPage.badge')}
               </span>
 
               <h1 className='mt-5 max-w-3xl text-4xl font-black tracking-[-0.05em] text-slate-950 sm:text-6xl'>
-                Career resources for a better job search
+                {t('resourcesPage.title')}
               </h1>
 
               <p className='mt-5 max-w-2xl text-base leading-7 text-slate-600'>
-                Tổng hợp hướng dẫn viết CV, chuẩn bị phỏng vấn, deal lương và xây dựng hồ sơ ứng tuyển chuyên nghiệp
-                hơn.
+                {t('resourcesPage.subtitle')}
               </p>
 
               <div className='mt-7 flex flex-col gap-3 sm:flex-row'>
@@ -134,7 +212,7 @@ const ResourcesPage = () => {
                   href='#career-guides'
                   className='inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-700 px-5 py-3 text-sm font-bold text-white shadow-[0_18px_36px_rgba(124,58,237,0.28)] transition hover:bg-violet-800'
                 >
-                  Read guides
+                  {isEn ? 'Read Guides' : 'Xem cẩm nang'}
                   <ArrowRight className='h-4 w-4' />
                 </a>
 
@@ -142,7 +220,7 @@ const ResourcesPage = () => {
                   to='/jobs'
                   className='inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-violet-200 hover:text-violet-700'
                 >
-                  Find jobs
+                  {t('resourcesPage.exploreJobs')}
                 </Link>
               </div>
             </div>
@@ -154,7 +232,7 @@ const ResourcesPage = () => {
                     <WandSparkles className='h-5 w-5' />
                   </span>
                   <div>
-                    <p className='text-sm font-bold text-slate-500'>Job search readiness</p>
+                    <p className='text-sm font-bold text-slate-500'>{t('resourcesPage.checklistTitle')}</p>
                     <p className='text-3xl font-black text-slate-950'>86%</p>
                   </div>
                 </div>
@@ -180,19 +258,19 @@ const ResourcesPage = () => {
           <div className='rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_16px_42px_rgba(15,23,42,0.05)]'>
             <BriefcaseBusiness className='h-6 w-6 text-violet-700' />
             <p className='mt-4 text-2xl font-black text-slate-950'>120+</p>
-            <p className='mt-1 text-sm font-semibold text-slate-500'>Job search lessons</p>
+            <p className='mt-1 text-sm font-semibold text-slate-500'>{isEn ? 'Job search lessons' : 'Bài học ứng tuyển'}</p>
           </div>
 
           <div className='rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_16px_42px_rgba(15,23,42,0.05)]'>
             <Target className='h-6 w-6 text-violet-700' />
-            <p className='mt-4 text-2xl font-black text-slate-950'>3 steps</p>
-            <p className='mt-1 text-sm font-semibold text-slate-500'>Prepare, apply, follow up</p>
+            <p className='mt-4 text-2xl font-black text-slate-950'>3 {isEn ? 'steps' : 'bước'}</p>
+            <p className='mt-1 text-sm font-semibold text-slate-500'>{isEn ? 'Prepare, apply, follow up' : 'Chuẩn bị, ứng tuyển, phản hồi'}</p>
           </div>
 
           <div className='rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_16px_42px_rgba(15,23,42,0.05)]'>
             <Star className='h-6 w-6 text-violet-700' />
-            <p className='mt-4 text-2xl font-black text-slate-950'>Better profile</p>
-            <p className='mt-1 text-sm font-semibold text-slate-500'>Improve CV and interview confidence</p>
+            <p className='mt-4 text-2xl font-black text-slate-950'>{isEn ? 'Better profile' : 'Tối ưu hồ sơ'}</p>
+            <p className='mt-1 text-sm font-semibold text-slate-500'>{isEn ? 'Improve CV and interview confidence' : 'Nâng cấp CV và tự tin phỏng vấn'}</p>
           </div>
         </section>
 
@@ -222,7 +300,7 @@ const ResourcesPage = () => {
                 </div>
 
                 <Link to='/jobs' className='mt-6 inline-flex items-center gap-2 text-sm font-bold text-violet-700'>
-                  Apply this guide
+                  {isEn ? 'Apply this guide' : 'Áp dụng ngay'}
                   <ArrowRight className='h-4 w-4 transition group-hover:translate-x-1' />
                 </Link>
               </article>
@@ -234,7 +312,7 @@ const ResourcesPage = () => {
           <div className='rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]'>
             <div className='flex items-center gap-3'>
               <Clock3 className='h-6 w-6 text-violet-700' />
-              <h2 className='text-2xl font-black text-slate-950'>3-day preparation plan</h2>
+              <h2 className='text-2xl font-black text-slate-950'>{isEn ? '3-day preparation plan' : 'Kế hoạch 3 ngày chuẩn bị'}</h2>
             </div>
 
             <div className='mt-6 space-y-4'>
@@ -251,11 +329,13 @@ const ResourcesPage = () => {
           <div className='rounded-[32px] border border-slate-200 bg-slate-950 p-6 text-white shadow-[0_24px_70px_rgba(15,23,42,0.18)]'>
             <div className='flex items-center gap-3'>
               <MessageSquareText className='h-6 w-6 text-violet-300' />
-              <h2 className='text-2xl font-black'>CV structure template</h2>
+              <h2 className='text-2xl font-black'>{isEn ? 'CV structure template' : 'Cấu trúc mẫu chuẩn cho CV'}</h2>
             </div>
 
             <p className='mt-3 text-sm leading-6 text-slate-300'>
-              Bạn có thể dùng bố cục này để viết CV rõ ràng, dễ scan và phù hợp với các vị trí công nghệ.
+              {isEn
+                ? 'Use this structured layout to produce a clean, scannable resume tailored for high-growth tech openings.'
+                : 'Bạn có thể dùng bố cục này để viết CV rõ ràng, dễ scan và phù hợp với các vị trí công nghệ.'}
             </p>
 
             <div className='mt-6 grid gap-3 sm:grid-cols-2'>
@@ -272,7 +352,7 @@ const ResourcesPage = () => {
         <section className='mt-10 rounded-[34px] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]'>
           <div className='flex items-center gap-3'>
             <HelpCircle className='h-6 w-6 text-violet-700' />
-            <h2 className='text-2xl font-black text-slate-950'>Frequently asked questions</h2>
+            <h2 className='text-2xl font-black text-slate-950'>{isEn ? 'Frequently asked questions' : 'Câu hỏi thường gặp'}</h2>
           </div>
 
           <div className='mt-6 grid gap-4 md:grid-cols-3'>
@@ -288,15 +368,15 @@ const ResourcesPage = () => {
         <section className='mt-10 overflow-hidden rounded-[34px] bg-violet-700 p-6 text-white shadow-[0_24px_70px_rgba(124,58,237,0.28)] sm:p-8'>
           <div className='flex flex-col gap-5 md:flex-row md:items-center md:justify-between'>
             <div>
-              <p className='text-sm font-bold uppercase tracking-[0.24em] text-violet-200'>Ready to apply?</p>
-              <h2 className='mt-3 text-3xl font-black'>Use these guides and find your next opportunity.</h2>
+              <p className='text-sm font-bold uppercase tracking-[0.24em] text-violet-200'>{isEn ? 'Ready to apply?' : 'Sẵn sàng ứng tuyển?'}</p>
+              <h2 className='mt-3 text-3xl font-black'>{isEn ? 'Use these guides and find your next opportunity.' : 'Áp dụng cẩm nang và tìm cơ hội việc làm tiếp theo.'}</h2>
             </div>
 
             <Link
               to='/jobs'
               className='inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-violet-700 transition hover:bg-violet-50'
             >
-              Browse jobs
+              {t('home.featured.viewAllJobs')}
               <ArrowRight className='h-4 w-4' />
             </Link>
           </div>

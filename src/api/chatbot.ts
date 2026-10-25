@@ -146,6 +146,8 @@ const normalizeSendMessageResponse = (payload: SendMessageResponse): SendMessage
     createdAt: payload.message?.createdAt || new Date().toISOString(),
     sources: Array.isArray(payload.message?.sources) ? payload.message.sources : [],
     detectedIntent: payload.message?.detectedIntent ?? payload.data?.intent ?? null,
+    subAgent: payload.subAgent ?? payload.message?.subAgent ?? null,
+    toolCalls: payload.message?.toolCalls ?? null,
     jobResults,
     jobResultsTotal,
     jobResultsSummary,
@@ -156,6 +158,7 @@ const normalizeSendMessageResponse = (payload: SendMessageResponse): SendMessage
 
   return {
     ...payload,
+    subAgent: payload.subAgent ?? payload.message?.subAgent ?? null,
     message: normalizeConversationMessage(normalizedMessage)
   }
 }
@@ -183,12 +186,18 @@ export const streamMessageApi = async (
     payload.conversationId = String(data.conversationId)
   }
 
+  const token = localStorage.getItem('accessToken')
+  const headers: Record<string, string> = {
+    Accept: 'text/event-stream',
+    'Content-Type': 'application/json'
+  }
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
   const response = await fetch(`${aiApiBaseUrl}/chatbot/message/stream`, {
     method: 'POST',
-    headers: {
-      Accept: 'text/event-stream',
-      'Content-Type': 'application/json'
-    },
+    headers,
     body: JSON.stringify(payload)
   })
 

@@ -25,14 +25,14 @@ const initialState: BrowseJobsFilters = {
   searchQuery: '',
   selectedLocation: '',
   selectedLanguages: [],
-  selectedExperience: ['Senior'],
+  selectedExperience: [],
   selectedWorkTypes: [],
   selectedJobTypes: [],
-  selectedPostedWithin: ['7d'],
+  selectedPostedWithin: [],
   salaryMin: '',
   salaryMax: '',
   currentPage: 1,
-  pageSize: 3
+  pageSize: 10
 }
 
 const toggleSelection = (value: string, current: string[]) =>

@@ -97,7 +97,7 @@ type CreateJobInput = {
   requirements: string[]
 }
 
-type UpdateJobInput = Partial<CreateJobInput>
+type UpdateJobInput = Partial<CreateJobInput> & { isActive?: boolean }
 
 type CreateInterviewInput = {
   applicationId: number

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Save, BriefcaseBusiness } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
@@ -85,6 +85,7 @@ const CreateJobForm = ({ onClose, mode = 'create', initialJob = null }: CreateJo
     requirements: ''
   })
   const isEditMode = mode === 'edit'
+  const [isActive, setIsActive] = useState<boolean>(initialJob?.isActive ?? true)
   const initialCategoryId = useMemo(() => String(initialJob?.category?.category_id ?? ''), [initialJob?.category?.category_id])
   const initialJobTypeId = useMemo(() => String(initialJob?.jobType?.job_type_id ?? ''), [initialJob?.jobType?.job_type_id])
 
@@ -163,7 +164,7 @@ const CreateJobForm = ({ onClose, mode = 'create', initialJob = null }: CreateJo
       }
 
       if (isEditMode && initialJob) {
-        await updateEmployerJobApi(initialJob.id, payload)
+        await updateEmployerJobApi(initialJob.id, { ...payload, isActive })
       } else {
         await createEmployerJobApi({
           ...payload,
@@ -272,9 +273,55 @@ const CreateJobForm = ({ onClose, mode = 'create', initialJob = null }: CreateJo
           />
         </Field>
 
+        {isEditMode && (
+          <div className='rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50'>
+            <div className='flex items-center justify-between gap-4'>
+              <div className='flex items-center gap-3'>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${isActive ? 'bg-emerald-100 dark:bg-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/20'}`}>
+                  <BriefcaseBusiness className={`h-4 w-4 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`} />
+                </div>
+                <div>
+                  <p className='text-sm font-medium text-slate-900 dark:text-slate-100'>
+                    {t('employer.jobs.edit.statusLabel', { defaultValue: 'Trạng thái tuyển dụng' })}
+                  </p>
+                  <p className={`text-xs font-medium ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+                    {isActive
+                      ? t('employer.jobs.edit.statusActive', { defaultValue: '✓ Đang tuyển dụng' })
+                      : t('employer.jobs.edit.statusInactive', { defaultValue: '✕ Đã ngừng tuyển' })}
+                  </p>
+                </div>
+              </div>
+              <button
+                type='button'
+                role='switch'
+                aria-checked={isActive}
+                onClick={() => setIsActive((prev) => !prev)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  isActive
+                    ? 'bg-emerald-500 focus:ring-emerald-500'
+                    : 'bg-rose-400 focus:ring-rose-400'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition-transform duration-200 ease-in-out ${
+                    isActive ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+            {!isActive && (
+              <p className='mt-3 rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-600 dark:border-rose-400/20 dark:bg-rose-500/10 dark:text-rose-300'>
+                {t('employer.jobs.edit.statusWarning', {
+                  defaultValue: '⚠️ Khi ngừng tuyển, ứng viên sẽ không thể tìm thấy bài đăng này trên hệ thống.'
+                })}
+              </p>
+            )}
+          </div>
+        )}
+
         <div className='flex flex-col gap-3 pt-4 sm:flex-row'>
           <Button type='submit' disabled={isSubmitting} className='w-full flex-1 rounded-xl'>
-            <Plus className='h-4 w-4' />
+            {isEditMode ? <Save className='h-4 w-4' /> : <Plus className='h-4 w-4' />}
             {isSubmitting
               ? t('employer.actions.creating')
               : isEditMode

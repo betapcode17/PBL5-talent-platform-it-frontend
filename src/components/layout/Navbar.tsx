@@ -1,14 +1,28 @@
-import { Bot, BriefcaseBusiness, ChevronDown, LogOut, Menu, MessageCircle, Search, User, X } from 'lucide-react'
+import {
+  Bot,
+  BriefcaseBusiness,
+  CalendarDays,
+  ChevronDown,
+  ClipboardList,
+  Heart,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Search,
+  User,
+  X
+} from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 import LanguageSwitcher from '@/components/i18n/LanguageSwitcher'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import Container from '@/components/ui/Container'
 import Logo from '@/components/ui/Logo'
 import { cn } from '@/lib/utils'
-import { useAuthStore } from '@/store/authStore'
 import { useBrowseJobsStore } from '@/store/browseJobsStore'
+import { useAuthStore } from '@/store/authStore'
 import { useChatbotStore } from '@/store/chatbotStore'
 
 type NavbarVariant = 'marketing' | 'default' | 'compact'
@@ -28,6 +42,29 @@ const navItems = [
   { labelKey: 'nav.resources', href: '/resources' }
 ]
 
+const seekerMenuItems = [
+  {
+    labelKey: 'nav.applicationTracker',
+    href: '/seeker/applications',
+    icon: ClipboardList
+  },
+  {
+    labelKey: 'nav.interviewSchedule',
+    href: '/seeker/interviews',
+    icon: CalendarDays
+  },
+  {
+    labelKey: 'nav.appliedCompanies',
+    href: '/seeker/applied-companies',
+    icon: BriefcaseBusiness
+  },
+  {
+    labelKey: 'nav.savedCompanies',
+    href: '/seeker/saved-companies',
+    icon: Heart
+  }
+] as const
+
 const baseFocusClassName =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2'
 
@@ -38,7 +75,7 @@ const getDashboardPath = (role?: string) => {
     case 'EMPLOYEE':
       return '/employer'
     case 'SEEKER':
-      return '/seeker'
+      return '/seeker/profile'
     default:
       return '/login'
   }
@@ -57,12 +94,13 @@ const Navbar = ({
   const [headerSearchQuery, setHeaderSearchQuery] = useState('')
   const navigate = useNavigate()
   const { isAuthenticated, logout, user } = useAuthStore()
-  const { setToggleDismissed, setWidgetOpen } = useChatbotStore()
   const profileRef = useRef<HTMLDivElement>(null)
+  const { setWidgetOpen, setToggleDismissed } = useChatbotStore()
 
   const isCompact = variant === 'compact'
   const dashboardPath = getDashboardPath(user?.role)
   const canShowPostJobButton = showPostJobButton && isAuthenticated && user?.role === 'EMPLOYEE'
+  const seekerOnlyMenuItems = user?.role === 'SEEKER' ? seekerMenuItems : []
   const initials = (user?.full_name || user?.email || 'U')
     .split(' ')
     .slice(0, 2)
@@ -97,17 +135,11 @@ const Navbar = ({
     navigate('/jobs')
   }
 
-  const handleOpenChatbot = () => {
-    setToggleDismissed(false)
-    setWidgetOpen(true)
-    closeMenu()
-  }
-
   const headerClassName = cn(
-    'sticky top-0 z-50 border-b transition-colors duration-300',
+    'sticky top-0 z-50 border-b transition-all duration-300',
     transparentOnTop
-      ? 'border-white/60 bg-white/78 shadow-[0_10px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl'
-      : 'border-slate-200/70 bg-white/92 shadow-[0_10px_30px_rgba(15,23,42,0.035)] backdrop-blur-xl'
+      ? 'border-white/60 bg-white/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-900/80'
+      : 'border-slate-200/80 bg-white/95 shadow-[0_4px_20px_rgba(15,23,42,0.03)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95'
   )
 
   return (
@@ -119,7 +151,7 @@ const Navbar = ({
 
             <nav
               aria-label={t('nav.primaryNavigation')}
-              className='hidden flex-none items-center gap-2 rounded-full border border-slate-200/70 bg-slate-50/75 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] 2xl:flex'
+              className='hidden flex-none items-center gap-1.5 rounded-full border border-slate-200/80 bg-slate-50/80 p-1 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/80 xl:flex'
             >
               {navItems.map((item) =>
                 item.href ? (
@@ -128,11 +160,11 @@ const Navbar = ({
                     to={item.href}
                     className={({ isActive }) =>
                       cn(
-                        'inline-flex h-10 min-w-[5.25rem] items-center justify-center rounded-full px-3 text-sm font-semibold whitespace-nowrap transition duration-200',
+                        'inline-flex h-9 min-w-[6rem] items-center justify-center rounded-full px-4 text-xs font-bold tracking-wide whitespace-nowrap transition-all duration-200',
                         baseFocusClassName,
                         isActive
-                          ? 'bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_10px_26px_rgba(124,58,237,0.28)]'
-                          : 'text-slate-600 hover:bg-white hover:text-slate-950 hover:shadow-[0_8px_20px_rgba(15,23,42,0.08)]'
+                          ? 'bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-500 text-white shadow-[0_6px_18px_rgba(124,58,237,0.35)]'
+                          : 'text-slate-600 hover:bg-white hover:text-slate-950 hover:shadow-sm dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white'
                       )
                     }
                   >
@@ -143,7 +175,7 @@ const Navbar = ({
                     key={item.labelKey}
                     type='button'
                     className={cn(
-                      'inline-flex h-10 min-w-[5.25rem] items-center justify-center rounded-full px-3 text-sm font-semibold whitespace-nowrap text-slate-600 transition duration-200 hover:bg-white hover:text-slate-950 hover:shadow-[0_8px_20px_rgba(15,23,42,0.08)]',
+                      'inline-flex h-9 min-w-[6rem] items-center justify-center rounded-full px-4 text-xs font-bold tracking-wide whitespace-nowrap text-slate-600 transition-all duration-200 hover:bg-white hover:text-slate-950 hover:shadow-sm dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white',
                       baseFocusClassName
                     )}
                   >
@@ -171,20 +203,6 @@ const Navbar = ({
           ) : null}
 
           <div className='hidden shrink-0 items-center justify-end gap-3 lg:flex'>
-            {showAuthButtons ? (
-              <button
-                type='button'
-                onClick={handleOpenChatbot}
-                className={cn(
-                  'inline-flex h-11 w-11 items-center justify-center rounded-full border border-violet-200 bg-violet-50 text-violet-700 shadow-[0_8px_22px_rgba(124,58,237,0.08)] transition duration-200 hover:-translate-y-0.5 hover:border-violet-300 hover:bg-violet-100 hover:shadow-[0_14px_30px_rgba(124,58,237,0.16)]',
-                  baseFocusClassName
-                )}
-                aria-label='Open chatbot'
-              >
-                <Bot className='h-4 w-4' />
-              </button>
-            ) : null}
-
             {canShowPostJobButton ? (
               <Link
                 to='/employer/jobs/create'
@@ -201,6 +219,26 @@ const Navbar = ({
             {showAuthButtons ? (
               isAuthenticated ? (
                 <>
+                  <NotificationBell />
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setToggleDismissed(false)
+                      setWidgetOpen(true)
+                    }}
+                    className={cn(
+                      'relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-violet-600 shadow-[0_8px_22px_rgba(15,23,42,0.05)] transition duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:bg-violet-50 hover:shadow-[0_14px_30px_rgba(124,58,237,0.14)]',
+                      baseFocusClassName
+                    )}
+                    aria-label={t('nav.openAiAdvisor')}
+                    title='AI Career Advisor'
+                  >
+                    <Bot className='h-5 w-5' />
+                    <span className='absolute -right-0.5 -top-0.5 flex h-3 w-3'>
+                      <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-75' />
+                      <span className='relative inline-flex h-3 w-3 rounded-full bg-violet-600' />
+                    </span>
+                  </button>
                   <Link
                     to='/chat'
                     className={cn(
@@ -233,7 +271,7 @@ const Navbar = ({
                       <div className='absolute right-0 mt-3 w-64 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.14)]'>
                         <div className='border-b border-slate-100 bg-slate-50 px-4 py-4'>
                           <p className='truncate text-sm font-semibold text-slate-900'>
-                            {user?.full_name || 'Account'}
+                            {user?.full_name || t('nav.account')}
                           </p>
                           <p className='mt-1 truncate text-xs text-slate-500'>{user?.email}</p>
                         </div>
@@ -244,8 +282,25 @@ const Navbar = ({
                             className='flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50'
                           >
                             <User className='h-4 w-4 text-slate-500' />
-                            {t('nav.dashboard')}
+                            {user?.role === 'SEEKER' ? t('nav.profileAndCv') : t('nav.dashboard')}
                           </Link>
+
+                          {seekerOnlyMenuItems.map((item) => {
+                            const Icon = item.icon
+
+                            return (
+                              <Link
+                                key={item.href}
+                                to={item.href}
+                                onClick={() => setIsProfileOpen(false)}
+                                className='flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50'
+                              >
+                                <Icon className='h-4 w-4 text-slate-500' />
+                                {t(item.labelKey)}
+                              </Link>
+                            )
+                          })}
+
                           <button
                             type='button'
                             onClick={handleLogout}
@@ -286,7 +341,7 @@ const Navbar = ({
                       baseFocusClassName
                     )}
                   >
-                    Đăng ký Nhà tuyển dụng
+                    {t('nav.employerRegister')}
                   </Link>
                 </>
               )
@@ -303,7 +358,7 @@ const Navbar = ({
             aria-expanded={isOpen}
             onClick={() => setIsOpen((current) => !current)}
             className={cn(
-              'inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 2xl:hidden',
+              'inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 lg:hidden',
               baseFocusClassName
             )}
           >
@@ -313,7 +368,7 @@ const Navbar = ({
 
         <div
           className={cn(
-            'overflow-hidden transition-[max-height,opacity,transform] duration-300 2xl:hidden',
+            'overflow-hidden transition-[max-height,opacity,transform] duration-300 lg:hidden',
             isOpen ? 'max-h-[34rem] translate-y-0 pb-4 opacity-100' : 'max-h-0 -translate-y-2 opacity-0'
           )}
         >
@@ -367,17 +422,6 @@ const Navbar = ({
             <div className='mt-3 grid gap-2 border-t border-slate-100 pt-3'>
               <LanguageSwitcher className='h-12 w-full justify-center rounded-2xl' />
 
-              {showAuthButtons ? (
-                <button
-                  type='button'
-                  onClick={handleOpenChatbot}
-                  className='inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-violet-200 bg-violet-50 text-sm font-semibold text-violet-700'
-                >
-                  <Bot className='h-4 w-4' />
-                  Chatbot
-                </button>
-              ) : null}
-
               {canShowPostJobButton ? (
                 <Link
                   to='/employer/jobs/create'
@@ -399,6 +443,23 @@ const Navbar = ({
                     >
                       {t('nav.goToDashboard')}
                     </Link>
+
+                    {seekerOnlyMenuItems.map((item) => {
+                      const Icon = item.icon
+
+                      return (
+                        <Link
+                          key={item.href}
+                          to={item.href}
+                          onClick={closeMenu}
+                          className='inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50'
+                        >
+                          <Icon className='h-4 w-4' />
+                          {t(item.labelKey)}
+                        </Link>
+                      )
+                    })}
+
                     <button
                       type='button'
                       onClick={handleLogout}
@@ -429,7 +490,7 @@ const Navbar = ({
                       onClick={closeMenu}
                       className='inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50'
                     >
-                      Đăng ký Nhà tuyển dụng
+                      {t('nav.employerRegister')}
                     </Link>
                   </>
                 )

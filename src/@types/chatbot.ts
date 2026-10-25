@@ -22,6 +22,9 @@ export interface ChatMessage {
   conversationType?: string | null
   cvAnalysis?: CVFileAnalysisResponse | null
   cvJdMatch?: CVJDMatchResponse | null
+  subAgent?: string | null
+  toolCalls?: Array<{ name?: string; args?: Record<string, unknown>; result?: unknown }> | null
+  isStreaming?: boolean
   retrieval?: ChatbotRetrievalSummary | null
   meta?: ChatbotResponseMeta | null
   responseMode?: string | null
@@ -117,6 +120,7 @@ export interface ChatbotResponseMeta {
 export interface SendMessageResponse {
   success?: boolean
   version?: string
+  subAgent?: string | null
   message: ChatMessage
   conversationId: string | number
   data?: ChatbotResponseData | null

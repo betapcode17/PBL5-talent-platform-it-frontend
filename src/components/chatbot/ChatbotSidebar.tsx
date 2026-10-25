@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Conversation } from '@/@types/chatbot'
 import { SquarePen, Trash2, MessageCircle, Search, PanelLeftClose, PanelLeftOpen, Edit2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 
 interface ChatSidebarProps {
@@ -25,6 +26,7 @@ const ChatSidebar = ({
   onDelete,
   onRename
 }: ChatSidebarProps) => {
+  const { t } = useTranslation()
   const [collapsed, setCollapsed] = useState(false)
   const [search, setSearch] = useState('')
   const [renamingId, setRenamingId] = useState<string | number | null>(null)
@@ -61,7 +63,9 @@ const ChatSidebar = ({
       <aside className='flex h-full w-12 flex-col items-center border-r bg-white py-3'>
         <button
           onClick={() => setCollapsed(false)}
+          title={t('chatbot.openSidebar')}
           className='rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900'
+          aria-label={t('chatbot.openSidebar')}
         >
           <PanelLeftOpen className='h-5 w-5' />
         </button>
@@ -92,15 +96,17 @@ const ChatSidebar = ({
         <div className='flex items-center gap-1'>
           <button
             onClick={onNew}
-            title='New chat'
+            title={t('chatbot.newChat')}
             className='rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900'
+            aria-label={t('chatbot.newChat')}
           >
             <SquarePen className='h-5 w-5' />
           </button>
           <button
             onClick={() => setCollapsed(true)}
-            title='Close sidebar'
+            title={t('chatbot.closeSidebar')}
             className='rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900'
+            aria-label={t('chatbot.closeSidebar')}
           >
             <PanelLeftClose className='h-5 w-5' />
           </button>
@@ -115,8 +121,8 @@ const ChatSidebar = ({
             type='text'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder='Search chats'
-            className='w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none'
+            placeholder={t('chatbot.searchChats')}
+            className='w-full bg-transparent text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none'
           />
         </div>
       </div>
@@ -125,10 +131,10 @@ const ChatSidebar = ({
       <div className='flex-1 overflow-y-auto px-2 py-1'>
         <div className='space-y-0.5'>
           {isLoading ? (
-            <div className='px-2 py-4 text-center text-xs text-slate-400'>Loading...</div>
+            <div className='px-2 py-4 text-center text-xs text-slate-400'>{t('chatbot.loadingHistory')}</div>
           ) : filtered.length === 0 ? (
             <div className='px-2 py-4 text-center text-xs text-slate-400'>
-              {search ? 'No results found' : 'No conversations yet'}
+              {search ? t('chatbot.noResults') : t('chatbot.noConversations')}
             </div>
           ) : (
             filtered.map((conv) => (
@@ -144,7 +150,7 @@ const ChatSidebar = ({
                       autoFocus
                       maxLength={100}
                       className='flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none'
-                      placeholder='Nhập tên mới...'
+                      placeholder={t('chatbot.enterNewName')}
                     />
                     <button
                       onClick={() => handleRenameSubmit(String(conv.id))}
@@ -171,7 +177,7 @@ const ChatSidebar = ({
                       <button
                         onClick={(e) => handleRenameClick(e, conv)}
                         className='hidden shrink-0 rounded p-1 text-slate-400 hover:text-blue-500 group-hover:block'
-                        title='Đổi tên'
+                        title={t('chatbot.rename')}
                       >
                         <Edit2 className='h-3.5 w-3.5' />
                       </button>
@@ -182,7 +188,7 @@ const ChatSidebar = ({
                         }}
                         disabled={isDeletingId === String(conv.id)}
                         className='hidden shrink-0 rounded p-1 text-slate-400 hover:text-red-500 group-hover:block disabled:opacity-50 disabled:cursor-not-allowed'
-                        title='Xóa'
+                        title={t('chatbot.delete')}
                       >
                         {isDeletingId === String(conv.id) ? (
                           <div className='h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-300 border-t-red-500' />

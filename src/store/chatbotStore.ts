@@ -2,10 +2,11 @@
 // useChat.ts
 import { create } from 'zustand'
 
-import type { ChatMessage, Conversation } from '@/@types/chatbot'
+import type { ChatMessage, Conversation, SendMessageResponse } from '@/@types/chatbot'
 
 import {
   sendMessageApi,
+  streamMessageApi,
   getConversationsApi,
   getMessagesApi,
   deleteConversationApi,
@@ -282,9 +283,10 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
     const conversationType = chatMode === 'cv' ? 'cv_analysis' : 'job_chat'
     const targetConvId = conversationId ?? activeConversationId ?? activeConversationIdsByMode[chatMode]
 
-    const tempId = -Date.now()
+    const tempUserId = -Date.now()
+    const tempAssistantId = -(Date.now() + 1)
     const tempUserMsg: ChatMessage = {
-      id: tempId,
+      id: tempUserId,
       role: 'user',
       content: message,
       createdAt: new Date(),
@@ -292,16 +294,74 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       conversationType,
       messageType: chatMode === 'cv' ? 'cv_followup_query' : 'job_query'
     }
-    set({ messages: [...messages, tempUserMsg], isSending: true, streamStatus: null, error: null })
+
+    const tempAssistantMsg: ChatMessage = {
+      id: tempAssistantId,
+      role: 'assistant',
+      content: '',
+      createdAt: new Date(),
+      conversationId: (targetConvId ?? '') as string | number,
+      conversationType,
+      messageType: chatMode === 'cv' ? 'cv_followup_answer' : 'job_answer',
+      isStreaming: true
+    }
+
+    set({
+      messages: [...messages, tempUserMsg, tempAssistantMsg],
+      isSending: true,
+      streamStatus: 'AI đang kết nối...',
+      error: null
+    })
+
+    let accumulatedContent = ''
 
     try {
-      const res = await sendMessageApi({
-        conversationId: targetConvId ?? undefined,
-        message
-      })
+      let res: SendMessageResponse
+      try {
+        res = await streamMessageApi(
+          {
+            conversationId: targetConvId ?? undefined,
+            message
+          },
+          {
+            onConversation: (convId) => {
+              set((s) => ({
+                activeConversationId: convId,
+                activeConversationIdsByMode: {
+                  ...s.activeConversationIdsByMode,
+                  jobs: convId,
+                  cv: convId
+                }
+              }))
+            },
+            onStatus: (status) => {
+              if (status?.message) {
+                set({ streamStatus: status.message })
+              }
+            },
+            onChunk: (delta) => {
+              accumulatedContent += delta
+              set((s) => ({
+                messages: s.messages.map((m) =>
+                  m.id === tempAssistantId ? { ...m, content: accumulatedContent, isStreaming: true } : m
+                )
+              }))
+            }
+          }
+        )
+      } catch (streamErr) {
+        console.warn('Streaming failed, falling back to standard API:', streamErr)
+        res = await sendMessageApi({
+          conversationId: targetConvId ?? undefined,
+          message
+        })
+      }
 
       const resolvedConversationId = res.conversationId
-      const assistantContent = typeof res.message?.content === 'string' ? res.message.content : ''
+      const assistantContent =
+        typeof res.message?.content === 'string' && res.message.content.trim()
+          ? res.message.content
+          : accumulatedContent
 
       set((s) => ({
         activeConversationId: resolvedConversationId,
@@ -323,10 +383,12 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
             : conversation
         ),
         messages: [
-          ...s.messages.filter((m) => m.id !== tempId),
+          ...s.messages.filter((m) => m.id !== tempUserId && m.id !== tempAssistantId),
           { ...tempUserMsg, conversationId: resolvedConversationId },
           {
             ...res.message,
+            content: assistantContent,
+            isStreaming: false,
             conversationType: res.message.conversationType ?? 'job_chat',
             messageType:
               res.message.messageType ?? (chatMode === 'cv' ? 'cv_followup_answer' : 'job_answer')
@@ -335,7 +397,10 @@ export const useChatbotStore = create<ChatState>()((set, get) => ({
       }))
       void get().getConversations()
     } catch {
-      set({ error: 'Failed to send message. Please try again.' })
+      set((s) => ({
+        messages: s.messages.filter((m) => m.id !== tempAssistantId),
+        error: 'Không thể gửi tin nhắn. Vui lòng thử lại.'
+      }))
     } finally {
       set({ isSending: false, streamStatus: null })
     }

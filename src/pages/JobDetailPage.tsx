@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft,
   CalendarClock,
@@ -22,8 +23,9 @@ import JobDetailSkeleton from '@/components/job-detail/JobDetailSkeleton'
 import JobDetailState from '@/components/job-detail/JobDetailState'
 import JobDetailTabs from '@/components/job-detail/JobDetailTabs' 
 import SimilarJobsList from '@/components/job-detail/SimilarJobsList'
+import CancelApplicationModal from '@/components/seeker/CancelApplicationModal'
 
-import { createApplication, getMyApplicationsApi, uploadApplicationCvApi } from '@/api/applications'
+import { createApplication, getMyApplicationsApi, uploadApplicationCvApi, cancelApplicationApi, type MyApplicationItem } from '@/api/applications'
 import { getCvDetailApi } from '@/api/cv'
 
 import { OutlineButton, PrimaryButton } from '@/components/ui/Buttons'
@@ -66,6 +68,7 @@ type ApplyCvOption = 'default' | 'upload'
 const isDefined = <T,>(value: T | null | undefined): value is T => value !== null && value !== undefined
 
 const JobDetailPage = () => {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()      
@@ -82,6 +85,9 @@ const JobDetailPage = () => {
   const [isLoadingCvOptions, setIsLoadingCvOptions] = useState(false)
   const [isUploadingApplyCv, setIsUploadingApplyCv] = useState(false)
   const [applyModalNotice, setApplyModalNotice] = useState<string | null>(null)
+  const [myApplication, setMyApplication] = useState<MyApplicationItem | null>(null)
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
+  const [isCanceling, setIsCanceling] = useState(false)
   const selectedCvUrl = defaultCvUrl
   const setCvUploadError = setApplyModalNotice
   const sectionRefs = useRef<Partial<Record<JobDetailSectionId, HTMLElement | null>>>({})
@@ -231,11 +237,14 @@ const JobDetailPage = () => {
     getMyApplicationsApi({ page: 1, limit: 100 })
       .then((response) => {
         if (cancelled) return
-        setHasApplied(response.applications.some((application) => application.job.id === job.id))
+        const application = response.applications.find((app) => app.job.id === job.id)
+        setMyApplication(application ?? null)
+        setHasApplied(!!application)
       })
       .catch(() => {
         if (cancelled) return
         setHasApplied(false)
+        setMyApplication(null)
       })
 
     return () => {
@@ -395,14 +404,14 @@ const JobDetailPage = () => {
       setIsApplyModalOpen(true)
 
       if (!existingCvUrl) {
-        setApplyModalNotice('Bạn chưa có CV mặc định. Hãy tải lên một CV để hoàn tất ứng tuyển.')
+        setApplyModalNotice(t('jobDetail.noCvNotice'))
       }
     } catch (error) {
       const message = error && typeof error === 'object' && 'response' in error
         ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
         : null
 
-      setActionNotice(message || 'Không thể tải thông tin CV lúc này. Vui lòng thử lại sau ít phút.')
+      setActionNotice(message || t('jobDetail.loadCvFailedNotice'))
     } finally {
       setIsLoadingCvOptions(false)
     }
@@ -446,7 +455,7 @@ const JobDetailPage = () => {
       if (status === 409) {
         setHasApplied(true)
         setIsApplyModalOpen(false)
-        setActionNotice('Bạn đã ứng tuyển vị trí này.')
+        setActionNotice(t('jobDetail.alreadyAppliedNotice'))
         return
       }
 
@@ -479,7 +488,7 @@ const JobDetailPage = () => {
     }
 
     if (hasApplied) {
-      setActionNotice('Bạn đã ứng tuyển vị trí này.')
+      setActionNotice(t('jobDetail.alreadyAppliedNotice'))
       return
     }
 
@@ -495,7 +504,7 @@ const JobDetailPage = () => {
 
     if (selectedCvOption === 'upload') {
       if (!selectedCvFile) {
-        setApplyModalNotice('Vui lòng chọn file CV trước khi ứng tuyển.')
+        setApplyModalNotice(t('jobDetail.selectCvFirstNotice'))
         return
       }
 
@@ -509,7 +518,7 @@ const JobDetailPage = () => {
           ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
           : null
 
-        setApplyModalNotice(message || 'Không thể tải CV lên lúc này. Vui lòng thử lại sau.')
+        setApplyModalNotice(message || t('jobDetail.uploadCvFailedNotice'))
         return
       } finally {
         setIsUploadingApplyCv(false)
@@ -517,7 +526,7 @@ const JobDetailPage = () => {
     }
 
     if (!cvUrl) {
-      setApplyModalNotice('Vui lòng chọn CV mặc định hoặc tải lên một CV khác để ứng tuyển.')
+      setApplyModalNotice(t('jobDetail.selectCvOptionNotice'))
       return
     }
 
@@ -528,7 +537,7 @@ const JobDetailPage = () => {
       setHasApplied(true)
       setIsApplyModalOpen(false)
       setSelectedCvFile(null)
-      setActionNotice('Ứng tuyển thành công. Nhà tuyển dụng đã có thể xem hồ sơ của bạn.')
+      setActionNotice(t('jobDetail.applySuccessNotice'))
     } catch (error) {
       const message = error && typeof error === 'object' && 'response' in error
         ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
@@ -540,13 +549,31 @@ const JobDetailPage = () => {
       if (status === 409) {
         setHasApplied(true)
         setIsApplyModalOpen(false)
-        setActionNotice('Bạn đã ứng tuyển vị trí này.')
+        setActionNotice(t('jobDetail.alreadyAppliedNotice'))
         return
       }
 
-      setApplyModalNotice(message || 'Không thể gửi hồ sơ lúc này. Vui lòng thử lại sau ít phút.')
+      setApplyModalNotice(message || t('jobDetail.submitFailedNotice'))
     } finally {
       setIsApplying(false)
+    }
+  }
+
+  const handleCancelApplication = async () => {
+    if (!myApplication) return
+
+    setIsCanceling(true)
+    setActionNotice(null)
+    try {
+      await cancelApplicationApi(myApplication.id)
+      setHasApplied(false)
+      setMyApplication(null)
+      setActionNotice(t('jobDetail.cancelSuccessNotice'))
+      setIsCancelModalOpen(false)
+    } catch {
+      setActionNotice(t('jobDetail.cancelFailedNotice'))
+    } finally {
+      setIsCanceling(false)
     }
   }
 
@@ -832,15 +859,18 @@ const JobDetailPage = () => {
               ) : null}
             </main>
 
-            <aside className='space-y-5 lg:sticky lg:top-24 lg:self-start'>
+            <aside className='space-y-5 lg:sticky lg:top-24'>
               <JobActionsCard
                 isBookmarked={isBookmarked}
                 isBookmarkLoading={isBookmarkLoading}
                 isApplying={isApplying || isLoadingCvOptions}
                 hasApplied={hasApplied}
-                onApply={handleApply}
-                onToggleBookmark={handleBookmark}
-                onCopyLink={handleCopyLink}
+                applicationStatus={myApplication?.status}
+                isCanceling={isCanceling}
+                onApply={() => void handleApply()}
+                onToggleBookmark={() => void handleBookmark()}
+                onCancelApplication={() => setIsCancelModalOpen(true)}
+                onCopyLink={() => void handleCopyLink()}
                 onShareLinkedIn={handleShareLinkedIn}
                 onShareEmail={handleShareEmail}
                 notice={actionNotice}
@@ -888,7 +918,7 @@ const JobDetailPage = () => {
               hasApplied && 'bg-emerald-600 shadow-[0_14px_32px_rgba(16,185,129,0.22)] hover:bg-emerald-600'
             )}
           >
-            {isApplying || isLoadingCvOptions ? 'Đang chuẩn bị...' : hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
+            {isApplying || isLoadingCvOptions ? t('jobDetail.preparing') : hasApplied ? t('jobDetail.applied') : t('jobDetail.applyNow')}
           </PrimaryButton>
         </div>
       </div>
@@ -899,9 +929,9 @@ const JobDetailPage = () => {
             <div className='border-b border-slate-200 bg-slate-50 px-6 py-5'>
               <div className='flex items-start justify-between gap-4'>
                 <div>
-                  <h2 className='text-xl font-semibold text-slate-950'>Chọn CV để ứng tuyển</h2>
+                  <h2 className='text-xl font-semibold text-slate-950'>{t('jobDetail.applyModalTitle')}</h2>
                   <p className='mt-1 text-sm leading-6 text-slate-600'>
-                    Bạn có thể dùng CV mặc định hiện có hoặc tải lên một CV khác chỉ cho lần ứng tuyển này.
+                    {t('jobDetail.applyModalSubtitle')}
                   </p>
                 </div>
                 <button
@@ -910,7 +940,7 @@ const JobDetailPage = () => {
                   disabled={isApplying || isUploadingApplyCv}
                   className='rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-500 transition hover:border-slate-300 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-60'
                 >
-                  Đóng
+                  {t('jobDetail.close')}
                 </button>
               </div>
             </div>
@@ -936,12 +966,12 @@ const JobDetailPage = () => {
                 <div className='flex-1'>
                   <div className='flex items-center gap-2 text-base font-semibold text-slate-900'>
                     <FileText className='h-5 w-5 text-violet-600' />
-                    CV mặc định
+                    {t('jobDetail.defaultCvLabel')}
                   </div>
                   <p className='mt-1 text-sm leading-6 text-slate-600'>
                     {defaultCvUrl
-                      ? 'Dùng file CV hiện đang lưu trong hồ sơ seeker của bạn.'
-                      : 'Hiện bạn chưa có CV mặc định trong hồ sơ.'}
+                      ? t('jobDetail.defaultCvDesc')
+                      : t('jobDetail.noDefaultCvDesc')}
                   </p>
                   {defaultCvUrl ? (
                     <a
@@ -950,7 +980,7 @@ const JobDetailPage = () => {
                       rel='noreferrer'
                       className='mt-3 inline-flex items-center gap-2 text-sm font-semibold text-violet-700 hover:text-violet-800'
                     >
-                      Xem CV hiện tại
+                      {t('jobDetail.viewCurrentCv')}
                     </a>
                   ) : null}
                 </div>
@@ -976,10 +1006,10 @@ const JobDetailPage = () => {
                 <div className='flex-1'>
                   <div className='flex items-center gap-2 text-base font-semibold text-slate-900'>
                     <Upload className='h-5 w-5 text-sky-600' />
-                    Tải lên CV khác
+                    {t('jobDetail.uploadOtherCvLabel')}
                   </div>
                   <p className='mt-1 text-sm leading-6 text-slate-600'>
-                    File này chỉ dùng cho lần ứng tuyển hiện tại, không ghi đè CV mặc định của bạn.
+                    {t('jobDetail.uploadOtherCvDesc')}
                   </p>
                   <input
                     type='file'
@@ -1011,7 +1041,7 @@ const JobDetailPage = () => {
                 disabled={isApplying || isUploadingApplyCv}
                 className='rounded-2xl border-slate-200 text-slate-700'
               >
-                Hủy
+                {t('jobDetail.cancel')}
               </OutlineButton>
               <PrimaryButton
                 onClick={submitApplication}
@@ -1020,12 +1050,19 @@ const JobDetailPage = () => {
               >
                 {isUploadingApplyCv ? <LoaderCircle className='mr-2 h-4 w-4 animate-spin' /> : null}
                 {isApplying ? <LoaderCircle className='mr-2 h-4 w-4 animate-spin' /> : null}
-                {isUploadingApplyCv ? 'Đang tải CV...' : isApplying ? 'Đang ứng tuyển...' : 'Xác nhận ứng tuyển'}
+                {isUploadingApplyCv ? t('jobDetail.uploadingCv') : isApplying ? t('jobDetail.applying') : t('jobDetail.confirmApply')}
               </PrimaryButton>
             </div>
           </div>
         </div>
       ) : null}
+
+      <CancelApplicationModal
+        open={isCancelModalOpen}
+        isCanceling={isCanceling}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={() => void handleCancelApplication()}
+      />
     </div>
   )
 }

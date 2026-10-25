@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Lock, Check, AlertCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -9,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/store/authStore'
 
 const ResetPasswordPage = () => {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const {
     resetNewPassword,
@@ -28,9 +30,9 @@ const ResetPasswordPage = () => {
 
   useEffect(() => {
     if (!token) {
-      setResetError('Invalid password reset link')
+      setResetError(t('auth.invalidResetLink'))
     }
-  }, [setResetError, token])
+  }, [setResetError, t, token])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,8 +53,8 @@ const ResetPasswordPage = () => {
               <Check className='h-8 w-8 text-green-600' />
             </div>
           </div>
-          <h2 className='text-2xl font-bold mb-2'>Password reset successful</h2>
-          <p className='text-muted-foreground mb-6'>Your password has been changed. Redirecting to login page...</p>
+          <h2 className='text-2xl font-bold mb-2'>{t('auth.resetSuccessTitle')}</h2>
+          <p className='text-muted-foreground mb-6'>{t('auth.resetSuccessSubtitle')}</p>
         </Card>
       </div>
     )
@@ -63,8 +65,8 @@ const ResetPasswordPage = () => {
       <Card className='w-full max-w-md p-8'>
         <div className='text-center mb-8'>
           <Lock className='h-12 w-12 mx-auto text-primary mb-4' />
-          <h1 className='text-2xl font-bold'>Reset password</h1>
-          <p className='text-muted-foreground mt-2'>Enter your new password</p>
+          <h1 className='text-2xl font-bold'>{t('auth.resetPasswordTitle')}</h1>
+          <p className='text-muted-foreground mt-2'>{t('auth.enterNewPassword')}</p>
         </div>
 
         {resetError && (
@@ -76,25 +78,25 @@ const ResetPasswordPage = () => {
 
         <form onSubmit={handleSubmit} className='space-y-6'>
           <div>
-            <Label htmlFor='password'>New password</Label>
+            <Label htmlFor='password'>{t('auth.newPassword')}</Label>
             <Input
               id='password'
               type='password'
-              placeholder='Enter new password'
+              placeholder='••••••••'
               value={resetNewPassword}
               onChange={(e) => setResetNewPassword(e.target.value)}
               disabled={resetLoading || !token}
               className='mt-2'
             />
-            <p className='text-xs text-muted-foreground mt-1'>Minimum 8 characters</p>
+            <p className='text-xs text-muted-foreground mt-1'>{t('auth.passwordHint')}</p>
           </div>
 
           <div>
-            <Label htmlFor='confirm'>Confirm password</Label>
+            <Label htmlFor='confirm'>{t('auth.confirmPassword')}</Label>
             <Input
               id='confirm'
               type='password'
-              placeholder='Re-enter password'
+              placeholder='••••••••'
               value={resetConfirmPassword}
               onChange={(e) => setResetConfirmPassword(e.target.value)}
               disabled={resetLoading || !token}
@@ -103,13 +105,13 @@ const ResetPasswordPage = () => {
           </div>
 
           <Button type='submit' className='w-full' disabled={resetLoading || !token}>
-            {resetLoading ? 'Resetting...' : 'Reset password'}
+            {resetLoading ? t('auth.resetting') : t('auth.resetPasswordTitle')}
           </Button>
         </form>
 
         <div className='mt-6 text-center'>
           <button onClick={() => navigate('/login')} className='text-primary hover:underline text-sm font-medium'>
-            Back to login
+            {t('auth.backToLogin')}
           </button>
         </div>
       </Card>

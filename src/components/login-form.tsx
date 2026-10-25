@@ -7,13 +7,13 @@ import { Briefcase, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { loginSchema, type LoginFormData } from '@/validators/loginSchema'
 import { Alert, AlertDescription } from './ui/alert'
 import { useAuth } from '@/hooks/useAuth'
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
-  console.log('[LoginForm] Component rendered')
-
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   // Lấy error từ URL (nếu có từ Google callback)
@@ -33,14 +33,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
   const socialErrorMessage =
     urlError === 'google_auth_failed'
-      ? 'Đăng nhập Google thất bại'
+      ? t('auth.googleAuthFailed')
       : urlError?.includes('github')
-        ? 'Đăng nhập GitHub thất bại'
+        ? t('auth.githubAuthFailed')
         : urlError?.includes('facebook')
-          ? 'Đăng nhập Facebook thất bại'
-          : 'Có lỗi xảy ra'
-
-  console.log('[LoginForm] Current state - isLoading:', isLoading, '| error:', error)
+          ? t('auth.facebookAuthFailed')
+          : t('auth.errorOccurred')
 
   const {
     register,
@@ -54,18 +52,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     }
   })
 
-  // Debug validation errors
-  if (Object.keys(errors).length > 0) {
-    console.log('[LoginForm] Validation errors:', errors)
-  }
-
   // Submit handler - gọi login từ store và handle navigation
   const onSubmit = async (data: LoginFormData) => {
     const user = await login(data)
 
     // Nếu login thành công, redirect theo role
     if (user) {
-      console.log('[LoginForm] Login successful, redirecting based on role:', user.role)
       redirectByRole(user)
     }
   }
@@ -77,8 +69,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
           <form className='bg-white p-6 md:p-8 lg:p-10' onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup className='gap-6'>
               <div className='flex flex-col items-center gap-2 text-center'>
-                <h1 className='text-3xl font-semibold tracking-[-0.04em] text-slate-950'>Welcome back</h1>
-                <p className='text-balance text-base text-slate-500'>Login to your ITJobVN account</p>
+                <h1 className='text-3xl font-semibold tracking-[-0.04em] text-slate-950'>{t('auth.welcomeBack')}</h1>
+                <p className='text-balance text-base text-slate-500'>{t('auth.loginSubtitle')}</p>
               </div>
 
               {/* Hiển thị lỗi từ API hoặc từ Google callback */}
@@ -89,7 +81,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               )}
 
               <Field>
-                <FieldLabel htmlFor='email'>Email</FieldLabel>
+                <FieldLabel htmlFor='email'>{t('auth.email')}</FieldLabel>
                 <Input
                   id='email'
                   type='email'
@@ -106,13 +98,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               </Field>
               <Field>
                 <div className='flex items-center'>
-                  <FieldLabel htmlFor='password'>Password</FieldLabel>
+                  <FieldLabel htmlFor='password'>{t('auth.password')}</FieldLabel>
                   <button
                     type='button'
                     onClick={() => navigate('/forgot-password')}
                     className='ml-auto text-sm text-violet-600 underline-offset-2 transition-colors hover:text-violet-700 hover:underline'
                   >
-                    Forgot your password?
+                    {t('auth.forgotPassword')}
                   </button>
                 </div>
                 <div className='relative'>
@@ -151,11 +143,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                   disabled={isLoading}
                   className='h-11 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_14px_36px_rgba(124,58,237,0.28)] hover:brightness-105'
                 >
-                  Login
+                  {isLoading ? t('auth.processing') : t('auth.login')}
                 </Button>
               </Field>
               <FieldSeparator className='*:data-[slot=field-separator-content]:bg-white *:data-[slot=field-separator-content]:text-slate-500'>
-                Or continue with
+                {t('auth.orContinueWith')}
               </FieldSeparator>
               <Field className='grid grid-cols-3 gap-4'>
                 <Button
@@ -171,7 +163,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                       fill='currentColor'
                     />
                   </svg>
-                  <span className='sr-only'>Login with GitHub</span>
+                  <span className='sr-only'>{t('auth.loginWithGithub')}</span>
                 </Button>
                 <Button
                   variant='outline'
@@ -186,7 +178,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                       fill='currentColor'
                     />
                   </svg>
-                  <span className='sr-only'>Login with Google</span>
+                  <span className='sr-only'>{t('auth.loginWithGoogle')}</span>
                 </Button>
                 <Button
                   variant='outline'
@@ -201,17 +193,17 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                       fill='currentColor'
                     />
                   </svg>
-                  <span className='sr-only'>Login with Meta</span>
+                  <span className='sr-only'>{t('auth.loginWithFacebook')}</span>
                 </Button>
               </Field>
               <FieldDescription className='text-center'>
-                Don&apos;t have an account?
+                {t('auth.dontHaveAccount')}{' '}
                 <button
                   type='button'
                   onClick={() => navigate('/register')}
-                  className='ml-auto text-sm underline-offset-2 hover:underline text-primary'
+                  className='ml-auto text-sm underline-offset-2 hover:underline text-primary font-semibold'
                 >
-                  Sign up
+                  {t('auth.signUp')}
                 </button>
               </FieldDescription>
             </FieldGroup>
@@ -238,26 +230,26 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               </svg>
             </div>
             <h2 className='relative mb-4 text-center text-3xl font-semibold leading-tight tracking-[-0.04em]'>
-              Launch your tech career in Vietnam.
+              {t('auth.heroTitle')}
             </h2>
-            <p className='relative mb-8 max-w-xs text-center text-lg leading-8 text-white/82'>
-              Join 50,000+ developers finding their dream jobs at top-tier tech companies.
+            <p className='relative mb-8 max-w-xs text-center text-sm leading-6 text-white/82'>
+              {t('auth.heroSubtitle')}
             </p>
             <div className='relative flex gap-4'>
               <div className='flex flex-col items-center rounded-2xl bg-white/16 px-6 py-5 backdrop-blur-sm'>
                 <Briefcase className='w-6 h-6 mb-2' />
-                <span className='text-sm font-semibold'>2,000+ Active Jobs</span>
+                <span className='text-sm font-semibold'>1,500+ Jobs</span>
               </div>
               <div className='flex flex-col items-center rounded-2xl bg-white/16 px-6 py-5 backdrop-blur-sm'>
                 <CheckCircle className='w-6 h-6 mb-2' />
-                <span className='text-sm font-semibold'>Verified Companies</span>
+                <span className='text-sm font-semibold'>Verified</span>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
       <FieldDescription className='px-6 text-center text-slate-500'>
-        By clicking continue, you agree to our <a href='#'>Terms of Service</a> and <a href='#'>Privacy Policy</a>.
+        {t('auth.termsNotice')}
       </FieldDescription>
     </div>
   )

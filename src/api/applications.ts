@@ -87,3 +87,8 @@ export const getMyApplicationsApi = async (params?: {
 
   return response.data
 }
+
+export const cancelApplicationApi = async (applicationId: number) => {
+  const response = await axiosInstance.delete<{ message: string }>(`/applications/${applicationId}/cancel`)
+  return response.data
+}

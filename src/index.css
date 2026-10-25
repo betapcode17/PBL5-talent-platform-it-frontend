@@ -239,9 +239,14 @@ html[data-theme-transition]::view-transition-new(root) {
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  code, pre, kbd {
+    font-family: 'JetBrains Mono', monospace;
   }
 
   a {
@@ -253,4 +258,71 @@ html[data-theme-transition]::view-transition-new(root) {
   input {
     font: inherit;
   }
+
+  /* Sleek modern scrollbars */
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 58, 237, 0.45);
+  }
 }
+
+/* UI/UX Pro Max Utility Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(25, 29, 39, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(63, 70, 85, 0.6);
+}
+
+.bento-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: #ffffff;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
+}
+
+.bento-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px -15px rgba(124, 58, 237, 0.12);
+  border-color: rgba(196, 181, 253, 0.8);
+}
+
+.dark .bento-card {
+  background: #191d27;
+  border-color: rgba(63, 70, 85, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+}
+
+.dark .bento-card:hover {
+  border-color: rgba(167, 139, 250, 0.4);
+  box-shadow: 0 20px 40px -15px rgba(124, 58, 237, 0.25);
+}
+
+.badge-glow {
+  box-shadow: 0 0 15px -3px rgba(124, 58, 237, 0.25);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.3);
+}
+

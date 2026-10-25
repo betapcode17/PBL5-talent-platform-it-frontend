@@ -14,6 +14,9 @@ type JobActionsCardProps = {
   onShareLinkedIn: () => void
   onShareEmail: () => void
   notice?: string | null
+  applicationStatus?: string | null
+  isCanceling?: boolean
+  onCancelApplication?: () => void
 }
 
 const shareButtons = [
@@ -44,7 +47,10 @@ const JobActionsCard = ({
   onCopyLink,
   onShareLinkedIn,
   onShareEmail,
-  notice
+  notice,
+  applicationStatus,
+  isCanceling,
+  onCancelApplication
 }: JobActionsCardProps) => {
   const { t } = useTranslation()
 
@@ -70,13 +76,24 @@ const JobActionsCard = ({
           disabled={isApplying || hasApplied}
           className={cn(
             'h-14 w-full rounded-2xl text-base disabled:cursor-not-allowed disabled:opacity-70',
-            hasApplied && 'bg-emerald-600 shadow-[0_14px_32px_rgba(16,185,129,0.22)] hover:bg-emerald-600'
+            hasApplied && 'bg-none bg-emerald-600 shadow-[0_14px_32px_rgba(16,185,129,0.22)] hover:bg-emerald-600'
           )}
         >
           {isApplying ? <LoaderCircle className='mr-2 h-4 w-4 animate-spin' /> : null}
           {!isApplying && hasApplied ? <CheckCircle2 className='mr-2 h-4 w-4' /> : null}
           {isApplying ? t('jobDetail.applying') : hasApplied ? t('jobDetail.applied') : t('jobDetail.applyNow')}
         </PrimaryButton>
+
+        {hasApplied && applicationStatus === 'PENDING' && (
+          <OutlineButton
+            onClick={onCancelApplication}
+            disabled={isCanceling}
+            className='h-[52px] w-full rounded-2xl border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700'
+          >
+            {isCanceling ? <LoaderCircle className='mr-2 h-4 w-4 animate-spin' /> : null}
+            {t('jobDetail.cancelApplication')}
+          </OutlineButton>
+        )}
 
         <OutlineButton onClick={onToggleBookmark} disabled={isBookmarkLoading} className='h-[52px] w-full rounded-2xl border-slate-200 text-slate-700'>
           {isBookmarkLoading ? <LoaderCircle className='mr-2 h-4 w-4 animate-spin' /> : <Bookmark className={cn('mr-2 h-4 w-4', isBookmarked ? 'fill-violet-600 text-violet-600' : '')} />}

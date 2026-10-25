@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { getCompanyByIdApi } from '@/api/company'
 import { CompanyContact } from '@/components/company/detail/CompanyContact'
 import { CompanyGallery } from '@/components/company/detail/CompanyGallery'
@@ -9,6 +10,7 @@ import { CompanyJobs } from '@/components/company/detail/CompanyJobs'
 import { CompanyOverview } from '@/components/company/detail/CompanyOverview'
 
 export default function CompanyDetailPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
 
   const { data, isLoading } = useQuery({
@@ -40,7 +42,7 @@ export default function CompanyDetailPage() {
   }
 
   if (!company) {
-    return <div className='p-10 text-center text-slate-500'>Không tìm thấy công ty.</div>
+    return <div className='p-10 text-center text-slate-500'>{t('company.companyNotFound')}</div>
   }
 
   return (

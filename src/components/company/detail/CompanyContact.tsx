@@ -1,13 +1,16 @@
 import type { ReactNode } from 'react'
 import type { CompanyDetail } from '@/@types/company'
 import { Globe, Mail } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export const CompanyContact = ({ company }: { company: CompanyDetail }) => {
+  const { t } = useTranslation()
+
   return (
     <section className='rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_56px_rgba(15,23,42,0.06)]'>
       <div className='mb-5'>
-        <p className='text-xs font-semibold uppercase tracking-[0.24em] text-slate-400'>Contact</p>
-        <h2 className='mt-2 text-xl font-semibold text-slate-950'>Kết nối với công ty</h2>
+        <p className='text-xs font-semibold uppercase tracking-[0.24em] text-slate-400'>{t('company.contact')}</p>
+        <h2 className='mt-2 text-xl font-semibold text-slate-950'>{t('company.connectCompany')}</h2>
       </div>
 
       <div className='space-y-3'>
@@ -15,13 +18,13 @@ export const CompanyContact = ({ company }: { company: CompanyDetail }) => {
           icon={<Mail className='h-4 w-4' />}
           label='Email'
           href={company.company_email ? `mailto:${company.company_email}` : undefined}
-          value={company.company_email || 'Chưa cập nhật'}
+          value={company.company_email || t('company.notUpdated')}
         />
         <ContactItem
           icon={<Globe className='h-4 w-4' />}
           label='Website'
           href={company.company_website_url || undefined}
-          value={company.company_website_url || 'Chưa cập nhật'}
+          value={company.company_website_url || t('company.notUpdated')}
           external={Boolean(company.company_website_url)}
         />
       </div>

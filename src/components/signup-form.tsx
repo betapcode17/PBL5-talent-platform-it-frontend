@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from './ui/card'
 import { Eye, EyeOff, Star } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/store/authStore'
 import { useForm } from 'react-hook-form'
 import { type RegisterFormData, registerSchema } from '@/validators'
@@ -13,6 +14,7 @@ import { Alert, AlertDescription } from './ui/alert'
 import { useState } from 'react'
 
 export function SignupForm({ className, ...props }: React.ComponentProps<'div'>) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { register: registerUser, isLoading, error, clearError } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
@@ -69,14 +71,13 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                   <rect x='14' y='14' width='7' height='7' rx='1' />
                 </svg>
               </div>
-              <span className='text-xl font-bold'>TalentPlatformIT</span>
+              <span className='text-xl font-bold'>ITJobVN</span>
             </div>
 
             <div className='flex flex-1 flex-col justify-center'>
-              <h2 className='mb-4 text-3xl font-bold leading-tight'>Connect with Vietnam&apos;s Top Tech Talents</h2>
+              <h2 className='mb-4 text-3xl font-bold leading-tight'>{t('auth.heroTitle')}</h2>
               <p className='text-sm leading-relaxed text-white/80'>
-                Access over 5,000+ curated developer profiles and the latest high-paying tech opportunities in Ho Chi
-                Minh City, Hanoi, and Da Nang.
+                {t('auth.heroSubtitle')}
               </p>
             </div>
 
@@ -87,7 +88,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                 ))}
               </div>
               <p className='mb-4 text-sm italic text-white/90'>
-                &quot;TalentPlatformIT helped me land my Senior Dev role at a top fintech firm within 2 weeks. The
+                &quot;ITJobVN helped me land my Senior Dev role at a top fintech firm within 2 weeks. The
                 platform is incredibly efficient.&quot;
               </p>
               <div className='flex items-center gap-3'>
@@ -116,16 +117,16 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
           <form className='p-6 md:p-8' onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <div className='flex flex-col items-center gap-1 text-center'>
-                <h1 className='text-2xl font-bold'>Create your account</h1>
+                <h1 className='text-2xl font-bold'>{t('auth.createAccount')}</h1>
                 <p className='text-muted-foreground text-sm text-balance'>
-                  Fill in the form below to create your account
+                  {t('auth.signupSubtitle')}
                 </p>
               </div>
 
               {isSuccess && (
                 <Alert className='border-green-200 bg-green-50'>
                   <AlertDescription className='break-words whitespace-normal text-green-800'>
-                    Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...
+                    {t('auth.signupSuccess')}
                   </AlertDescription>
                 </Alert>
               )}
@@ -137,7 +138,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
               )}
 
               <Field>
-                <FieldLabel htmlFor='fullName'>Full Name</FieldLabel>
+                <FieldLabel htmlFor='fullName'>{t('auth.fullName')}</FieldLabel>
                 <Input
                   id='fullName'
                   type='text'
@@ -150,7 +151,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
               </Field>
 
               <Field>
-                <FieldLabel htmlFor='email'>Email</FieldLabel>
+                <FieldLabel htmlFor='email'>{t('auth.email')}</FieldLabel>
                 <Input
                   id='email'
                   type='email'
@@ -160,11 +161,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                   disabled={isLoading || isSuccess}
                 />
                 {errors.email && <p className='text-sm text-destructive'>{errors.email.message}</p>}
-                <FieldDescription>Chúng tôi sẽ không chia sẻ email của bạn với bất kỳ ai.</FieldDescription>
+                <FieldDescription>{t('auth.emailPrivacy')}</FieldDescription>
               </Field>
 
               <Field>
-                <FieldLabel htmlFor='password'>Password</FieldLabel>
+                <FieldLabel htmlFor='password'>{t('auth.password')}</FieldLabel>
                 <div className='relative'>
                   <Input
                     id='password'
@@ -190,11 +191,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                   </Button>
                 </div>
                 {errors.password && <p className='text-sm text-destructive'>{errors.password.message}</p>}
-                <FieldDescription>Ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.</FieldDescription>
+                <FieldDescription>{t('auth.passwordHint')}</FieldDescription>
               </Field>
 
               <Field>
-                <FieldLabel htmlFor='confirmPassword'>Confirm Password</FieldLabel>
+                <FieldLabel htmlFor='confirmPassword'>{t('auth.confirmPassword')}</FieldLabel>
                 <div className='relative'>
                   <Input
                     id='confirmPassword'
@@ -224,11 +225,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
               <Field>
                 <Button type='submit' disabled={isLoading || isSuccess} className='w-full'>
-                  {isLoading ? 'Đang xử lý...' : 'Tạo tài khoản'}
+                  {isLoading ? t('auth.processing') : t('auth.createAccount')}
                 </Button>
               </Field>
 
-              <FieldSeparator>Or continue with</FieldSeparator>
+              <FieldSeparator>{t('auth.orContinueWith')}</FieldSeparator>
 
               <Field>
                 <Button variant='outline' type='button' className='w-full' disabled={isLoading || isSuccess}>
@@ -238,18 +239,18 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                       fill='currentColor'
                     />
                   </svg>
-                  Sign up with GitHub
+                  {t('auth.loginWithGithub')}
                 </Button>
               </Field>
 
               <FieldDescription className='text-center'>
-                Have a account?{' '}
+                {t('auth.alreadyHaveAccount')}{' '}
                 <button
                   type='button'
                   onClick={() => navigate('/login')}
-                  className='ml-auto text-sm text-primary underline-offset-2 hover:underline'
+                  className='ml-auto text-sm text-primary underline-offset-2 hover:underline font-semibold'
                 >
-                  Login
+                  {t('auth.signIn')}
                 </button>
               </FieldDescription>
             </FieldGroup>

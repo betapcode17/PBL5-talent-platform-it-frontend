@@ -7,12 +7,14 @@ import axios from 'axios'
 import { ArrowUpRight, BriefcaseBusiness, Building2, MapPin, Star, Users } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 type Props = {
   company: Company
 }
 
 export const CompanyCard = ({ company }: Props) => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { followerCount, isFollowed } = useFollow(company.company_id)
   const [jobs, setJobs] = useState<CompanyJobSummary[]>([])
@@ -120,20 +122,20 @@ export const CompanyCard = ({ company }: Props) => {
                   ) : null}
                   <span className='inline-flex items-center gap-2'>
                     <Building2 className='h-4 w-4 text-violet-500' />
-                    {followerCount} người đang follow
+                    {t('company.followers', { count: followerCount })}
                   </span>
                 </div>
               </div>
             </div>
 
             <div className='flex shrink-0 flex-col items-start gap-2 xl:items-end'>
-              <p className='text-xs font-semibold uppercase tracking-[0.22em] text-slate-400'>Company Profile</p>
+              <p className='text-xs font-semibold uppercase tracking-[0.22em] text-slate-400'>{t('company.companyProfile')}</p>
               <Link
                 to={`/companies/${company.company_id}`}
                 onClick={(e) => e.stopPropagation()}
                 className='inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(124,58,237,0.24)] transition hover:bg-violet-700'
               >
-                Xem công ty
+                {t('company.viewCompany')}
                 <ArrowUpRight className='h-4 w-4' />
               </Link>
             </div>
@@ -159,8 +161,8 @@ export const CompanyCard = ({ company }: Props) => {
                   <BriefcaseBusiness className='h-4 w-4' />
                 </div>
                 <div>
-                  <p className='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>Open Roles</p>
-                  <p className='text-sm font-semibold text-slate-900'>Vị trí đang tuyển</p>
+                  <p className='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>{t('company.openPositions')}</p>
+                  <p className='text-sm font-semibold text-slate-900'>{t('company.openPositions')}</p>
                 </div>
               </div>
 
@@ -187,28 +189,28 @@ export const CompanyCard = ({ company }: Props) => {
                       }}
                       className='pt-1 text-sm font-semibold text-violet-700 transition hover:text-violet-800 hover:underline'
                     >
-                      {showMoreJobs ? 'Thu gọn' : 'Xem thêm'}
+                      {showMoreJobs ? t('company.showLess') : t('company.viewMore')}
                     </button>
                   )}
                 </div>
               ) : (
-                <p className='text-sm text-slate-500'>Chưa có công việc đang tuyển.</p>
+                <p className='text-sm text-slate-500'>{t('company.noOpenPositions')}</p>
               )}
             </div>
 
             <div className='rounded-[24px] border border-slate-200 bg-white p-4'>
-              <p className='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>Quick View</p>
+              <p className='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>{t('company.quickView')}</p>
               <div className='mt-3 space-y-3 text-sm text-slate-600'>
                 <div className='flex items-start justify-between gap-4'>
-                  <span className='text-slate-400'>Lĩnh vực</span>
+                  <span className='text-slate-400'>{t('company.industry')}</span>
                   <span className='text-right font-medium text-slate-900'>{company.company_industry || '-'}</span>
                 </div>
                 <div className='flex items-start justify-between gap-4'>
-                  <span className='text-slate-400'>Quy mô</span>
+                  <span className='text-slate-400'>{t('company.companySize')}</span>
                   <span className='text-right font-medium text-slate-900'>{company.company_size || '-'}</span>
                 </div>
                 <div className='flex items-start justify-between gap-4'>
-                  <span className='text-slate-400'>Thành phố</span>
+                  <span className='text-slate-400'>{t('company.location')}</span>
                   <span className='text-right font-medium text-slate-900'>{company.city || '-'}</span>
                 </div>
               </div>

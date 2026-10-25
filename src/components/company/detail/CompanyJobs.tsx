@@ -4,8 +4,10 @@ import axios from 'axios'
 import { ArrowUpRight, BriefcaseBusiness, Clock3 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export const CompanyJobs = ({ companyId }: { companyId: number }) => {
+  const { t, i18n } = useTranslation()
   const [jobs, setJobs] = useState<CompanyJobSummary[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -39,8 +41,8 @@ export const CompanyJobs = ({ companyId }: { companyId: number }) => {
     <section className='rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_56px_rgba(15,23,42,0.06)]'>
       <div className='mb-5 flex items-center justify-between gap-3'>
         <div>
-          <p className='text-xs font-semibold uppercase tracking-[0.24em] text-slate-400'>Open Roles</p>
-          <h2 className='mt-2 text-xl font-semibold text-slate-950'>Việc làm đang tuyển</h2>
+          <p className='text-xs font-semibold uppercase tracking-[0.24em] text-slate-400'>{t('company.openPositions')}</p>
+          <h2 className='mt-2 text-xl font-semibold text-slate-950'>{t('company.openPositions')}</h2>
         </div>
       </div>
 
@@ -55,8 +57,7 @@ export const CompanyJobs = ({ companyId }: { companyId: number }) => {
         </div>
       ) : jobs.length === 0 ? (
         <div className='rounded-[22px] border border-dashed border-slate-300 bg-slate-50/70 px-5 py-8 text-center'>
-          <p className='text-sm font-medium text-slate-700'>Công ty hiện chưa có vị trí active.</p>
-          <p className='mt-2 text-sm text-slate-500'>Danh sách việc làm sẽ hiển thị tại đây ngay khi có tin tuyển dụng mới.</p>
+          <p className='text-sm font-medium text-slate-700'>{t('company.noOpenPositions')}</p>
         </div>
       ) : (
         <div className='space-y-3'>
@@ -81,7 +82,7 @@ export const CompanyJobs = ({ companyId }: { companyId: number }) => {
                     {job.createdDate ? (
                       <span className='inline-flex items-center gap-1.5'>
                         <Clock3 className='h-3.5 w-3.5 text-violet-500' />
-                        {new Date(job.createdDate).toLocaleDateString('vi-VN')}
+                        {new Date(job.createdDate).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'vi-VN')}
                       </span>
                     ) : null}
                   </div>

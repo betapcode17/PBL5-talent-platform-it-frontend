@@ -35,6 +35,9 @@ export type Employer = {
   id: string
   name: string
   shortName: string
+  industry?: string
+  openRolesCount?: number
+  tone?: string
 }
 
 export type FooterLink = {

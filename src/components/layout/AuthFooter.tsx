@@ -1,37 +1,40 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Separator } from '@/components/ui/separator'
 
 const footerLinks = {
   candidates: {
-    title: 'For Candidates',
+    titleKey: 'footer.forCandidates',
     links: [
-      { label: 'Browse Jobs', href: '/jobs' },
-      { label: 'Remote Jobs', href: '/jobs' },
-      { label: 'CV Templates', href: '/jobs' },
-      { label: 'Salaries', href: '/jobs' }
+      { labelKey: 'footer.browseJobs', href: '/jobs' },
+      { labelKey: 'footer.remoteJobs', href: '/jobs' },
+      { labelKey: 'footer.cvTemplates', href: '/jobs' },
+      { labelKey: 'footer.salaries', href: '/jobs' }
     ]
   },
   employers: {
-    title: 'For Employers',
+    titleKey: 'footer.forEmployers',
     links: [
-      { label: 'Post a Job', href: '/employer/jobs/create' },
-      { label: 'Candidate Search', href: '/employer/candidates' },
-      { label: 'Pricing', href: '/employer' },
-      { label: 'Hiring Solutions', href: '/employer' }
+      { labelKey: 'footer.postJob', href: '/employer/jobs/create' },
+      { labelKey: 'footer.candidateSearch', href: '/employer/candidates' },
+      { labelKey: 'footer.pricing', href: '/employer' },
+      { labelKey: 'footer.hiringSolutions', href: '/employer' }
     ]
   },
   support: {
-    title: 'Support',
+    titleKey: 'footer.support',
     links: [
-      { label: 'Help Center', href: '/jobs' },
-      { label: 'Contact Us', href: '/jobs' },
-      { label: 'Privacy Policy', href: '/jobs' },
-      { label: 'Terms of Service', href: '/jobs' }
+      { labelKey: 'footer.helpCenter', href: '/jobs' },
+      { labelKey: 'footer.contactUs', href: '/jobs' },
+      { labelKey: 'footer.privacyPolicy', href: '/jobs' },
+      { labelKey: 'footer.termsOfService', href: '/jobs' }
     ]
   }
 }
 
 const AuthFooter = () => {
+  const { t } = useTranslation()
+
   return (
     <footer className='border-t bg-slate-50'>
       <div className='container mx-auto px-6 py-12'>
@@ -49,19 +52,18 @@ const AuthFooter = () => {
               <span className='text-xl font-bold text-slate-800'>ITJobVN</span>
             </Link>
             <p className='text-sm leading-relaxed text-slate-500'>
-              The premium destination for IT professionals in Vietnam. We help developers find meaningful work at the
-              best tech companies.
+              {t('footer.desc')}
             </p>
           </div>
 
           {Object.values(footerLinks).map((section) => (
-            <div key={section.title}>
-              <h3 className='mb-4 text-sm font-semibold text-slate-800'>{section.title}</h3>
+            <div key={section.titleKey}>
+              <h3 className='mb-4 text-sm font-semibold text-slate-800'>{t(section.titleKey)}</h3>
               <ul className='space-y-3'>
                 {section.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.labelKey}>
                     <Link to={link.href} className='text-sm text-slate-500 transition-colors hover:text-purple-600'>
-                      {link.label}
+                      {t(link.labelKey)}
                     </Link>
                   </li>
                 ))}
@@ -73,10 +75,10 @@ const AuthFooter = () => {
 
       <Separator />
       <div className='container mx-auto flex flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row'>
-        <p className='text-sm text-slate-400'>© 2024 ITJobVN Network. Made with love in Ho Chi Minh City.</p>
+        <p className='text-sm text-slate-400'>© {new Date().getFullYear()} ITJobVN Network. Engineered with ❤️ for Vietnam&apos;s Tech Community.</p>
         <div className='flex items-center gap-4'>
-          <span className='text-sm text-slate-400'>English (EN)</span>
-          <span className='text-sm text-slate-400'>15,204 jobs online</span>
+          <span className='text-sm text-slate-400'>{t('footer.region')}</span>
+          <span className='text-sm text-slate-400'>{t('footer.verifiedCount')}</span>
         </div>
       </div>
     </footer>

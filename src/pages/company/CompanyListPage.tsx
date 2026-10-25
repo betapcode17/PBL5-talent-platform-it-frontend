@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Building2, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { CompanyFilters } from '@/components/company/CompanyFilters'
 import { CompanyList } from '@/components/company/CompanyList'
 import { CompanyPagination } from '@/components/company/CompanyPagination'
@@ -26,27 +27,27 @@ export default function CompanyListPage() {
 }
 
 const HeaderSection = ({ total }: { total: number; visibleCount: number }) => {
+  const { t } = useTranslation()
+
   return (
     <section className='rounded-[32px] border border-slate-200/80 bg-white/90 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8'>
       <div className='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
         <div className='max-w-2xl'>
           <div className='inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-violet-700'>
             <Sparkles className='h-3.5 w-3.5' />
-            Company Explorer
+            {t('company.explorer')}
           </div>
 
           <h1 className='mt-4 text-3xl font-semibold tracking-[-0.05em] text-slate-950 sm:text-[3.1rem]'>
-            Khám phá các công ty công nghệ phù hợp với định hướng của bạn
+            {t('company.heroTitle')}
           </h1>
           <p className='mt-3 max-w-xl text-sm leading-7 text-slate-500 sm:text-base'>
-            Theo dõi nhanh quy mô, lĩnh vực, kỹ năng nổi bật và các vị trí đang tuyển để chọn ra môi trường làm việc phù
-            hợp trước khi ứng tuyển.
+            {t('company.heroSubtitle')}
           </p>
         </div>
 
         <div className='grid gap-3 sm:grid-cols-1'>
-          <MetricCard icon={<Building2 className='h-5 w-5' />} label='Tổng công ty' value={total} />
-          {/* <MetricCard icon={<LayoutGrid className='h-5 w-5' />} label='Đang hiển thị' value={visibleCount} /> */}
+          <MetricCard icon={<Building2 className='h-5 w-5' />} label={t('company.totalCompanies')} value={total} />
         </div>
       </div>
     </section>

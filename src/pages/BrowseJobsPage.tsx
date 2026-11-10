@@ -1,5 +1,6 @@
-import { memo, useCallback, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 import { SlidersHorizontal } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import ActiveFiltersBar from '@/components/browse-jobs/ActiveFiltersBar'
 import CareerTipsCard from '@/components/browse-jobs/CareerTipsCard'
@@ -100,7 +101,35 @@ const BrowseJobsResults = memo(() => {
 
 const BrowseJobsPage = () => {
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const setSearchQuery = useBrowseJobsStore((state) => state.setSearchQuery)
+  const setSelectedLocation = useBrowseJobsStore((state) => state.setSelectedLocation)
+  const setActiveTab = useBrowseJobsStore((state) => state.setActiveTab)
+  const setSortBy = useBrowseJobsStore((state) => state.setSortBy)
+
+  useEffect(() => {
+    const q = searchParams.get('q') || searchParams.get('category') || searchParams.get('keyword')
+    if (q !== null && q !== undefined) {
+      setSearchQuery(q)
+    }
+    const loc = searchParams.get('location')
+    if (loc !== null && loc !== undefined) {
+      setSelectedLocation(loc)
+    }
+    const tab = searchParams.get('tab')
+    if (tab === 'latest' || tab === 'savedJobs' || tab === 'bestMatch') {
+      setActiveTab(tab)
+    }
+    const sort = searchParams.get('sort')
+    if (sort === 'latest' || sort === 'newest') {
+      setSortBy('newest')
+    } else if (sort === 'salaryHigh') {
+      setSortBy('salaryHigh')
+    } else if (sort === 'salaryLow') {
+      setSortBy('salaryLow')
+    }
+  }, [searchParams, setActiveTab, setSearchQuery, setSelectedLocation, setSortBy])
 
   return (
     <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(168,85,247,0.10),_transparent_26%),linear-gradient(180deg,#f7f4ff_0%,#fafafc_100%)]'>

@@ -22,6 +22,7 @@ export type TopCompany = {
   jobsCount: number
   logoText: string
   logoTone: string
+  logoUrl?: string | null
 }
 
 export type FilterOption = {
@@ -42,6 +43,8 @@ export type BrowseJobsFilters = {
   salaryMax: string
   currentPage: number
   pageSize: number
+  activeTab?: 'bestMatch' | 'latest' | 'savedJobs'
+  sortBy?: 'newest' | 'salaryHigh' | 'salaryLow'
 }
 
 export type BrowseJobsQueryParams = BrowseJobsFilters

@@ -1,16 +1,57 @@
+import { useEffect, useState } from 'react'
 import { ArrowRight, BriefcaseBusiness, Search, Sparkles, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Container from '@/components/ui/Container'
-import { categories } from '@/data/categories'
+import { categories as defaultCategories } from '@/data/categories'
+import { getFeaturedCategoriesApi } from '@/api/categories'
+import type { Category } from '@/types'
+
+type EnrichedCategory = Category & {
+  count: number
+  percent: number
+}
 
 const CategoriesPage = () => {
   const { t } = useTranslation()
+  const [categoryList, setCategoryList] = useState<EnrichedCategory[]>(() =>
+    defaultCategories.map((c) => ({
+      ...c,
+      count: Number(String(c.openRoles).replace(/\D/g, '')) || 100,
+      percent: 65
+    }))
+  )
 
-  const totalRoles = categories.reduce((sum, category) => {
-    const number = Number(String(category.openRoles).replace(/\D/g, ''))
-    return sum + (Number.isNaN(number) ? 0 : number)
-  }, 0)
+  useEffect(() => {
+    let isMounted = true
+    getFeaturedCategoriesApi().then((featured) => {
+      if (isMounted && featured.length > 0) {
+        const maxJobs = Math.max(...featured.map((f) => f.count), 1)
+        const updated = defaultCategories.map((cat) => {
+          const match = featured.find((f) => f.id === cat.id)
+          const count = match?.count ?? (Number(String(cat.openRoles).replace(/\D/g, '')) || 0)
+          const openRoles = match?.openRoles ?? cat.openRoles
+          const percent = Math.min(100, Math.max(15, Math.round((count / maxJobs) * 100)))
+          return {
+            ...cat,
+            count,
+            openRoles,
+            percent
+          }
+        })
+
+        // Sort by job count desc for ranking
+        updated.sort((a, b) => b.count - a.count)
+        setCategoryList(updated)
+      }
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const totalRoles = categoryList.reduce((sum, cat) => sum + cat.count, 0)
 
   return (
     <div className='min-h-screen bg-[linear-gradient(180deg,#f8f5ff_0%,#ffffff_42%,#f8fafc_100%)] text-slate-950'>
@@ -72,7 +113,7 @@ const CategoriesPage = () => {
                       <TrendingUp className='h-5 w-5' />
                     </span>
                     <div>
-                      <p className='text-2xl font-black text-slate-950'>{categories.length}</p>
+                      <p className='text-2xl font-black text-slate-950'>{categoryList.length}</p>
                       <p className='text-sm font-semibold text-slate-500'>{t('categoriesPage.categoriesCount')}</p>
                     </div>
                   </div>
@@ -99,13 +140,13 @@ const CategoriesPage = () => {
         </section>
 
         <section className='mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-          {categories.map((category, index) => {
+          {categoryList.map((category, index) => {
             const Icon = category.icon
 
             return (
               <Link
                 key={category.id}
-                to={`/jobs?category=${encodeURIComponent(category.title)}`}
+                to={`/jobs?q=${encodeURIComponent(category.title)}`}
                 className='group relative overflow-hidden rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_16px_42px_rgba(15,23,42,0.05)] transition duration-200 hover:-translate-y-1 hover:border-violet-200 hover:shadow-[0_24px_58px_rgba(124,58,237,0.13)]'
               >
                 <div className='absolute -right-10 -top-10 h-28 w-28 rounded-full bg-violet-100 opacity-0 blur-2xl transition group-hover:opacity-100' />
@@ -126,7 +167,10 @@ const CategoriesPage = () => {
                   <p className='mt-2 text-sm font-semibold text-slate-500'>{category.openRoles}</p>
 
                   <div className='mt-5 h-2 overflow-hidden rounded-full bg-slate-100'>
-                    <div className='h-full w-2/3 rounded-full bg-violet-500 transition group-hover:w-full' />
+                    <div
+                      className='h-full rounded-full bg-violet-500 transition-all duration-500 group-hover:bg-violet-600'
+                      style={{ width: `${category.percent}%` }}
+                    />
                   </div>
 
                   <span className='mt-5 inline-flex items-center gap-2 text-sm font-bold text-violet-700'>

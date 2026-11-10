@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import axiosInstance from '@/api/axiosInstance'
 import { getMyApplicationsApi } from '@/api/applications'
+import { getBookmarks } from '@/api/bookmarks'
 import { useAuthStore } from '@/store/authStore'
 import type { BrowseJob, BrowseJobsFilterOptions, BrowseJobsQueryParams, BrowseJobsResponse } from '@/types/browse-jobs'
 import { formatSalaryDisplay } from '@/utils/salary'
@@ -257,7 +258,11 @@ const toBrowseJob = (job: SearchJobsApiItem, index: number): BrowseJob => {
   }
 }
 
-const applyClientFilters = (jobs: SearchJobsApiItem[], params: BrowseJobsQueryParams) => {
+const applyClientFilters = (
+  jobs: SearchJobsApiItem[],
+  params: BrowseJobsQueryParams,
+  savedJobIds?: Set<number> | null
+) => {
   const rawMax = params.salaryMax ? Number(params.salaryMax) : null
   const normalizedMax = rawMax !== null && Number.isFinite(rawMax) ? rawMax : null
 
@@ -267,14 +272,66 @@ const applyClientFilters = (jobs: SearchJobsApiItem[], params: BrowseJobsQueryPa
       return false
     }
 
+    if (params.activeTab === 'savedJobs') {
+      if (!savedJobIds || !savedJobIds.has(job.id)) {
+        return false
+      }
+    }
+
     const mapped = toBrowseJob(job, 0)
     const salaryRange = parseSalaryRange(job)
+
+    const jobText = [
+      job.title,
+      job.description,
+      job.requirements,
+      job.level,
+      job.location,
+      job.workType,
+      job.jobType?.job_type,
+      job.category?.name,
+      ...(job.skills || [])
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+
     const matchesLanguage =
       params.selectedLanguages.length === 0 ||
-      params.selectedLanguages.some((language) => mapped.skills.includes(language))
+      params.selectedLanguages.some((language) => {
+        const langLower = language.toLowerCase()
+        return (
+          mapped.skills.some((s) => s.toLowerCase() === langLower) ||
+          jobText.includes(langLower)
+        )
+      })
+
     const matchesExperience =
-      params.selectedExperience.length === 0 || params.selectedExperience.includes(mapped.experience)
-    const matchesWorkType = params.selectedWorkTypes.length === 0 || params.selectedWorkTypes.includes(mapped.workType)
+      params.selectedExperience.length === 0 ||
+      params.selectedExperience.some((exp) => {
+        if (exp === mapped.experience) return true
+        if (exp === 'Junior') {
+          return /\b(junior|jr\.?|fresher|intern|entry|thực tập)\b/i.test(jobText)
+        }
+        if (exp === 'Senior') {
+          return /\b(senior|sr\.?|chuyên viên)\b/i.test(jobText)
+        }
+        if (exp.includes('Lead') || exp.includes('Architect')) {
+          return /\b(lead|architect|principal|trưởng|quản lý|manager)\b/i.test(jobText)
+        }
+        return false
+      })
+
+    const matchesWorkType =
+      params.selectedWorkTypes.length === 0 ||
+      params.selectedWorkTypes.some((wt) => {
+        if (wt === mapped.workType) return true
+        if (wt === 'Remote') return /\b(remote|từ xa)\b/i.test(jobText)
+        if (wt === 'Hybrid') return /\b(hybrid|linh hoạt)\b/i.test(jobText)
+        if (wt === 'On-site') return /\b(on-site|onsite|văn phòng)\b/i.test(jobText)
+        return false
+      })
+
     const matchesJobType =
       params.selectedJobTypes.length === 0 || params.selectedJobTypes.includes(mapped.employmentType)
     const matchesSalaryMax = normalizedMax === null || salaryRange.min === null || salaryRange.min <= normalizedMax
@@ -307,6 +364,8 @@ const getCacheKey = (params: BrowseJobsQueryParams) => {
     pw: [...(params.selectedPostedWithin || [])].sort(),
     min: params.salaryMin || '',
     max: params.salaryMax || '',
+    tab: params.activeTab || 'bestMatch',
+    sort: params.sortBy || 'newest',
     page: params.currentPage,
     size: params.pageSize
   })
@@ -376,9 +435,33 @@ const fetchSearchJobsWithFallback = async (
 const buildBrowseJobsResponse = (
   raw: SearchJobsApiResponse,
   params: BrowseJobsQueryParams,
-  isPartial: boolean
+  isPartial: boolean,
+  savedJobIds?: Set<number> | null
 ): BrowseJobsResponse => {
-  const filteredJobs = applyClientFilters(raw.jobs, params).map(toBrowseJob)
+  const filtered = applyClientFilters(raw.jobs, params, savedJobIds)
+
+  // Sort jobs based on sortBy or activeTab
+  if (params.activeTab === 'latest' || params.sortBy === 'newest') {
+    filtered.sort((a, b) => {
+      const da = a.createdDate ? new Date(a.createdDate).getTime() : 0
+      const db = b.createdDate ? new Date(b.createdDate).getTime() : 0
+      return db - da
+    })
+  } else if (params.sortBy === 'salaryHigh') {
+    filtered.sort((a, b) => {
+      const sa = parseSalaryRange(a).max ?? 0
+      const sb = parseSalaryRange(b).max ?? 0
+      return sb - sa
+    })
+  } else if (params.sortBy === 'salaryLow') {
+    filtered.sort((a, b) => {
+      const sa = parseSalaryRange(a).min ?? 999999999
+      const sb = parseSalaryRange(b).min ?? 999999999
+      return sa - sb
+    })
+  }
+
+  const filteredJobs = filtered.map(toBrowseJob)
   const totalItems = isPartial ? Math.max(raw.total, filteredJobs.length) : filteredJobs.length
   const totalPages = Math.max(1, Math.ceil(totalItems / params.pageSize))
   const safeCurrentPage = Math.min(params.currentPage, totalPages)
@@ -421,12 +504,23 @@ export const fetchBrowseJobs = async (
     options?.onInitialBatch?.(cached.data)
   }
 
+  // If saved jobs tab selected, load bookmarks
+  let savedJobIds: Set<number> | null = null
+  if (params.activeTab === 'savedJobs') {
+    try {
+      const res = await getBookmarks(undefined, signal)
+      savedJobIds = new Set((res.bookmarks || []).map((b) => b.job.id))
+    } catch {
+      savedJobIds = new Set()
+    }
+  }
+
   // 2. Phase 1: Fast Initial Batch (20 jobs, < 1s)
   const initialPage = params.currentPage > 2 ? Math.ceil((params.currentPage * params.pageSize) / 20) : 1
   const initialLimit = 20
 
   const initialRaw = await fetchSearchJobsWithFallback(params, signal, initialLimit, initialPage)
-  const initialResponse = buildBrowseJobsResponse(initialRaw, params, true)
+  const initialResponse = buildBrowseJobsResponse(initialRaw, params, true, savedJobIds)
 
   // Notify UI immediately to render Phase 1 and drop skeleton loaders
   options?.onInitialBatch?.(initialResponse)
@@ -450,7 +544,7 @@ export const fetchBrowseJobs = async (
       return initialResponse
     }
 
-    const fullResponse = buildBrowseJobsResponse(fullRaw, params, false)
+    const fullResponse = buildBrowseJobsResponse(fullRaw, params, false, savedJobIds)
 
     browseJobsCache.set(cacheKey, {
       data: fullResponse,

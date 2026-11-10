@@ -70,6 +70,8 @@
       "showingJobs": "Đang hiển thị {{from}}-{{to}} trên {{count}} việc làm",
       "sortBy": "Sắp xếp",
       "newestFirst": "Mới nhất trước",
+      "salaryHigh": "Lương: Cao đến thấp",
+      "salaryLow": "Lương: Thấp đến cao",
       "suggestedFilters": "Bộ lọc gợi ý",
       "clearAll": "Xóa tất cả"
     },

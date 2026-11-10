@@ -17,6 +17,8 @@ type BrowseJobsState = BrowseJobsFilters & {
   setSalaryMin: (value: string) => void
   setSalaryMax: (value: string) => void
   setCurrentPage: (page: number) => void
+  setActiveTab: (tab: 'bestMatch' | 'latest' | 'savedJobs') => void
+  setSortBy: (sort: 'newest' | 'salaryHigh' | 'salaryLow') => void
   setAvailableFilterOptions: (filters: BrowseJobsFilterOptions) => void
   resetFilters: () => void
 }
@@ -32,7 +34,9 @@ const initialState: BrowseJobsFilters = {
   salaryMin: '',
   salaryMax: '',
   currentPage: 1,
-  pageSize: 10
+  pageSize: 10,
+  activeTab: 'bestMatch',
+  sortBy: 'newest'
 }
 
 const toggleSelection = (value: string, current: string[]) =>
@@ -45,6 +49,8 @@ export const useBrowseJobsStore = create<BrowseJobsState>()((set) => ({
   availableLocationOptions: [],
   setSearchQuery: (value) => set({ searchQuery: value, currentPage: 1 }),
   setSelectedLocation: (value) => set({ selectedLocation: value, currentPage: 1 }),
+  setActiveTab: (tab) => set({ activeTab: tab, currentPage: 1 }),
+  setSortBy: (sortBy) => set({ sortBy, currentPage: 1 }),
   toggleLanguage: (value) =>
     set((state) => ({
       selectedLanguages: toggleSelection(value, state.selectedLanguages),

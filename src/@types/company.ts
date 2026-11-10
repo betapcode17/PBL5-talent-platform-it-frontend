@@ -12,6 +12,9 @@ export interface CompanyBase {
   company_website_url?: string
   is_active: boolean
   created_date: string
+  _count?: {
+    JobPost?: number
+  }
 }
 
 export type Company = CompanyBase

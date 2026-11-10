@@ -34,6 +34,8 @@ export const useBrowseJobs = () => {
   const salaryMax = useBrowseJobsStore((state) => state.salaryMax)
   const currentPage = useBrowseJobsStore((state) => state.currentPage)
   const pageSize = useBrowseJobsStore((state) => state.pageSize)
+  const activeTab = useBrowseJobsStore((state) => state.activeTab)
+  const sortBy = useBrowseJobsStore((state) => state.sortBy)
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
@@ -49,9 +51,12 @@ export const useBrowseJobs = () => {
       salaryMin,
       salaryMax,
       currentPage,
-      pageSize
+      pageSize,
+      activeTab,
+      sortBy
     }),
     [
+      activeTab,
       currentPage,
       debouncedSearchQuery,
       pageSize,
@@ -62,7 +67,8 @@ export const useBrowseJobs = () => {
       selectedJobTypes,
       selectedLanguages,
       selectedPostedWithin,
-      selectedWorkTypes
+      selectedWorkTypes,
+      sortBy
     ]
   )
 

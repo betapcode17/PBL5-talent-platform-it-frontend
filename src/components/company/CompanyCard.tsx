@@ -20,7 +20,20 @@ export const CompanyCard = ({ company }: Props) => {
   const [jobs, setJobs] = useState<CompanyJobSummary[]>([])
   const [showMoreJobs, setShowMoreJobs] = useState(false)
   const [isJobsLoading, setIsJobsLoading] = useState(false)
+  const [imgError, setImgError] = useState(false)
   const visibleJobs = showMoreJobs ? jobs.slice(0, 4) : jobs.slice(0, 2)
+  const openPositionsCount = company._count?.JobPost ?? jobs.length
+
+  const companyInitials = useMemo(
+    () =>
+      company.company_name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? '')
+        .join('') || 'CP',
+    [company.company_name]
+  )
 
   const skills = useMemo(
     () =>
@@ -83,7 +96,18 @@ export const CompanyCard = ({ company }: Props) => {
                 <Star className='h-5 w-5 fill-current' />
               </div>
             ) : null}
-            <img src={company.company_image} alt={company.company_name} className='h-full w-full object-cover' />
+            {company.company_image && !imgError ? (
+              <img
+                src={company.company_image}
+                alt={company.company_name}
+                className='h-full w-full object-cover'
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className='flex h-full w-full items-center justify-center bg-violet-100 text-xl font-bold text-violet-700'>
+                {companyInitials}
+              </div>
+            )}
           </div>
         </div>
 
@@ -162,7 +186,11 @@ export const CompanyCard = ({ company }: Props) => {
                 </div>
                 <div>
                   <p className='text-xs font-semibold uppercase tracking-[0.2em] text-slate-400'>{t('company.openPositions')}</p>
-                  <p className='text-sm font-semibold text-slate-900'>{t('company.openPositions')}</p>
+                  <p className='text-sm font-semibold text-slate-900'>
+                    {openPositionsCount > 0
+                      ? t('browseJobs.topCompanies.jobs', { count: openPositionsCount })
+                      : t('company.openPositions')}
+                  </p>
                 </div>
               </div>
 
@@ -192,6 +220,20 @@ export const CompanyCard = ({ company }: Props) => {
                       {showMoreJobs ? t('company.showLess') : t('company.viewMore')}
                     </button>
                   )}
+                </div>
+              ) : openPositionsCount > 0 ? (
+                <div className='space-y-2'>
+                  <p className='text-sm text-slate-600'>
+                    {t('browseJobs.results.found', { count: openPositionsCount })}
+                  </p>
+                  <Link
+                    to={`/jobs?q=${encodeURIComponent(company.company_name)}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className='inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700 hover:underline'
+                  >
+                    {t('home.categories.exploreJobs')}
+                    <ArrowUpRight className='h-3.5 w-3.5' />
+                  </Link>
                 </div>
               ) : (
                 <p className='text-sm text-slate-500'>{t('company.noOpenPositions')}</p>

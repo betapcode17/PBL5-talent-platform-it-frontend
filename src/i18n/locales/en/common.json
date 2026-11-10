@@ -70,6 +70,8 @@
       "showingJobs": "Showing {{from}}-{{to}} of {{count}} jobs",
       "sortBy": "Sort by",
       "newestFirst": "Newest First",
+      "salaryHigh": "Salary: High to Low",
+      "salaryLow": "Salary: Low to High",
       "suggestedFilters": "Suggested filters",
       "clearAll": "Clear all"
     },

@@ -1,4 +1,5 @@
 import axiosInstance from '@/api/axiosInstance'
+import { clearBrowseJobsCache } from '@/api/browseJobs'
 
 export type CreateApplicationRequest = {
   jobId: number
@@ -59,7 +60,7 @@ export type GetMyApplicationsResponse = {
 
 export const createApplication = async (data: CreateApplicationRequest) => {
   const response = await axiosInstance.post<CreateApplicationResponse>('/applications', data)
-
+  clearBrowseJobsCache()
   return response.data
 }
 
@@ -90,5 +91,6 @@ export const getMyApplicationsApi = async (params?: {
 
 export const cancelApplicationApi = async (applicationId: number) => {
   const response = await axiosInstance.delete<{ message: string }>(`/applications/${applicationId}/cancel`)
+  clearBrowseJobsCache()
   return response.data
 }

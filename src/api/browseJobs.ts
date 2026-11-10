@@ -283,19 +283,51 @@ const applyClientFilters = (jobs: SearchJobsApiItem[], params: BrowseJobsQueryPa
   })
 }
 
+type CachedResult = {
+  data: BrowseJobsResponse
+  timestamp: number
+  isFull: boolean
+}
+
+const CACHE_TTL_MS = 2 * 60 * 1000 // 2 minutes
+const browseJobsCache = new Map<string, CachedResult>()
+
+export const clearBrowseJobsCache = () => {
+  browseJobsCache.clear()
+}
+
+const getCacheKey = (params: BrowseJobsQueryParams) => {
+  return JSON.stringify({
+    q: params.searchQuery || '',
+    loc: params.selectedLocation || '',
+    lang: [...(params.selectedLanguages || [])].sort(),
+    exp: [...(params.selectedExperience || [])].sort(),
+    wt: [...(params.selectedWorkTypes || [])].sort(),
+    jt: [...(params.selectedJobTypes || [])].sort(),
+    pw: [...(params.selectedPostedWithin || [])].sort(),
+    min: params.salaryMin || '',
+    max: params.salaryMax || '',
+    page: params.currentPage,
+    size: params.pageSize
+  })
+}
+
 const fetchSearchJobsApi = async (
   params: BrowseJobsQueryParams,
   signal?: AbortSignal,
-  excludeApplied?: boolean
+  excludeApplied?: boolean,
+  limit: number = 20,
+  page: number = 1
 ) => {
   const response = await axiosInstance.get<SearchJobsApiResponse>('/jobs/search', {
     params: {
       q: params.searchQuery || undefined,
       location: params.selectedLocation || undefined,
       salaryMin: params.salaryMin || undefined,
+      salaryMax: params.salaryMax || undefined,
       excludeApplied: excludeApplied ? true : undefined,
-      page: 1,
-      limit: 100
+      page,
+      limit
     },
     signal,
     skipErrorLog: excludeApplied === true
@@ -309,16 +341,16 @@ const shouldUseExcludeApplied = () => {
   return isAuthenticated && user?.role === 'SEEKER'
 }
 
-export const fetchBrowseJobs = async (
+const fetchSearchJobsWithFallback = async (
   params: BrowseJobsQueryParams,
-  signal?: AbortSignal
-): Promise<BrowseJobsResponse> => {
+  signal?: AbortSignal,
+  limit: number = 20,
+  page: number = 1
+): Promise<SearchJobsApiResponse> => {
   const useExcludeApplied = shouldUseExcludeApplied()
 
-  let responseData: SearchJobsApiResponse
-
   try {
-    responseData = await fetchSearchJobsApi(params, signal, useExcludeApplied)
+    return await fetchSearchJobsApi(params, signal, useExcludeApplied, limit, page)
   } catch (error) {
     const axiosError = error as AxiosError
 
@@ -326,22 +358,28 @@ export const fetchBrowseJobs = async (
       throw error
     }
 
-    responseData = await fetchSearchJobsApi(params, signal, false)
+    const responseData = await fetchSearchJobsApi(params, signal, false, limit, page)
 
     try {
       const applied = await getMyApplicationsApi({ page: 1, limit: 100 })
       const appliedJobIds = new Set(applied.applications.map((application) => application.job.id))
-      responseData = {
+      return {
         ...responseData,
         jobs: responseData.jobs.filter((job) => !appliedJobIds.has(job.id))
       }
     } catch {
-      // Ignore fallback filtering failure and keep the job list available.
+      return responseData
     }
   }
+}
 
-  const filteredJobs = applyClientFilters(responseData.jobs, params).map(toBrowseJob)
-  const totalItems = filteredJobs.length
+const buildBrowseJobsResponse = (
+  raw: SearchJobsApiResponse,
+  params: BrowseJobsQueryParams,
+  isPartial: boolean
+): BrowseJobsResponse => {
+  const filteredJobs = applyClientFilters(raw.jobs, params).map(toBrowseJob)
+  const totalItems = isPartial ? Math.max(raw.total, filteredJobs.length) : filteredJobs.length
   const totalPages = Math.max(1, Math.ceil(totalItems / params.pageSize))
   const safeCurrentPage = Math.min(params.currentPage, totalPages)
   const startIndex = (safeCurrentPage - 1) * params.pageSize
@@ -355,8 +393,74 @@ export const fetchBrowseJobs = async (
       totalItems,
       totalPages,
       from: totalItems === 0 ? 0 : startIndex + 1,
-      to: totalItems === 0 ? 0 : Math.min(startIndex + params.pageSize, totalItems)
+      to: totalItems === 0 ? 0 : Math.min(startIndex + jobs.length, totalItems)
     },
-    filters: mapFilterOptions(responseData.filters)
+    filters: mapFilterOptions(raw.filters)
+  }
+}
+
+export type FetchBrowseJobsOptions = {
+  onInitialBatch?: (data: BrowseJobsResponse) => void
+}
+
+export const fetchBrowseJobs = async (
+  params: BrowseJobsQueryParams,
+  signal?: AbortSignal,
+  options?: FetchBrowseJobsOptions
+): Promise<BrowseJobsResponse> => {
+  const cacheKey = getCacheKey(params)
+  const cached = browseJobsCache.get(cacheKey)
+  const now = Date.now()
+
+  // 1. Instant Cache Hit (0ms)
+  if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+    if (cached.isFull) {
+      options?.onInitialBatch?.(cached.data)
+      return cached.data
+    }
+    options?.onInitialBatch?.(cached.data)
+  }
+
+  // 2. Phase 1: Fast Initial Batch (20 jobs, < 1s)
+  const initialPage = params.currentPage > 2 ? Math.ceil((params.currentPage * params.pageSize) / 20) : 1
+  const initialLimit = 20
+
+  const initialRaw = await fetchSearchJobsWithFallback(params, signal, initialLimit, initialPage)
+  const initialResponse = buildBrowseJobsResponse(initialRaw, params, true)
+
+  // Notify UI immediately to render Phase 1 and drop skeleton loaders
+  options?.onInitialBatch?.(initialResponse)
+
+  // Cache initial response
+  browseJobsCache.set(cacheKey, {
+    data: initialResponse,
+    timestamp: Date.now(),
+    isFull: initialRaw.total <= initialLimit
+  })
+
+  // If all jobs fit within the initial batch, no second phase needed
+  if (initialRaw.total <= initialLimit) {
+    return initialResponse
+  }
+
+  // 3. Phase 2: Background Full Hydration (silently fetch complete list for pagination and filter options)
+  try {
+    const fullRaw = await fetchSearchJobsWithFallback(params, signal, 100, 1)
+    if (signal?.aborted) {
+      return initialResponse
+    }
+
+    const fullResponse = buildBrowseJobsResponse(fullRaw, params, false)
+
+    browseJobsCache.set(cacheKey, {
+      data: fullResponse,
+      timestamp: Date.now(),
+      isFull: true
+    })
+
+    return fullResponse
+  } catch {
+    // If background hydration fails, gracefully return the initial batch
+    return initialResponse
   }
 }

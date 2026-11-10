@@ -82,8 +82,21 @@ export const useBrowseJobs = () => {
       setIsLoading(true)
     }
 
-    fetchBrowseJobs(queryParams, controller.signal)
+    fetchBrowseJobs(queryParams, controller.signal, {
+      onInitialBatch: (initialResponse) => {
+        if (controller.signal.aborted) {
+          return
+        }
+        setData(initialResponse)
+        useBrowseJobsStore.getState().setAvailableFilterOptions(initialResponse.filters)
+        setIsLoading(false)
+        hasResolvedOnceRef.current = true
+      }
+    })
       .then((response) => {
+        if (controller.signal.aborted) {
+          return
+        }
         setData(response)
         useBrowseJobsStore.getState().setAvailableFilterOptions(response.filters)
         hasResolvedOnceRef.current = true
@@ -97,7 +110,7 @@ export const useBrowseJobs = () => {
           return
         }
 
-        setError('Unable to load jobs right now.')
+        setError('jobs.load_failed')
       })
       .finally(() => {
         if (controller.signal.aborted) {

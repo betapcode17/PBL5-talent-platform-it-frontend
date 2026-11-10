@@ -11,9 +11,11 @@ import { useTranslation } from 'react-i18next'
 import { loginSchema, type LoginFormData } from '@/validators/loginSchema'
 import { Alert, AlertDescription } from './ui/alert'
 import { useAuth } from '@/hooks/useAuth'
+import { formatLocalizedError } from '@/utils/errorI18n'
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language?.startsWith('vi') ? 'vi' : 'en'
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   // Lấy error từ URL (nếu có từ Google callback)
@@ -30,6 +32,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     handleGithubLogin,
     handleFacebookLogin
   } = useAuth()
+
+  const localizedError = error ? formatLocalizedError(error, currentLang) : null
 
   const socialErrorMessage =
     urlError === 'google_auth_failed'
@@ -74,9 +78,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
               </div>
 
               {/* Hiển thị lỗi từ API hoặc từ Google callback */}
-              {(error || urlError) && (
+              {(localizedError || urlError) && (
                 <Alert variant='destructive'>
-                  <AlertDescription>{error || socialErrorMessage}</AlertDescription>
+                  <AlertDescription>{localizedError || socialErrorMessage}</AlertDescription>
                 </Alert>
               )}
 
@@ -94,7 +98,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                   disabled={isLoading}
                   required
                 />
-                {errors.email && <p className='text-sm text-destructive'>{errors.email.message}</p>}
+                {errors.email && (
+                  <p className='text-sm text-destructive'>
+                    {formatLocalizedError(errors.email.message, currentLang)}
+                  </p>
+                )}
               </Field>
               <Field>
                 <div className='flex items-center'>
@@ -135,7 +143,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                     )}
                   </Button>
                 </div>
-                {errors.password && <p className='text-sm text-destructive'>{errors.password.message}</p>}
+                {errors.password && (
+                  <p className='text-sm text-destructive'>
+                    {formatLocalizedError(errors.password.message, currentLang)}
+                  </p>
+                )}
               </Field>
               <Field>
                 <Button

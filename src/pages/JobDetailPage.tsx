@@ -34,6 +34,7 @@ import Tag from '@/components/ui/Tag'
 import { browseJobs } from '@/data/browse-jobs/jobs'
 import { useJobDetail } from '@/hooks/useJobDetail'
 import { cn } from '@/lib/utils'
+import { formatLocalizedError } from '@/utils/errorI18n'
 import type { JobDetailSectionId } from '@/types/job-detail'
 import {
   buildFallbackSimilarJobs,
@@ -68,7 +69,8 @@ type ApplyCvOption = 'default' | 'upload'
 const isDefined = <T,>(value: T | null | undefined): value is T => value !== null && value !== undefined
 
 const JobDetailPage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language?.startsWith('vi') ? 'vi' : 'en'
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()      
@@ -626,8 +628,8 @@ const JobDetailPage = () => {
         <Container className='max-w-[1380px] py-10 sm:py-14'>
           <JobDetailState
             tone='error'
-            title='We could not load this job'
-            description={errorMessage ?? 'Something went wrong while loading the job detail page.'}
+            title={currentLang === 'vi' ? 'Không thể tải thông tin công việc' : 'We could not load this job'}
+            description={formatLocalizedError(errorMessage ?? 'jobs.detail_load_failed', currentLang)}
             onRetry={refetch}
           />
         </Container>

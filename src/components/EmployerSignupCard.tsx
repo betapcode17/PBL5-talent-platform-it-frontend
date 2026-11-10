@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next'
 
 import { registerEmployerApi } from '@/api/employees'
 import { cn } from '@/lib/utils'
+import { formatLocalizedError } from '@/utils/errorI18n'
 
 type FormState = {
   full_name: string
@@ -42,7 +43,8 @@ const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const phoneRe = /^[0-9()+\-\s]{7,20}$/
 
 export default function EmployerSignupCard() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language?.startsWith('vi') ? 'vi' : 'en'
   const [form, setForm] = useState<FormState>(initialState)
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -255,7 +257,7 @@ export default function EmployerSignupCard() {
 
               {submitError ? (
                 <div className='mt-6 rounded-3xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-600 shadow-sm break-words whitespace-normal'>
-                  {submitError}
+                  {formatLocalizedError(submitError, currentLang)}
                 </div>
               ) : null}
 

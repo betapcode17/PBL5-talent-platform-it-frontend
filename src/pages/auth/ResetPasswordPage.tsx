@@ -8,9 +8,11 @@ import { Card } from '@/components/ui/card'
 import { Alert } from '@/components/ui/alert'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/store/authStore'
+import { formatLocalizedError } from '@/utils/errorI18n'
 
 const ResetPasswordPage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language?.startsWith('vi') ? 'vi' : 'en'
   const [searchParams] = useSearchParams()
   const {
     resetNewPassword,
@@ -72,7 +74,7 @@ const ResetPasswordPage = () => {
         {resetError && (
           <Alert variant='destructive' className='mb-6'>
             <AlertCircle className='h-4 w-4' />
-            <span>{resetError}</span>
+            <span>{formatLocalizedError(resetError, currentLang)}</span>
           </Alert>
         )}
 

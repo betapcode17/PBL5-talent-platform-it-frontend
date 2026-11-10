@@ -12,9 +12,11 @@ import { type RegisterFormData, registerSchema } from '@/validators'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, AlertDescription } from './ui/alert'
 import { useState } from 'react'
+import { formatLocalizedError } from '@/utils/errorI18n'
 
 export function SignupForm({ className, ...props }: React.ComponentProps<'div'>) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language?.startsWith('vi') ? 'vi' : 'en'
   const navigate = useNavigate()
   const { register: registerUser, isLoading, error, clearError } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
@@ -133,7 +135,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
               {error && (
                 <Alert variant='destructive'>
-                  <AlertDescription className='break-words whitespace-normal'>{error}</AlertDescription>
+                  <AlertDescription className='break-words whitespace-normal'>
+                    {formatLocalizedError(error, currentLang)}
+                  </AlertDescription>
                 </Alert>
               )}
 
@@ -147,7 +151,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                   className={cn(errors.fullName && 'border-destructive')}
                   disabled={isLoading || isSuccess}
                 />
-                {errors.fullName && <p className='text-sm text-destructive'>{errors.fullName.message}</p>}
+                {errors.fullName && (
+                  <p className='text-sm text-destructive'>
+                    {formatLocalizedError(errors.fullName.message, currentLang)}
+                  </p>
+                )}
               </Field>
 
               <Field>
@@ -160,7 +168,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                   className={cn(errors.email && 'border-destructive')}
                   disabled={isLoading || isSuccess}
                 />
-                {errors.email && <p className='text-sm text-destructive'>{errors.email.message}</p>}
+                {errors.email && (
+                  <p className='text-sm text-destructive'>
+                    {formatLocalizedError(errors.email.message, currentLang)}
+                  </p>
+                )}
                 <FieldDescription>{t('auth.emailPrivacy')}</FieldDescription>
               </Field>
 
@@ -190,7 +202,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                     )}
                   </Button>
                 </div>
-                {errors.password && <p className='text-sm text-destructive'>{errors.password.message}</p>}
+                {errors.password && (
+                  <p className='text-sm text-destructive'>
+                    {formatLocalizedError(errors.password.message, currentLang)}
+                  </p>
+                )}
                 <FieldDescription>{t('auth.passwordHint')}</FieldDescription>
               </Field>
 
@@ -220,7 +236,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                     )}
                   </Button>
                 </div>
-                {errors.confirmPassword && <p className='text-sm text-destructive'>{errors.confirmPassword.message}</p>}
+                {errors.confirmPassword && (
+                  <p className='text-sm text-destructive'>
+                    {formatLocalizedError(errors.confirmPassword.message, currentLang)}
+                  </p>
+                )}
               </Field>
 
               <Field>

@@ -7,9 +7,11 @@ import { Card } from '@/components/ui/card'
 import { Alert } from '@/components/ui/alert'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/store/authStore'
+import { formatLocalizedError } from '@/utils/errorI18n'
 
 const ForgotPasswordPage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language?.startsWith('vi') ? 'vi' : 'en'
   const {
     forgotEmail,
     forgotLoading,
@@ -69,7 +71,7 @@ const ForgotPasswordPage = () => {
         {forgotError && (
           <Alert variant='destructive' className='mb-6'>
             <AlertCircle className='h-4 w-4' />
-            <span>{forgotError}</span>
+            <span>{formatLocalizedError(forgotError, currentLang)}</span>
           </Alert>
         )}
 

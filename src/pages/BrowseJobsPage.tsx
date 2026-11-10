@@ -16,6 +16,7 @@ import Container from '@/components/ui/Container'
 import { useBrowseJobs } from '@/hooks/useBrowseJobs'
 import { topCompanies } from '@/data/browse-jobs/companies'
 import { useBrowseJobsStore } from '@/store/browseJobsStore'
+import { formatLocalizedError } from '@/utils/errorI18n'
 
 const BrowseJobsSearch = memo(() => {
   const searchQuery = useBrowseJobsStore((state) => state.searchQuery)
@@ -38,7 +39,9 @@ const BrowseJobsSearch = memo(() => {
 })
 
 const BrowseJobsResults = memo(() => {
-  const { jobs, pagination, activeFilters, isLoading, isFetching } = useBrowseJobs()
+  const { i18n } = useTranslation()
+  const currentLang = i18n.language?.startsWith('vi') ? 'vi' : 'en'
+  const { jobs, pagination, activeFilters, isLoading, isFetching, error } = useBrowseJobs()
   const removeFilter = useBrowseJobsStore((state) => state.removeFilter)
   const resetFilters = useBrowseJobsStore((state) => state.resetFilters)
   const setCurrentPage = useBrowseJobsStore((state) => state.setCurrentPage)
@@ -73,7 +76,13 @@ const BrowseJobsResults = memo(() => {
 
         {!isLoading && jobs.length > 0 ? jobs.map((job) => <JobCard key={job.id} job={job} />) : null}
 
-        {!isLoading && jobs.length === 0 ? <EmptyState onReset={resetFilters} /> : null}
+        {!isLoading && error && jobs.length === 0 ? (
+          <div className='rounded-2xl border border-rose-200 bg-rose-50/80 p-6 text-center text-rose-700 shadow-sm'>
+            <p className='font-medium'>{formatLocalizedError(error, currentLang)}</p>
+          </div>
+        ) : null}
+
+        {!isLoading && !error && jobs.length === 0 ? <EmptyState onReset={resetFilters} /> : null}
 
         {!isLoading && isFetching && jobs.length > 0 ? <SkeletonJobCard /> : null}
       </div>

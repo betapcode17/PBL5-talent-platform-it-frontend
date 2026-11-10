@@ -58,7 +58,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 
   // Submit handler - gọi login từ store và handle navigation
   const onSubmit = async (data: LoginFormData) => {
-    const user = await login(data)
+    const payload: LoginFormData = {
+      ...data,
+      email: data.email?.trim().toLowerCase()
+    }
+    const user = await login(payload)
 
     // Nếu login thành công, redirect theo role
     if (user) {

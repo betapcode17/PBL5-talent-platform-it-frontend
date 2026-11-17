@@ -510,6 +510,24 @@ const JobDetailPage = () => {
         return
       }
 
+      if (selectedCvFile.size === 0) {
+        setApplyModalNotice('Tệp tải lên không được rỗng.')
+        return
+      }
+
+      const maxFileSizeBytes = 5 * 1024 * 1024
+      if (selectedCvFile.size > maxFileSizeBytes) {
+        setApplyModalNotice('Dung lượng file không được vượt quá 5MB.')
+        return
+      }
+
+      const allowedExtensions = ['.pdf', '.doc', '.docx']
+      const fileNameLower = selectedCvFile.name.toLowerCase()
+      if (!allowedExtensions.some((ext) => fileNameLower.endsWith(ext))) {
+        setApplyModalNotice('Chỉ chấp nhận file định dạng PDF, DOC, DOCX.')
+        return
+      }
+
       setIsUploadingApplyCv(true)
 
       try {

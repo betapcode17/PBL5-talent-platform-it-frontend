@@ -3,14 +3,6 @@ export const googleConfig = {
   clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID as string
 }
 
-// Debug: Log config khi app khởi động
-console.log('========== GOOGLE CONFIG DEBUG ==========')
-console.log('[GoogleConfig] Client ID:', googleConfig.clientId)
-if (!googleConfig.clientId || googleConfig.clientId === 'undefined') {
-  console.error('[GoogleConfig] ERROR: VITE_GOOGLE_CLIENT_ID is not set!')
-}
-console.log('==========================================')
-
 // Type definitions cho Google Identity Services
 declare global {
   interface Window {
